@@ -1,8 +1,0 @@
-// this is a main function
-int main() {
-	int x = 5;
-	char = "sscsacascascasa something"
-	int powerOfx = x * x;
-	print(x);
-	return 0;
-}

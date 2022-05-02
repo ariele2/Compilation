@@ -1,0 +1,9 @@
+6: RetType ->  VOID
+7: Formals -> epsilon
+40: Exp -> STRING
+17: Statement -> AUTO ID ASSIGN Exp SC
+12: Statements -> Statement
+38: Exp -> NUM
+17: Statement -> AUTO ID ASSIGN Exp SC
+13: Statements -> Statements Statement
+line 4: syntax error

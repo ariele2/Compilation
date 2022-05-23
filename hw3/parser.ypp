@@ -1,0 +1,181 @@
+%{
+#include <stdio.h>
+#include "parse_utils.h"
+#include <iostream>
+#include "hw3_output.hpp"
+using namespace std;
+using namespace output;
+extern int yylex();
+extern int yylineno;
+void yyerror(const char* message);
+%}
+
+
+%token TRUE
+%token FALSE
+%token RETURN
+%token ID
+%token NUM
+%token VOID
+%token INT
+%token IF
+%token SC
+%token BOOL
+%token COMMA
+%token WHILE
+%token BREAK
+%token STRING
+%token BYTE
+%token B
+%token CONTINUE
+%token AUTO 
+%token COLON
+
+
+
+%right ASSIGN
+
+%left OR
+
+%left AND
+
+%left EQUAL_UNEQUAL
+
+%nonassoc NOT_EQUALITY
+
+%left ADD
+%left SUB
+
+%left MUL 
+%left DIV
+
+%right NOT
+
+%left LBRACE
+%left RBRACE
+%left LPAREN 
+%left RPAREN
+
+// highest priority in order to take care of dangaling else
+
+%right ELSE
+
+%%
+
+Program: Funcs
+    {}
+Funcs:  %empty
+    {Utils::instance().ParseFuncs(yylineno);}
+Funcs: FuncDecl Funcs
+    {Utils::instance().ParseFuncs(yylineno);}
+FuncDecl: FuncHead LBRACE Statements  RBRACE PopScope  // pushing scope inside FuncHead too
+    {Utils::instance().ParseFuncDecl(yylineno);}
+FuncHead: RetType ID LPAREN Formals RPAREN
+    {$$ = Utils::instance().ParseFuncHead(yylineno, $1, $2, $4);}
+RetType: Type
+    {$$ = Utils::instance().ParseRetType(yylineno, $1);}
+RetType: VOID
+    {$$ = Utils::instance().ParseRetType(yylineno);}
+Formals: %empty
+    {$$ = Utils::instance().ParseFormals(yylineno);}
+Formals: FormalsList
+    {$$ = Utils::instance().ParseFormals(yylineno, $1);}
+FormalsList: FormalDecl
+    {$$ = Utils::instance().ParseFormalsList(yylineno, $1);}
+FormalsList: FormalDecl COMMA FormalsList
+    {$$ = Utils::instance().ParseFormalsList(yylineno, $1, $3);}
+FormalDecl: Type ID
+    {$$ = Utils::instance().ParseFormalDecl(yylineno, $1, $2);}
+Statements: Statement
+    {Utils::instance().ParseStatements(yylineno);}
+Statements: Statements Statement
+    {Utils::instance().ParseStatements(yylineno);}
+Statement: PushStatementScope LBRACE Statements RBRACE PopScope
+    {Utils::instance().ParseStatementOfStatements(yylineno);}
+Statement: Type ID SC
+    {Utils::instance().ParseStatementType(yylineno, $1, $2);}
+Statement: Type ID ASSIGN Exp SC
+    {Utils::instance().ParseStatementTypeAssign(yylineno, $1, $2, $4);}
+Statement: ID ASSIGN Exp SC
+    {Utils::instance().ParseStatementAssign(yylineno, $1, $3);}
+Statement: Call SC
+    {Utils::instance().ParseStatementCall(yylineno);}
+Statement: RETURN SC
+    {Utils::instance().ParseStatementReturn(yylineno);}
+Statement: RETURN Exp SC
+    {Utils::instance().ParseStatementReturnExp(yylineno, $2);}
+Statement: IF LPAREN Exp CheckBool RPAREN PushStatementScope Statement PopScope
+    {Utils::instance().ParseStatementIf(yylineno);}
+Statement: IF LPAREN Exp CheckBool RPAREN PushStatementScope Statement PopScope ELSE PushStatementScope Statement PopScope
+    {Utils::instance().ParseStatementIfElse(yylineno);}
+Statement: WHILE LPAREN Exp CheckBool RPAREN PushWhileScope Statement PopScope
+    {Utils::instance().ParseStatementWhile(yylineno);}
+Statement: BREAK SC
+    {Utils::instance().ParseStatementBreak(yylineno);}
+Statement: CONTINUE SC
+    {Utils::instance().ParseStatementContinue(yylineno);}
+Call: ID LPAREN ExpList RPAREN
+    {$$ = Utils::instance().ParseCall(yylineno, $1, $3);}
+Call: ID LPAREN RPAREN
+    {$$ = Utils::instance().ParseCall(yylineno, $1);}
+ExpList: Exp
+    {$$ = Utils::instance().ParseExplist(yylineno, $1);}
+ExpList: Exp COMMA ExpList
+    {$$ = Utils::instance().ParseExplist(yylineno, $1, $3);}
+Type: INT
+    {$$ = Utils::instance().ParseInt(yylineno);}
+Type: BYTE
+    {$$ = Utils::instance().ParseByte(yylineno);}
+Type: BOOL
+    {$$ = Utils::instance().ParseBool(yylineno);}
+Exp: LPAREN Exp RPAREN
+    {$$ = Utils::instance().ParseParentheses(yylineno, $2);}
+Exp: Exp ADD Exp
+    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+Exp: Exp SUB Exp
+    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+Exp: Exp MUL Exp
+    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+Exp: Exp DIV Exp
+    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+Exp: ID
+    {$$ = Utils::instance().ParseID(yylineno, $1);}
+Exp: Call
+    {$$ = Utils::instance().ParseCallExp(yylineno, $1);}
+Exp: NUM
+    {$$ = Utils::instance().ParseNum(yylineno, $1);}
+Exp: NUM B
+    {$$ = Utils::instance().ParseNumB(yylineno, $1);}
+Exp: STRING
+    {$$ = Utils::instance().ParseString(yylineno, $1);}
+Exp: TRUE
+    {$$ = Utils::instance().ParseTrue(yylineno);}
+Exp: FALSE
+    {$$ = Utils::instance().ParseFalse(yylineno);}
+Exp: NOT Exp
+    {$$ = Utils::instance().ParseNot(yylineno, $2);}
+Exp: Exp AND Exp
+    {$$ = Utils::instance().ParseAnd(yylineno, $1, $3);}
+Exp: Exp OR Exp
+    {$$ = Utils::instance().ParseOr(yylineno, $1, $3);}
+Exp: Exp EQUAL_UNEQUAL Exp
+    {$$ = Utils::instance().ParseRelOp(yylineno, $1, $3);}
+Exp: Exp NOT_EQUALITY Exp
+    {$$ = Utils::instance().ParseRelOp(yylineno, $1, $3);}
+Exp: LPAREN Type RPAREN Exp
+    {$$ = Utils::instance().ParseCast(yylineno, $2, $4);}
+PushStatementScope: %empty
+    {Utils::instance().ParsePushStatementScope(yylineno);}
+PushWhileScope: %empty
+    {Utils::instance().ParsePushWhileScope(yylineno);}
+PopScope: %empty
+    {Utils::instance().ParsePopScope(yylineno);}
+CheckBool : %empty
+    {Utils::instance().ParseCheckBool(yylineno, $0);}
+%%
+
+void yyerror(const char * message)
+{
+	errorSyn(yylineno);
+	exit(0);
+}

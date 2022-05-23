@@ -12,10 +12,6 @@ equalUnequal    (==|!=)
 notEquality     (<|>|<=|>=)
 
 
-%x STR
-%x STRES
-%x STRESX
-%x STRESE
 
 %%
 
@@ -35,16 +31,16 @@ else 						  return LexToken(ELSE, yytext);
 while 					  return LexToken(WHILE, yytext);
 break 					  return LexToken(BREAK, yytext);
 continue				  return LexToken(CONTINUE, yytext);
-":"	        			return LexToken(COLON, yytext);
-";" 						  return LexToken(SC, yytext);
-"," 						  return LexToken(COMMA, yytext);
-"(" 						  return LexToken(LPAREN, yytext);
-")" 						  return LexToken(RPAREN, yytext);
-"{" 						  return LexToken(LBRACE, yytext);
-"}" 						  return LexToken(RBRACE, yytext);
+\:	        			return LexToken(COLON, yytext);
+\; 						  return LexToken(SC, yytext);
+\, 						  return LexToken(COMMA, yytext);
+\( 						  return LexToken(LPAREN, yytext);
+\) 						  return LexToken(RPAREN, yytext);
+\{ 						  return LexToken(LBRACE, yytext);
+\} 						  return LexToken(RBRACE, yytext);
 {equalUnequal}		return LexToken(EQUAL_UNEQUAL, yytext);
 {notEquality}			return LexToken(NOT_EQUALITY, yytext);
-"=" 						  return LexToken(ASSIGN, yytext);
+\= 						  return LexToken(ASSIGN, yytext);
 \*				        return LexToken(MUL, yytext);
 \/					      return LexToken(DIV, yytext);
 \+					      return LexToken(ADD, yytext);
@@ -58,5 +54,4 @@ continue				  return LexToken(CONTINUE, yytext);
                                 output::errorLex(yylineno); 
                                 exit(0); 
                                 }
-
 %%

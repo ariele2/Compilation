@@ -66,8 +66,6 @@ public:
 
     void ParseStatementContinue(int lineno);
 
-    void ParseStatementSwitch(int lineno);  // TODO - remove
-
     STypePtr ParseCall(int lineno, STypePtr id, STypePtr exp_list);
 
     STypePtr ParseCall(int lineno, STypePtr id);
@@ -110,25 +108,17 @@ public:
 
     STypePtr ParseCast(int lineno, STypePtr type, STypePtr exp);
 
-    void ParseCaseList(int lineno); // TODO - remove
-
-    void ParseCaseDefault(int lineno);  //TODO - remove
-
-    void ParseCaseDecl(int lineno); //TODO - remove
-
     void ParsePushStatementScope(int lineno);
 
     void ParsePushWhileScope(int lineno);
 
-    void ParsePushSwitchScope(int lineno);  //TODO - remove
-
     void ParsePopScope(int lineno);
-
-    void ParseCheckSwitchExp(int lineno, STypePtr num_exp); //TODO - remove
 
     void ParseCheckBool(int lineno, STypePtr bool_exp);
 
     static ParseUtils &instance();
+    
+    //TODO - add auto
 };
 
 

@@ -213,10 +213,6 @@ void ParseUtils::ParseStatementWhile(int lineno) {
 
 }
 
-void ParseUtils::ParseStatementSwitch(int lineno) { //TODO - remove
-
-}
-
 void ParseUtils::ParseStatementBreak(int lineno) {
     if (!semantic_checks.IsLegalBreak()) {
         errorUnexpectedBreak(lineno);
@@ -507,18 +503,6 @@ STypePtr ParseUtils::ParseCast(int lineno, STypePtr type, STypePtr exp) {
     return exp;
 }
 
-void ParseUtils::ParseCaseList(int lineno) {    //TODO - remove
-
-}
-
-void ParseUtils::ParseCaseDefault(int lineno) { //TODO - remove
-
-}
-
-void ParseUtils::ParseCaseDecl(int lineno) {    //TODO - remove
-
-}
-
 void ParseUtils::ParsePushStatementScope(int lineno) {
     symbol_table.PushScope(STATEMENT_SCOPE);
 }
@@ -527,25 +511,8 @@ void ParseUtils::ParsePushWhileScope(int lineno) {
     symbol_table.PushScope(WHILE_SCOPE);
 }
 
-void ParseUtils::ParsePushSwitchScope(int lineno) { //TODO - remove
-    symbol_table.PushScope(SWITCH_SCOPE);
-}
-
 void ParseUtils::ParsePopScope(int lineno) {
     symbol_table.PopScope();
-}
-
-void ParseUtils::ParseCheckSwitchExp(int lineno, STypePtr num_exp) {    //TODO - remove
-    if (semantic_checks.IsFunctionType(num_exp->general_type)) {
-        auto cast_function = dynamic_pointer_cast<STypeFunctionSymbol>(num_exp);
-        errorUndef(lineno, cast_function->name);
-        exit(0);
-    }
-
-    if (!semantic_checks.IsLegalAssignTypes(INT_TYPE, num_exp->general_type)) {
-        errorMismatch(lineno);
-        exit(0);
-    }
 }
 
 void ParseUtils::ParseCheckBool(int lineno, STypePtr bool_exp) {

@@ -2,7 +2,7 @@
 
 /* Declarations section */
 #include <stdio.h>
-#include "output.hpp"
+#include "hw3_output.hpp"
 #include "parser.tab.hpp"
 
 %}
@@ -10,7 +10,8 @@
 
 %option noyywrap
 %option yylineno
-relop		(==|!=|<=|>=|<|>)
+equalUnequal    (==|!=)
+notEquality      (<|>|<=|>=)
 whitespace	([\t\n\r ])
 
 
@@ -21,7 +22,7 @@ int			return INT;
 byte		return BYTE;
 bool		return BOOL;
 break		return BREAK;
-b			  return B;
+b			return B;
 or			return OR;
 and			return AND;
 not			return NOT;
@@ -39,7 +40,8 @@ continue	return CONTINUE;
 \}			return RBRACE;
 \{			return LBRACE;
 =			return ASSIGN;
-{relop}		return RELOP;
+{equalUnequal}		return EQUAL_UNEQUAL;
+{notEquality}		return NOT_EQUALITY;
 \+  		return ADD;
 \-  		return SUB;
 \*  		return MUL;

@@ -28,7 +28,7 @@ Tptr Utils::ParseFuncHead(int lineno, Tptr ret_type, Tptr id, Tptr formals)
 {
     auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
     auto dynamic_cast_ret_type = std::dynamic_pointer_cast<STypeCType>(ret_type);
-    auto dy_cast = std::dynamic_pointer_cast<STypeArgList>(formals);
+    auto dy_cast = std::dynamic_pointer_cast<SimpleSymbolList>(formals);
 
     if (symbol_table.IsSymbolDefined(dynamic_cast_id->token)) {
         errorDef(lineno, dynamic_cast_id->token);
@@ -36,11 +36,11 @@ Tptr Utils::ParseFuncHead(int lineno, Tptr ret_type, Tptr id, Tptr formals)
     }
 
     auto function_symbol = make_shared<STypeFunctionSymbol>(dynamic_cast_id->token, dynamic_cast_ret_type->general_type,
-                                                            dy_cast->arg_list);
+                                                            dy_cast->symbols_list);
     symbol_table.AddFunction(function_symbol);
     symbol_table.PushFunctionScope(FUNCTION_SCOPE, dynamic_cast_ret_type->general_type, function_symbol);
     for (auto param:function_symbol->parameters) {
-        auto param_symbol = make_shared<STypeSymbol>(param);
+        auto param_symbol = make_shared<SimpleSymbol>(param);
         if (semantic_checks.IsSymbolDefined(param_symbol->name)) {
             errorDef(lineno, param_symbol->name);
             exit(0);
@@ -64,45 +64,45 @@ Tptr Utils::ParseRetType(int lineno, Tptr type)
     return type;
 }
 
-STypeArgListPtr Utils::ParseFormals(int lineno, Tptr formals)
+SimpleSymbolListPtr Utils::ParseFormals(int lineno, Tptr formals)
 {
-    auto dy_cast = std::dynamic_pointer_cast<STypeArgList>(formals);
+    auto dy_cast = std::dynamic_pointer_cast<SimpleSymbolList>(formals);
 
-    auto fp = make_shared<STypeArgList>();
-    for (auto symbol_iter = dy_cast->arg_list.rbegin();
-         symbol_iter != dy_cast->arg_list.rend(); symbol_iter++) {
+    auto fp = make_shared<SimpleSymbolList>();
+    for (auto symbol_iter = dy_cast->symbols_list.rbegin();
+         symbol_iter != dy_cast->symbols_list.rend(); symbol_iter++) {
 
-        fp->arg_list.push_back(*symbol_iter);
+        fp->symbols_list.push_back(*symbol_iter);
     }
     return fp;
 }
 
-STypeArgListPtr Utils::ParseFormals(int lineno)
+SimpleSymbolListPtr Utils::ParseFormals(int lineno)
 {
-    auto fp = make_shared<STypeArgList>();
+    auto fp = make_shared<SimpleSymbolList>();
     return fp;
 }
 
-STypeArgListPtr Utils::ParseFormalsList(int lineno, Tptr formal)
+SimpleSymbolListPtr Utils::ParseFormalsList(int lineno, Tptr formal)
 {
-    auto arg_list_pointer = make_shared<STypeArgList>();
-    arg_list_pointer->arg_list.push_back(*std::dynamic_pointer_cast<STypeSymbol>(formal));
+    auto arg_list_pointer = make_shared<SimpleSymbolList>();
+    arg_list_pointer->symbols_list.push_back(*std::dynamic_pointer_cast<SimpleSymbol>(formal));
     return arg_list_pointer;
 }
 
-STypeArgListPtr Utils::ParseFormalsList(int lineno, Tptr formal, Tptr formals_list)
+SimpleSymbolListPtr Utils::ParseFormalsList(int lineno, Tptr formal, Tptr formals_list)
 {
-    auto dynamic_cast_formals_list = std::dynamic_pointer_cast<STypeArgList>(formals_list);
-    auto dynamic_cast_formal = std::dynamic_pointer_cast<STypeSymbol>(formal);
+    auto dynamic_cast_formals_list = std::dynamic_pointer_cast<SimpleSymbolList>(formals_list);
+    auto dynamic_cast_formal = std::dynamic_pointer_cast<SimpleSymbol>(formal);
 
-    dynamic_cast_formals_list->arg_list.push_back(*dynamic_cast_formal);
+    dynamic_cast_formals_list->symbols_list.push_back(*dynamic_cast_formal);
     return dynamic_cast_formals_list;
 }
 
-STypeSymbolPtr Utils::ParseFormalDecl(int lineno, Tptr type, Tptr id)
+SimpleSymbolPtr Utils::ParseFormalDecl(int lineno, Tptr type, Tptr id)
 {
 
-    auto symbol_pointer = make_shared<STypeSymbol>(std::dynamic_pointer_cast<STypeString>(id)->token, symbol_table.scope_stack.top()->offset,
+    auto symbol_pointer = make_shared<SimpleSymbol>(std::dynamic_pointer_cast<STypeString>(id)->token, symbol_table.scope_stack.top()->offset,
                                                    std::dynamic_pointer_cast<STypeCType>(type)->general_type);
     return symbol_pointer;
 }
@@ -119,7 +119,7 @@ void Utils::ParseStatementType(int lineno, Tptr type, Tptr id)
         exit(0);
     }
 
-    const auto symbol = make_shared<STypeSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
+    const auto symbol = make_shared<SimpleSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
     symbol_table.AddVariable(symbol);
 }
 
@@ -143,7 +143,7 @@ void Utils::ParseStatementTypeAssign(int lineno, Tptr type, Tptr id, Tptr exp)
         exit(0);
     }
 
-    const auto symbol = make_shared<STypeSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
+    const auto symbol = make_shared<SimpleSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
     symbol_table.AddVariable(symbol);
 }
 

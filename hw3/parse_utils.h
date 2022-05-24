@@ -1,7 +1,7 @@
 #ifndef HW3_PARSE_UTILS_H
 #define HW3_PARSE_UTILS_H
 
-#include "typedefs.h"
+#include "types.h"
 #include "sym_table.h"
 #include "hw3_output.hpp"
 #include "semantics.h"
@@ -26,11 +26,11 @@ public:
     Tptr ParseRetType(int lineno, Tptr type);
 
     STypeCTypePtr ParseRetType(int lineno);
-    STypeArgListPtr ParseFormals(int lineno);
-    STypeArgListPtr ParseFormals(int lineno, Tptr formals);
-    STypeArgListPtr ParseFormalsList(int lineno, Tptr formal);
-    STypeArgListPtr ParseFormalsList(int lineno, Tptr formal, Tptr formals_list);
-    STypeSymbolPtr ParseFormalDecl(int lineno, Tptr type, Tptr id);
+    SimpleSymbolListPtr ParseFormals(int lineno);
+    SimpleSymbolListPtr ParseFormals(int lineno, Tptr formals);
+    SimpleSymbolListPtr ParseFormalsList(int lineno, Tptr formal);
+    SimpleSymbolListPtr ParseFormalsList(int lineno, Tptr formal, Tptr formals_list);
+    SimpleSymbolPtr ParseFormalDecl(int lineno, Tptr type, Tptr id);
 
     void ParseStatements(int lineno){};
     void ParseStatementOfStatements(int lineno) {};

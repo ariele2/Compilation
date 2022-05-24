@@ -4,22 +4,22 @@
 void SymbolTable::PushDefaultFunctions() {
     // push print
     std::string message_name = "message";
-    // STypeSymbol(name, offset, type)
-    STypeSymbol print_param_symbol(message_name, -1, STRING_TYPE);
+    // SimpleSymbol(name, offset, type)
+    SimpleSymbol print_param_symbol(message_name, -1, STRING_TYPE);
 
     std::string print_name = "print";
-    ArgList print_args;
+    SSList print_args;
     print_args.emplace_back(print_param_symbol);
-    // STypeFunctionSymbol(name, type, list of STypeSymbol)
+    // STypeFunctionSymbol(name, type, list of SimpleSymbol)
     auto print_func = make_shared<STypeFunctionSymbol>(print_name, VOID_TYPE, print_args);
     AddFunction(print_func);
 
     // push printi
     std::string number_name = "number";
-    STypeSymbol printi_param_symbol(number_name, -1, INT_TYPE);
+    SimpleSymbol printi_param_symbol(number_name, -1, INT_TYPE);
 
     std::string printi_name = "printi";
-    ArgList printi_args;
+    SSList printi_args;
     printi_args.emplace_back(printi_param_symbol);
     auto printi_func = make_shared<STypeFunctionSymbol>(printi_name, VOID_TYPE, printi_args);
     AddFunction(printi_func);
@@ -64,7 +64,7 @@ void SymbolTable::PopScope() {
             assert(func_symbol->general_type == FUNCTION_TYPE);
             auto dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(func_symbol);
             std::vector<std::string> string_types;
-            ArgListToStrings(dynamic_cast_func->parameters, string_types);
+            SSListToStrings(dynamic_cast_func->parameters, string_types);
             std::string ret_type = TypeToString(dynamic_cast_func->ret_type);
             printID(dynamic_cast_func->name, 0, makeFunctionType(ret_type, string_types));
             symbols_map.erase(dynamic_cast_func->name);
@@ -90,13 +90,13 @@ SymbolTable::SymbolTable() : current_offset(0), symbols_map(), scope_stack() {
 
 }
 
-void SymbolTable::AddParam(const STypeSymbolPtr &symbol) {
+void SymbolTable::AddParam(const SimpleSymbolPtr &symbol) {
     assert(!scope_stack.empty());
     scope_stack.top()->symbols.push_back(symbol);
     symbols_map.emplace(symbol->name, symbol);
 }
 
-void SymbolTable::AddVariable(const STypeSymbolPtr &symbol) {
+void SymbolTable::AddVariable(const SimpleSymbolPtr &symbol) {
     // add params only after adding the function
     assert(!scope_stack.empty());
     symbol->offset = current_offset++;
@@ -122,7 +122,7 @@ bool SymbolTable::IsSymbolDefined(std::string &symbol_name) {
     return (symbols_map.find(symbol_name) != symbols_map.end());
 }
 
-STypeSymbolPtr SymbolTable::GetDefinedSymbol(std::string &symbol_name) {
+SimpleSymbolPtr SymbolTable::GetDefinedSymbol(std::string &symbol_name) {
     return symbols_map[symbol_name];
 }
 

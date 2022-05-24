@@ -1,7 +1,7 @@
-#ifndef HW3_SYMBOL_TABLE_H
-#define HW3_SYMBOL_TABLE_H
+#ifndef SYM_TABLE_H
+#define SYM_TABLE_H
 
-#include "typedefs.h"
+#include "types.h"
 #include "hw3_output.hpp"
 
 using namespace output;
@@ -17,7 +17,7 @@ class Scope {
 public:
     ScopeType scope_type;
     int offset;
-    std::vector<STypeSymbolPtr> symbols;
+    std::vector<SimpleSymbolPtr> symbols;
     Type ret_type;
     bool inside_while;
 
@@ -27,7 +27,7 @@ public:
 class SymbolTable {
 public:
     int current_offset;
-    std::unordered_map<std::string, STypeSymbolPtr> symbols_map;
+    std::unordered_map<std::string, SimpleSymbolPtr> symbols_map;
     std::stack<ScopePtr> scope_stack;
 
     void PushDefaultFunctions();
@@ -40,16 +40,16 @@ public:
 
     SymbolTable();
 
-    void AddParam(const STypeSymbolPtr& symbol);
+    void AddParam(const SimpleSymbolPtr& symbol);
 
-    void AddVariable(const STypeSymbolPtr& symbol);
+    void AddVariable(const SimpleSymbolPtr& symbol);
 
     void AddFunction(const STypeFunctionSymbolPtr & symbol);
 
     bool IsSymbolDefined(std::string &symbol_name);
 
-    STypeSymbolPtr GetDefinedSymbol(std::string& symbol_name);
+    SimpleSymbolPtr GetDefinedSymbol(std::string& symbol_name);
 
 };
 
-#endif
+#endif // SYM_TABLE_H

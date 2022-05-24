@@ -1,8 +1,6 @@
 #include "semantics.h"
 
-SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table) {
-
-}
+SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table) {} // c'tor
 
 bool SemanticChecks::IsSymbolDefined(string &name) {
     return table_ref.IsSymbolDefined(name);

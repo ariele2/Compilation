@@ -1,26 +1,24 @@
 #define _236360_3_
-
-#include <vector>
 #include <string>
+#include <vector>
+
 using namespace std;
+// rm - changed all names, and order, indlude order, names of parms
+namespace output
+{
+    void errorUndefinedFunction(int ln, const string &id);
+    void errorDoesNotMatch(int ln);
+    string makeFunctionType(const string &returnTypes, vector<string> &argumentsTypes);
+    void errorInLexical(int ln);
+    void endOfScope();
+    void errorMissingMain();
+    void errorPrototypeMismatch(int ln, const string &id, vector<string> &argumentsTypes);
+    void idPrint(const string &id, int offset, const string &type);
+    void errorBreak(int ln);
+    void errorInSyntax(int ln);
+    void errorIsUndefined(int ln, const string &id);
+    void errorInDefintion(int ln, const string &id);
+    void errorByteIsTooBig(int ln, const string &value);
+    void errorContinue(int ln);
 
-namespace output{
-    void endScope();
-    void printID(const string& id, int offset, const string& type);
-
-    /* Do not save the string returned from this function in a data structure
-        as it is not dynamically allocated and will be destroyed(!) at the end of the calling scope.
-    */
-    string makeFunctionType(const string& retType, vector<string>& argTypes);
-    void errorLex(int lineno);
-    void errorSyn(int lineno);
-    void errorUndef(int lineno, const string& id);
-    void errorDef(int lineno, const string& id);
-    void errorUndefFunc(int lineno, const string& id);
-    void errorMismatch(int lineno);
-    void errorPrototypeMismatch(int lineno, const string& id, vector<string>& argTypes);
-    void errorUnexpectedBreak(int lineno);
-    void errorUnexpectedContinue(int lineno);
-    void errorMainMissing();
-    void errorByteTooLarge(int lineno, const string& value);
 }

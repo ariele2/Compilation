@@ -1341,61 +1341,61 @@ yyreduce:
 
   case 3:
 #line 68 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseFuncs(yylineno);}
+    {Utils::instance().pFunctions(yylineno);}
 #line 1346 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 70 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseFuncs(yylineno);}
+    {Utils::instance().pFunctions(yylineno);}
 #line 1352 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
 #line 72 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseFuncDecl(yylineno);}
+    {Utils::instance().pFunctionDeclaration(yylineno);}
 #line 1358 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
 #line 74 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseFuncHead(yylineno, (yyvsp[-4]), (yyvsp[-3]), (yyvsp[-1]));}
+    {(yyval) = Utils::instance().parseFunctionDef(yylineno, (yyvsp[-4]), (yyvsp[-3]), (yyvsp[-1]));}
 #line 1364 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 76 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseRetType(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pReturnType(yylineno, (yyvsp[0]));}
 #line 1370 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 78 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseRetType(yylineno);}
+    {(yyval) = Utils::instance().pReturnType(yylineno);}
 #line 1376 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
 #line 80 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseFormals(yylineno);}
+    {(yyval) = Utils::instance().pFormals(yylineno);}
 #line 1382 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 82 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseFormals(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pFormals(yylineno, (yyvsp[0]));}
 #line 1388 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
 #line 84 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseFormalsList(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pFormList(yylineno, (yyvsp[0]));}
 #line 1394 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
 #line 86 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseFormalsList(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pFormList(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1400 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
@@ -1407,259 +1407,259 @@ yyreduce:
 
   case 14:
 #line 90 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatements(yylineno);}
+    {Utils::instance().parseState(yylineno);}
 #line 1412 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 92 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatements(yylineno);}
+    {Utils::instance().parseState(yylineno);}
 #line 1418 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
 #line 94 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementOfStatements(yylineno);}
+    {Utils::instance().parseStateOfState(yylineno);}
 #line 1424 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
 #line 96 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementType(yylineno, (yyvsp[-2]), (yyvsp[-1]));}
+    {Utils::instance().parseStateType(yylineno, (yyvsp[-2]), (yyvsp[-1]));}
 #line 1430 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 98 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementTypeAssign(yylineno, (yyvsp[-4]), (yyvsp[-3]), (yyvsp[-1]));}
+    {Utils::instance().parseStateTypeAssignment(yylineno, (yyvsp[-4]), (yyvsp[-3]), (yyvsp[-1]));}
 #line 1436 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
 #line 100 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementAssign(yylineno, (yyvsp[-3]), (yyvsp[-1]));}
+    {Utils::instance().parseStateAssignment(yylineno, (yyvsp[-3]), (yyvsp[-1]));}
 #line 1442 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
 #line 102 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementCall(yylineno);}
+    {Utils::instance().parseStateCallFunc(yylineno);}
 #line 1448 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
 #line 104 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementReturn(yylineno);}
+    {Utils::instance().parseStateRet(yylineno);}
 #line 1454 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 106 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementReturnExp(yylineno, (yyvsp[-1]));}
+    {Utils::instance().parseStateRetExpression(yylineno, (yyvsp[-1]));}
 #line 1460 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 108 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementIf(yylineno);}
+    {Utils::instance().parseStateIf(yylineno);}
 #line 1466 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 110 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementIfElse(yylineno);}
+    {Utils::instance().parseStateElseIF(yylineno);}
 #line 1472 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 112 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementWhile(yylineno);}
+    {Utils::instance().parseStatemeWhile(yylineno);}
 #line 1478 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 114 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementBreak(yylineno);}
+    {Utils::instance().parseStateBreak(yylineno);}
 #line 1484 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
 #line 116 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseStatementContinue(yylineno);}
+    {Utils::instance().parseStateContinue(yylineno);}
 #line 1490 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
 #line 118 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseCall(yylineno, (yyvsp[-3]), (yyvsp[-1]));}
+    {(yyval) = Utils::instance().pCall(yylineno, (yyvsp[-3]), (yyvsp[-1]));}
 #line 1496 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
 #line 120 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseCall(yylineno, (yyvsp[-2]));}
+    {(yyval) = Utils::instance().pCall(yylineno, (yyvsp[-2]));}
 #line 1502 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 122 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseExplist(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pExpressionList(yylineno, (yyvsp[0]));}
 #line 1508 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 124 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseExplist(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pExpressionList(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1514 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
 #line 126 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseInt(yylineno);}
+    {(yyval) = Utils::instance().pInt(yylineno);}
 #line 1520 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
 #line 128 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseByte(yylineno);}
+    {(yyval) = Utils::instance().pByte(yylineno);}
 #line 1526 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
 #line 130 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseBool(yylineno);}
+    {(yyval) = Utils::instance().pBool(yylineno);}
 #line 1532 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
 #line 132 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseParentheses(yylineno, (yyvsp[-1]));}
+    {(yyval) = Utils::instance().pParen(yylineno, (yyvsp[-1]));}
 #line 1538 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
 #line 134 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseBinop(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pBinaryOp(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1544 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
 #line 136 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseBinop(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pBinaryOp(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1550 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
 #line 138 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseBinop(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pBinaryOp(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1556 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
 #line 140 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseBinop(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pBinaryOp(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1562 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
 #line 142 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseID(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pId(yylineno, (yyvsp[0]));}
 #line 1568 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
 #line 144 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseCallExp(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pCallExpression(yylineno, (yyvsp[0]));}
 #line 1574 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
 #line 146 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseNum(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pNum(yylineno, (yyvsp[0]));}
 #line 1580 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
 #line 148 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseNumB(yylineno, (yyvsp[-1]));}
+    {(yyval) = Utils::instance().pNumB(yylineno, (yyvsp[-1]));}
 #line 1586 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
 #line 150 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseString(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pString(yylineno, (yyvsp[0]));}
 #line 1592 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
 #line 152 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseTrue(yylineno);}
+    {(yyval) = Utils::instance().pTrue(yylineno);}
 #line 1598 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
 #line 154 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseFalse(yylineno);}
+    {(yyval) = Utils::instance().pFalse(yylineno);}
 #line 1604 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
 #line 156 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseNot(yylineno, (yyvsp[0]));}
+    {(yyval) = Utils::instance().pNot(yylineno, (yyvsp[0]));}
 #line 1610 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
 #line 158 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseAnd(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pAnd(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1616 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
 #line 160 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseOr(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pOr(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1622 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
 #line 162 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseRelOp(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pRelOprator(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1628 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
 #line 164 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseRelOp(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pRelOprator(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1634 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 166 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = Utils::instance().ParseCast(yylineno, (yyvsp[-2]), (yyvsp[0]));}
+    {(yyval) = Utils::instance().pCast(yylineno, (yyvsp[-2]), (yyvsp[0]));}
 #line 1640 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
 #line 168 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParsePushStatementScope(yylineno);}
+    {Utils::instance().pAddStateScope(yylineno);}
 #line 1646 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
 #line 170 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParsePushWhileScope(yylineno);}
+    {Utils::instance().pAddWhileScope(yylineno);}
 #line 1652 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
 #line 172 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParsePopScope(yylineno);}
+    {Utils::instance().pPopScope(yylineno);}
 #line 1658 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
 #line 174 "parser.ypp" /* yacc.c:1646  */
-    {Utils::instance().ParseCheckBool(yylineno, (yyvsp[0]));}
+    {Utils::instance().pCheckBool(yylineno, (yyvsp[0]));}
 #line 1664 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
@@ -1897,6 +1897,6 @@ yyreturn:
 
 void yyerror(const char * message)
 {
-	errorSyn(yylineno);
+	errorInSyntax(yylineno);
 	exit(0);
 }

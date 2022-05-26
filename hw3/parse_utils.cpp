@@ -2,287 +2,309 @@
 
 #include <memory>
 
-Utils::Utils() : symbol_table(), semantic_checks(symbol_table)
-{
-}
+Utils::Utils() : symbol_table(), semantic_checks(symbol_table){}
 
 Utils &Utils::instance()
 {
-    static Utils parse_utils;
-    return parse_utils;
+    static Utils pu;
+    return pu;
 }
-
-void Utils::ParseProgram(int lineno)
+// rm- changed order, 
+void Utils::pProgram(int ln)
 {
-    if (!semantic_checks.IsMainDefined()) {
-        errorMainMissing();
+    if (semantic_checks.IsMainDefined())
+    {
+       symbol_table.PopScope();
+    }else{
+     errorMissingMain();
         exit(0);
-    }
-
-    symbol_table.PopScope();
-}
-
-
-
-Tptr Utils::ParseFuncHead(int lineno, Tptr ret_type, Tptr id, Tptr formals)
-{
-    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
-    auto dynamic_cast_ret_type = std::dynamic_pointer_cast<STypeCType>(ret_type);
-    auto dy_cast = std::dynamic_pointer_cast<SimpleSymbolList>(formals);
-
-    if (symbol_table.IsSymbolDefined(dynamic_cast_id->token)) {
-        errorDef(lineno, dynamic_cast_id->token);
-        exit(0);
-    }
-
-    auto function_symbol = make_shared<STypeFunctionSymbol>(dynamic_cast_id->token, dynamic_cast_ret_type->general_type,
-                                                            dy_cast->symbols_list);
-    symbol_table.AddFunction(function_symbol);
-    symbol_table.PushFunctionScope(FUNCTION_SCOPE, dynamic_cast_ret_type->general_type, function_symbol);
-    for (auto param:function_symbol->parameters) {
-        auto param_symbol = make_shared<SimpleSymbol>(param);
-        if (semantic_checks.IsSymbolDefined(param_symbol->name)) {
-            errorDef(lineno, param_symbol->name);
-            exit(0);
         }
-
-        symbol_table.AddParam(param_symbol);
-    }
-    return function_symbol;
+    
 }
 
-
-
-STypeCTypePtr Utils::ParseRetType(int lineno)
+// rm - changed order, defs of args, if logic, auto removed
+Tptr Utils::parseFunctionDef(int lnno, Tptr return_type, Tptr id, Tptr formals)
 {
-    auto type_pointer = make_shared<STypeCType>(VOID_TYPE);
-    return type_pointer;
+
+    STypeFunctionSymbolPtr func_sym = make_shared<STypeFunctionSymbol>(std::dynamic_pointer_cast<STypeString>(id)->token, std::dynamic_pointer_cast<STypeCType>(return_type)->general_type,
+                                               std::dynamic_pointer_cast<SimpleSymbolList>(formals)->symbols_list);
+    if (symbol_table.IsSymbolDefined(std::dynamic_pointer_cast<STypeString>(id)->token))
+    {
+        errorInDefintion(lnno, std::dynamic_pointer_cast<STypeString>(id)->token);
+        exit(0);
+    }
+    else
+    {
+        symbol_table.AddFunction(func_sym);
+        symbol_table.PushFunctionScope(SCOPE_FUNCTION, std::dynamic_pointer_cast<STypeCType>(return_type)->general_type, func_sym);
+        for (auto param : func_sym->parameters)
+        {
+            auto param_symbol = make_shared<SimpleSymbol>(param);
+            if (!semantic_checks.checkSymbolDefined(param_symbol->name))
+            {
+               symbol_table.AddParam(param_symbol); 
+            }
+            else{
+                errorInDefintion(lnno, param_symbol->name);
+                exit(0);
+
+            }  
+        }
+    }
+    return func_sym;
 }
 
-Tptr Utils::ParseRetType(int lineno, Tptr type)
+// rm
+TypePtr Utils::pReturnType(int ln)
+{
+    return make_shared<STypeCType>(VOID_TYPE);
+}
+
+Tptr Utils::pReturnType(int ln, Tptr type)
 {
     return type;
 }
 
-SimpleSymbolListPtr Utils::ParseFormals(int lineno, Tptr formals)
+SymListPtr Utils::pFormals(int ln, Tptr formals)
 {
-    auto dy_cast = std::dynamic_pointer_cast<SimpleSymbolList>(formals);
 
     auto fp = make_shared<SimpleSymbolList>();
-    for (auto symbol_iter = dy_cast->symbols_list.rbegin();
-         symbol_iter != dy_cast->symbols_list.rend(); symbol_iter++) {
+    for (auto sym = std::dynamic_pointer_cast<SimpleSymbolList>(formals)->symbols_list.rbegin();
+         sym != std::dynamic_pointer_cast<SimpleSymbolList>(formals)->symbols_list.rend(); sym++)
+    {
 
-        fp->symbols_list.push_back(*symbol_iter);
+        fp->symbols_list.push_back(*sym);
     }
     return fp;
 }
 
-SimpleSymbolListPtr Utils::ParseFormals(int lineno)
+SymListPtr Utils::pFormals(int ln)
 {
-    auto fp = make_shared<SimpleSymbolList>();
-    return fp;
+    return make_shared<SimpleSymbolList>();
 }
 
-SimpleSymbolListPtr Utils::ParseFormalsList(int lineno, Tptr formal)
+SymListPtr Utils::pFormList(int ln, Tptr formal)
 {
     auto arg_list_pointer = make_shared<SimpleSymbolList>();
     arg_list_pointer->symbols_list.push_back(*std::dynamic_pointer_cast<SimpleSymbol>(formal));
     return arg_list_pointer;
 }
 
-SimpleSymbolListPtr Utils::ParseFormalsList(int lineno, Tptr formal, Tptr formals_list)
+SymListPtr Utils::pFormList(int ln, Tptr formal, Tptr formals_list)
 {
-    auto dynamic_cast_formals_list = std::dynamic_pointer_cast<SimpleSymbolList>(formals_list);
-    auto dynamic_cast_formal = std::dynamic_pointer_cast<SimpleSymbol>(formal);
-
-    dynamic_cast_formals_list->symbols_list.push_back(*dynamic_cast_formal);
-    return dynamic_cast_formals_list;
+    auto dyn_cast_formal = std::dynamic_pointer_cast<SimpleSymbol>(formal);
+    auto dyn_cast_formal_list = std::dynamic_pointer_cast<SimpleSymbolList>(formals_list);
+    dyn_cast_formal_list->symbols_list.push_back(*dyn_cast_formal);
+    return dyn_cast_formal_list;
 }
 
-SimpleSymbolPtr Utils::ParseFormalDecl(int lineno, Tptr type, Tptr id)
+SymbolPtr Utils::ParseFormalDecl(int ln, Tptr type, Tptr id)
 {
 
     auto symbol_pointer = make_shared<SimpleSymbol>(std::dynamic_pointer_cast<STypeString>(id)->token, symbol_table.scope_stack.top()->offset,
-                                                   std::dynamic_pointer_cast<STypeCType>(type)->general_type);
+                                                    std::dynamic_pointer_cast<STypeCType>(type)->general_type);
     return symbol_pointer;
 }
 
-
-
-void Utils::ParseStatementType(int lineno, Tptr type, Tptr id)
+void Utils::parseStateType(int ln, Tptr type, Tptr id)
 {
-    auto dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
-    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
+    auto dyn_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
+    auto dyn_cast_id = std::dynamic_pointer_cast<STypeString>(id);
 
-    if (semantic_checks.IsSymbolDefined(dynamic_cast_id->token)) {
-        errorDef(lineno, dynamic_cast_id->token);
+    if (!semantic_checks.checkSymbolDefined(dyn_cast_id->token))
+    {
+    const auto symbol = make_shared<SimpleSymbol>(dyn_cast_id->token, 0, dyn_cast_type->general_type);
+    symbol_table.AddVariable(symbol);
+    }
+    else{
+        errorInDefintion(ln, dyn_cast_id->token);
         exit(0);
     }
 
+    
+}
+
+void Utils::parseStateTypeAssignment(int ln, Tptr type, Tptr id, Tptr exp)
+{
+    bool check_semantics;
+    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
+    auto dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
+    
+    check_semantics = semantic_checks.IsFunctionType(exp->general_type);
+    if (check_semantics)
+    {
+        auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
+        errorIsUndefined(ln, cast_function->name);
+        exit(0);
+    }
+    check_semantics= semantic_checks.IsLegalAssignTypes(dynamic_cast_type->general_type, exp->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
+        exit(0);
+    }
+    check_semantics = semantic_checks.checkSymbolDefined(dynamic_cast_id->token);
+    if (check_semantics)
+    {
+        errorInDefintion(ln, dynamic_cast_id->token);
+        exit(0);
+    }
     const auto symbol = make_shared<SimpleSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
     symbol_table.AddVariable(symbol);
 }
 
-void Utils::ParseStatementTypeAssign(int lineno, Tptr type, Tptr id, Tptr exp)
+void Utils::parseStateAssignment(int ln, Tptr id, Tptr exp)
 {
-    auto dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
-    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
+    auto dyn_cast_id = std::dynamic_pointer_cast<STypeString>(id);
 
-    if (semantic_checks.IsFunctionType(exp->general_type)) {
+    bool check_semantics  = semantic_checks.checkSymbolDefined(dyn_cast_id->token);
+    if (!check_semantics)
+    {
+        errorIsUndefined(ln, dyn_cast_id->token);
+        exit(0);
+    }
+
+    auto sym_from_id = symbol_table.GetDefinedSymbol(dyn_cast_id->token);
+    check_semantics = semantic_checks.IsFunctionType(exp->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (!semantic_checks.IsLegalAssignTypes(dynamic_cast_type->general_type, exp->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = semantic_checks.IsFunctionType(sym_from_id->general_type);
+    if (check_semantics)
+    {
+        auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(sym_from_id);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-    if (semantic_checks.IsSymbolDefined(dynamic_cast_id->token)) {
-        errorDef(lineno, dynamic_cast_id->token);
+    check_semantics = semantic_checks.IsLegalAssignTypes(sym_from_id->general_type, exp->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
-
-    const auto symbol = make_shared<SimpleSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
-    symbol_table.AddVariable(symbol);
 }
 
-void Utils::ParseStatementAssign(int lineno, Tptr id, Tptr exp)
+void Utils::parseStateRet(int ln)
 {
-    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
-
-    if (!semantic_checks.IsSymbolDefined(dynamic_cast_id->token)) {
-        errorUndef(lineno, dynamic_cast_id->token);
+    bool check_semantics = semantic_checks.IsLegalReturnType(VOID_TYPE);
+    if (!check_semantics){
+        errorDoesNotMatch(ln);
         exit(0);
     }
+}
 
-    auto symbol_from_id = symbol_table.GetDefinedSymbol(dynamic_cast_id->token);
-
-    if (semantic_checks.IsFunctionType(exp->general_type)) {
+void Utils::parseStateRetExpression(int ln, Tptr exp)
+{
+     bool check_semantics = semantic_checks.IsFunctionType(exp->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (semantic_checks.IsFunctionType(symbol_from_id->general_type)) {
-        auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(symbol_from_id);
-        errorUndef(lineno, cast_function->name);
-        exit(0);
-    }
-
-    if (!semantic_checks.IsLegalAssignTypes(symbol_from_id->general_type, exp->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = (!semantic_checks.IsLegalReturnType(exp->general_type)) || (semantic_checks.IsVoidType(exp->general_type));
+    if (check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
 }
 
-
-
-void Utils::ParseStatementReturn(int lineno)
+void Utils::parseStateBreak(int ln)
 {
-    if (!semantic_checks.IsLegalReturnType(VOID_TYPE)) {
-        errorMismatch(lineno);
+    bool check_semantics=semantic_checks.IsLegalBreak();
+    if (!check_semantics)
+    {
+        errorBreak(ln);
         exit(0);
     }
 }
 
-void Utils::ParseStatementReturnExp(int lineno, Tptr exp)
+void Utils::parseStateContinue(int ln)
 {
-    if (semantic_checks.IsFunctionType(exp->general_type)) {
-        auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
-        errorUndef(lineno, cast_function->name);
-        exit(0);
-    }
-
-    if ((!semantic_checks.IsLegalReturnType(exp->general_type)) || (semantic_checks.IsVoidType(exp->general_type))) {
-        errorMismatch(lineno);
+    bool check_semantics=semantic_checks.IsLegalContinue();
+    if (!check_semantics)
+    {
+        errorContinue(ln);
         exit(0);
     }
 }
 
-void Utils::ParseStatementBreak(int lineno)
+Tptr Utils::pCall(int ln, Tptr id, Tptr exp_list)
 {
-    if (!semantic_checks.IsLegalBreak()) {
-        errorUnexpectedBreak(lineno);
-        exit(0);
-    }
-}
+    auto dyn_cast_id = std::dynamic_pointer_cast<STypeString>(id);
 
-void Utils::ParseStatementContinue(int lineno)
-{
-    if (!semantic_checks.IsLegalContinue()) {
-        errorUnexpectedContinue(lineno);
-        exit(0);
-    }
-}
-
-
-
-
-Tptr Utils::ParseCall(int lineno, Tptr id, Tptr exp_list)
-{
-    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
-
-    if (!semantic_checks.IsSymbolDefined(dynamic_cast_id->token)) {
-        errorUndefFunc(lineno, dynamic_cast_id->token);
+    if (!semantic_checks.checkSymbolDefined(dyn_cast_id->token))
+    {
+        errorUndefinedFunction(ln, dyn_cast_id->token);
         exit(0);
     }
 
-    auto symbol_from_id = symbol_table.GetDefinedSymbol(dynamic_cast_id->token);
+    auto symbol_from_id = symbol_table.GetDefinedSymbol(dyn_cast_id->token);
 
-    if (!semantic_checks.IsFunctionType(symbol_from_id->general_type)) {
-        errorUndefFunc(lineno, dynamic_cast_id->token);
+    if (!semantic_checks.IsFunctionType(symbol_from_id->general_type))
+    {
+        errorUndefinedFunction(ln, dyn_cast_id->token);
         exit(0);
     }
-
-    auto dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(symbol_from_id);
-    auto dynamic_cast_exp_list = std::dynamic_pointer_cast<STypeExpList>(exp_list);
-
     auto reversed_exp_list = make_shared<STypeExpList>();
-    for (auto exp_iter = dynamic_cast_exp_list->exp_list.rbegin();
-         exp_iter != dynamic_cast_exp_list->exp_list.rend(); exp_iter++) {
+    auto dynamic_cast_exp_list = std::dynamic_pointer_cast<STypeExpList>(exp_list);
+    auto dyn_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(symbol_from_id);
+    
+    for (auto exp = dynamic_cast_exp_list->exp_list.rbegin();
+         exp != dynamic_cast_exp_list->exp_list.rend(); exp++)
+    {
 
-        reversed_exp_list->exp_list.push_back(*exp_iter);
+        reversed_exp_list->exp_list.push_back(*exp);
     }
 
-    if (!semantic_checks.IsLegalCallTypes(dynamic_cast_func, reversed_exp_list)) {
+    if (!semantic_checks.IsLegalCallTypes(dyn_cast_func, reversed_exp_list))
+    {
         std::vector<std::string> expected_args;
-        for (auto symbol:dynamic_cast_func->parameters) {
-            expected_args.push_back(TypeToString(symbol.general_type));
+        for (auto sym : dyn_cast_func->parameters)
+        {
+            expected_args.push_back(TypeToString(sym.general_type));
         }
-        errorPrototypeMismatch(lineno, dynamic_cast_id->token, expected_args);
+        errorPrototypeMismatch(ln, dyn_cast_id->token, expected_args);
         exit(0);
     }
 
-    auto ret_type_pointer = make_shared<TBase>(dynamic_cast_func->ret_type);
+    auto ret_type_pointer = make_shared<TBase>(dyn_cast_func->ret_type);
     return ret_type_pointer;
 }
 
-Tptr Utils::ParseCall(int lineno, Tptr id)
+Tptr Utils::pCall(int ln, Tptr id)
 {
-    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
+    auto dyn_cast_id = std::dynamic_pointer_cast<STypeString>(id);
 
-    if (!semantic_checks.IsSymbolDefined(dynamic_cast_id->token)) {
-        errorUndefFunc(lineno, dynamic_cast_id->token);
+    if (!semantic_checks.checkSymbolDefined(dyn_cast_id->token))
+    {
+        errorUndefinedFunction(ln, dyn_cast_id->token);
         exit(0);
     }
 
-    auto symbol_from_id = symbol_table.GetDefinedSymbol(dynamic_cast_id->token);
+    auto symbol_from_id = symbol_table.GetDefinedSymbol(dyn_cast_id->token);
 
-    if (!semantic_checks.IsFunctionType(symbol_from_id->general_type)) {
-        errorUndefFunc(lineno, dynamic_cast_id->token);
+    if (!semantic_checks.IsFunctionType(symbol_from_id->general_type))
+    {
+        errorUndefinedFunction(ln, dyn_cast_id->token);
         exit(0);
     }
 
     auto dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(symbol_from_id);
     auto empty_exp_list = make_shared<STypeExpList>();
 
-    if (!semantic_checks.IsLegalCallTypes(dynamic_cast_func, empty_exp_list)) {
+    if (!semantic_checks.IsLegalCallTypes(dynamic_cast_func, empty_exp_list))
+    {
         std::vector<std::string> expected_args;
-        for (auto symbol:dynamic_cast_func->parameters) {
+        for (auto symbol : dynamic_cast_func->parameters)
+        {
             expected_args.push_back(TypeToString(symbol.general_type));
         }
-        errorPrototypeMismatch(lineno, dynamic_cast_id->token, expected_args);
+        errorPrototypeMismatch(ln, dyn_cast_id->token, expected_args);
         exit(0);
     }
 
@@ -290,14 +312,14 @@ Tptr Utils::ParseCall(int lineno, Tptr id)
     return ret_type_pointer;
 }
 
-Tptr Utils::ParseExplist(int lineno, Tptr exp)
+Tptr Utils::pExpressionList(int ln, Tptr exp)
 {
     auto exp_list_pointer = make_shared<STypeExpList>();
     exp_list_pointer->exp_list.push_back(*exp);
     return exp_list_pointer;
 }
 
-Tptr Utils::ParseExplist(int lineno, Tptr exp, Tptr exp_list)
+Tptr Utils::pExpressionList(int ln, Tptr exp, Tptr exp_list)
 {
     auto dynamic_cast_exp_list = std::dynamic_pointer_cast<STypeExpList>(exp_list);
 
@@ -305,53 +327,57 @@ Tptr Utils::ParseExplist(int lineno, Tptr exp, Tptr exp_list)
     return dynamic_cast_exp_list;
 }
 
-STypeCTypePtr Utils::ParseInt(int lineno)
+TypePtr Utils::pInt(int ln)
 {
     return std::make_shared<STypeCType>(INT_TYPE);
 }
 
-STypeCTypePtr Utils::ParseByte(int lineno)
+TypePtr Utils::pByte(int ln)
 {
     return std::make_shared<STypeCType>(BYTE_TYPE);
 }
 
-STypeCTypePtr Utils::ParseBool(int lineno)
+TypePtr Utils::pBool(int ln)
 {
     return std::make_shared<STypeCType>(BOOL_TYPE);
 }
 
-Tptr Utils::ParseParentheses(int lineno, Tptr exp)
+Tptr Utils::pParen(int ln, Tptr exp)
 {
     return exp;
 }
 
-Tptr Utils::ParseBinop(int lineno, Tptr exp1, Tptr exp2)
+Tptr Utils::pBinaryOp(int ln, Tptr exp1, Tptr exp2)
 {
-    if (semantic_checks.IsFunctionType(exp1->general_type)) {
+    if (semantic_checks.IsFunctionType(exp1->general_type))
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp1);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
 
-    if (semantic_checks.IsFunctionType(exp2->general_type)) {
+    if (semantic_checks.IsFunctionType(exp2->general_type))
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp2);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
 
-    if (semantic_checks.CheckAndGetBinOpType(exp1->general_type, exp2->general_type) == OTHER_TYPE) {
-        errorMismatch(lineno);
+    if (semantic_checks.CheckAndGetBinOpType(exp1->general_type, exp2->general_type) == OTHER_TYPE)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
     return exp1;
 }
 
-Tptr Utils::ParseID(int lineno, Tptr id)
+Tptr Utils::pId(int ln, Tptr id)
 {
     auto dynamic_cast_string = std::dynamic_pointer_cast<STypeString>(id);
 
-    if (!symbol_table.IsSymbolDefined(dynamic_cast_string->token)) {
-        errorUndef(lineno, dynamic_cast_string->token);
+    if (!symbol_table.IsSymbolDefined(dynamic_cast_string->token))
+    {
+        errorIsUndefined(ln, dynamic_cast_string->token);
         exit(0);
     }
 
@@ -359,156 +385,173 @@ Tptr Utils::ParseID(int lineno, Tptr id)
     return id_pointer;
 }
 
-Tptr Utils::ParseCallExp(int lineno, Tptr call_exp)
+Tptr Utils::pCallExpression(int ln, Tptr call_exp)
 {
     return call_exp;
 }
 
-STypeNumberPtr Utils::ParseNum(int lineno, Tptr num)
+NumberTypePtr Utils::pNum(int ln, Tptr num)
 {
     auto dynamic_cast_num = std::dynamic_pointer_cast<STypeNumber>(num);
 
     return dynamic_cast_num;
 }
 
-Tptr Utils::ParseNumB(int lineno, Tptr num)
+Tptr Utils::pNumB(int ln, Tptr num)
 {
     auto dynamic_cast_num = std::dynamic_pointer_cast<STypeNumber>(num);
 
-    if (!semantic_checks.IsByteOverflow(dynamic_cast_num->token)) {
-        errorByteTooLarge(lineno, to_string(dynamic_cast_num->token));
+    if (!semantic_checks.IsByteOverflow(dynamic_cast_num->token))
+    {
+        errorByteIsTooBig(ln, to_string(dynamic_cast_num->token));
         exit(0);
     }
     num->general_type = BYTE_TYPE;
     return num;
 }
 
-STypeStringPtr Utils::ParseString(int lineno, Tptr stype_string)
+StringTypePtr Utils::pString(int ln, Tptr stype_string)
 {
     auto dynamic_cast_string = std::dynamic_pointer_cast<STypeString>(stype_string);
 
     return dynamic_cast_string;
 }
 
-STypeBoolPtr Utils::ParseTrue(int lineno)
+BoolTypePtr Utils::pTrue(int ln)
 {
     auto bool_pointer = make_shared<STypeBool>(true);
     return bool_pointer;
 }
 
-STypeBoolPtr Utils::ParseFalse(int lineno)
+BoolTypePtr Utils::pFalse(int ln)
 {
     auto bool_pointer = make_shared<STypeBool>(false);
     return bool_pointer;
 }
 
-Tptr Utils::ParseNot(int lineno, Tptr bool_exp)
+Tptr Utils::pNot(int ln, Tptr bool_exp)
 {
     // exp can be a bool literal or an id
-    if (semantic_checks.IsFunctionType(bool_exp->general_type)) {
+    if (semantic_checks.IsFunctionType(bool_exp->general_type))
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(bool_exp);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
 
-    if (!semantic_checks.IsBoolType(bool_exp->general_type)) {
-        errorMismatch(lineno);
+    if (!semantic_checks.IsBoolType(bool_exp->general_type))
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
 
     return bool_exp;
 }
 
-Tptr Utils::ParseAnd(int lineno, Tptr bool_exp1, Tptr bool_exp2)
+Tptr Utils::pAnd(int ln, Tptr bool_exp1, Tptr bool_exp2)
 {
-    if (semantic_checks.IsFunctionType(bool_exp1->general_type)) {
+    bool check_semantics = semantic_checks.IsFunctionType(bool_exp1->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(bool_exp1);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (semantic_checks.IsFunctionType(bool_exp2->general_type)) {
+    check_semantics = semantic_checks.IsFunctionType(bool_exp2->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(bool_exp2);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (!semantic_checks.IsBoolType(bool_exp1->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = semantic_checks.IsBoolType(bool_exp1->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
-
-    if (!semantic_checks.IsBoolType(bool_exp2->general_type)) {
-        errorMismatch(lineno);
+    check_semantics= semantic_checks.IsBoolType(bool_exp2->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
 
     return bool_exp1;
 }
 
-Tptr Utils::ParseOr(int lineno, Tptr bool_exp1, Tptr bool_exp2)
+Tptr Utils::pOr(int ln, Tptr bool_exp1, Tptr bool_exp2)
 {
-    if (semantic_checks.IsFunctionType(bool_exp1->general_type)) {
+    bool check_semantics = semantic_checks.IsFunctionType(bool_exp1->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(bool_exp1);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (semantic_checks.IsFunctionType(bool_exp2->general_type)) {
+    check_semantics = semantic_checks.IsFunctionType(bool_exp2->general_type); 
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(bool_exp2);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (!semantic_checks.IsBoolType(bool_exp1->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = semantic_checks.IsBoolType(bool_exp1->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
-
-    if (!semantic_checks.IsBoolType(bool_exp2->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = semantic_checks.IsBoolType(bool_exp2->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
 
     return bool_exp1;
 }
 
-STypeBoolPtr Utils::ParseRelOp(int lineno, Tptr exp1, Tptr exp2)
+BoolTypePtr Utils::pRelOprator(int ln, Tptr exp1, Tptr exp2)
 {
-    if (semantic_checks.IsFunctionType(exp1->general_type)) {
+    bool check_semantics = semantic_checks.IsFunctionType(exp1->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp1);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (semantic_checks.IsFunctionType(exp2->general_type)) {
+    check_semantics = semantic_checks.IsFunctionType(exp2->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp2);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (!semantic_checks.IsLegalRelopTypes(exp1->general_type, exp2->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = semantic_checks.IsLegalRelopTypes(exp1->general_type, exp2->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
-
-    auto bool_pointer = make_shared<STypeBool>(true);
-    return bool_pointer;
+    return make_shared<STypeBool>(true);
 }
 
-Tptr Utils::ParseCast(int lineno, Tptr type, Tptr exp)
+Tptr Utils::pCast(int ln, Tptr type, Tptr exp)
 {
+    bool check_semantics = semantic_checks.IsFunctionType(exp->general_type);
     auto dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
 
-    if (semantic_checks.IsFunctionType(exp->general_type)) {
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-
-    if (!semantic_checks.IsLegalCast(dynamic_cast_type->general_type, exp->general_type)) {
-        errorMismatch(lineno);
+    check_semantics = semantic_checks.IsLegalCast(dynamic_cast_type->general_type, exp->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
 
@@ -516,31 +559,34 @@ Tptr Utils::ParseCast(int lineno, Tptr type, Tptr exp)
     return exp;
 }
 
-void Utils::ParsePushStatementScope(int lineno)
+void Utils::pAddStateScope(int ln)
 {
-    symbol_table.PushScope(STATEMENT_SCOPE);
+    symbol_table.PushScope(SCOPE_STATEMENT);
 }
 
-void Utils::ParsePushWhileScope(int lineno)
+void Utils::pAddWhileScope(int ln)
 {
-    symbol_table.PushScope(WHILE_SCOPE);
+    symbol_table.PushScope(SCOPE_WHILE);
 }
 
-void Utils::ParsePopScope(int lineno)
+void Utils::pPopScope(int ln)
 {
     symbol_table.PopScope();
 }
 
-void Utils::ParseCheckBool(int lineno, Tptr bool_exp)
+void Utils::pCheckBool(int ln, Tptr bool_exp)
 {
-    if (semantic_checks.IsFunctionType(bool_exp->general_type)) {
+    bool check_semantics = semantic_checks.IsFunctionType(bool_exp->general_type);
+    if (check_semantics)
+    {
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(bool_exp);
-        errorUndef(lineno, cast_function->name);
+        errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-
-    if (!semantic_checks.IsBoolType(bool_exp->general_type)) {
-        errorMismatch(lineno);
+    check_semantics =  semantic_checks.IsBoolType(bool_exp->general_type);
+    if (!check_semantics)
+    {
+        errorDoesNotMatch(ln);
         exit(0);
     }
 }

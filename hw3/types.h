@@ -57,7 +57,7 @@ public:
     explicit STypeCType(Type type);
 };
 
-typedef std::shared_ptr<STypeCType> STypeCTypePtr;
+typedef std::shared_ptr<STypeCType> TypePtr;
 
 class STypeString : public TBase {
 public:
@@ -65,7 +65,7 @@ public:
     explicit STypeString(std::string& token);
 };
 
-typedef std::shared_ptr<STypeString> STypeStringPtr;
+typedef std::shared_ptr<STypeString> StringTypePtr;
 
 class STypeNumber : public TBase {
 public:
@@ -73,7 +73,7 @@ public:
     explicit STypeNumber(std::string& token_string);
 };
 
-typedef std::shared_ptr<STypeNumber> STypeNumberPtr;
+typedef std::shared_ptr<STypeNumber> NumberTypePtr;
 
 class STypeBool : public TBase {
 public:
@@ -81,7 +81,7 @@ public:
     explicit STypeBool(bool token);
 };
 
-typedef std::shared_ptr<STypeBool> STypeBoolPtr;
+typedef std::shared_ptr<STypeBool> BoolTypePtr;
 
 
 // its the base of a symbol inside the table which has a general type, name and offset
@@ -93,7 +93,7 @@ public:
     virtual ~SimpleSymbol() = default;
 };
 
-typedef std::shared_ptr<SimpleSymbol> SimpleSymbolPtr;
+typedef std::shared_ptr<SimpleSymbol> SymbolPtr;
 typedef std::vector<SimpleSymbol> SSList;
 
 // holds all of the symbol table arguments 
@@ -104,7 +104,7 @@ public:
     explicit SimpleSymbolList(SSList &symbols_list);
 };
 
-typedef std::shared_ptr<SimpleSymbolList> SimpleSymbolListPtr;
+typedef std::shared_ptr<SimpleSymbolList> SymListPtr;
 
 
 // function symbol should have list of argumets and a return type in addition to the function name, offset and the general type

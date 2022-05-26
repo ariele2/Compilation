@@ -51,7 +51,7 @@ continue				  return LexToken(CONTINUE, yytext);
 \"([^\n\r\"\\]|\\[rnt"\\])+\"	   return LexToken(STRING, yytext);
 {whitespace}				                                     ;
 .							                  {
-                                output::errorLex(yylineno); 
+                                output::errorInLexical(yylineno); 
                                 exit(0); 
                                 }
 %%

@@ -7,17 +7,17 @@
 using namespace output;
 
 enum ScopeType {
-    STATEMENT_SCOPE,
-    FUNCTION_SCOPE,
-    WHILE_SCOPE,
-    GLOBAL_SCOPE
+    SCOPE_STATEMENT,
+    SCOPE_FUNCTION,
+    SCOPE_WHILE,
+    SCOPE_GLOBAL
 };
 
 class Scope {
 public:
     ScopeType scope_type;
     int offset;
-    std::vector<SimpleSymbolPtr> symbols;
+    std::vector<SymbolPtr> symbols;
     Type ret_type;
     bool inside_while;
 
@@ -27,7 +27,7 @@ public:
 class SymbolTable {
 public:
     int current_offset;
-    std::unordered_map<std::string, SimpleSymbolPtr> symbols_map;
+    std::unordered_map<std::string, SymbolPtr> symbols_map;
     std::stack<ScopePtr> scope_stack;
 
     void PushDefaultFunctions();
@@ -40,15 +40,15 @@ public:
 
     SymbolTable();
 
-    void AddParam(const SimpleSymbolPtr& symbol);
+    void AddParam(const SymbolPtr& symbol);
 
-    void AddVariable(const SimpleSymbolPtr& symbol);
+    void AddVariable(const SymbolPtr& symbol);
 
     void AddFunction(const STypeFunctionSymbolPtr & symbol);
 
     bool IsSymbolDefined(std::string &symbol_name);
 
-    SimpleSymbolPtr GetDefinedSymbol(std::string& symbol_name);
+    SymbolPtr GetDefinedSymbol(std::string& symbol_name);
 
 };
 

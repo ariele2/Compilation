@@ -39,7 +39,7 @@ int LexToken(int bison_enum, std::string token) {
 }
 
 void errorLexAndExit(int lineno){
-    errorLex(lineno);
+    errorInLexical(lineno);
     exit(0);
 }
 

@@ -17,72 +17,65 @@ public:
     SemanticChecks semantic_checks;
 
     Utils();
-
-    void ParseProgram(int lineno);
-    void ParseFuncs(int lineno){};
-    void ParseFuncDecl(int lineno) {};
-
-    Tptr ParseFuncHead(int lineno, Tptr ret_type, Tptr id, Tptr formals);
-    Tptr ParseRetType(int lineno, Tptr type);
-
-    STypeCTypePtr ParseRetType(int lineno);
-    SimpleSymbolListPtr ParseFormals(int lineno);
-    SimpleSymbolListPtr ParseFormals(int lineno, Tptr formals);
-    SimpleSymbolListPtr ParseFormalsList(int lineno, Tptr formal);
-    SimpleSymbolListPtr ParseFormalsList(int lineno, Tptr formal, Tptr formals_list);
-    SimpleSymbolPtr ParseFormalDecl(int lineno, Tptr type, Tptr id);
-
-    void ParseStatements(int lineno){};
-    void ParseStatementOfStatements(int lineno) {};
-    void ParseStatementType(int lineno, Tptr type, Tptr id);
-    void ParseStatementTypeAssign(int lineno, Tptr type, Tptr id, Tptr exp);
-    void ParseStatementAssign(int lineno, Tptr id, Tptr exp);
-    void ParseStatementCall(int lineno) {};
-    void ParseStatementReturn(int lineno);
-    void ParseStatementReturnExp(int lineno, Tptr exp);
-    void ParseStatementIf(int lineno) {};
-    void ParseStatementIfElse(int lineno) {};
-    void ParseStatementWhile(int lineno) {};
-    void ParseStatementBreak(int lineno);
-    void ParseStatementContinue(int lineno);
-
-    Tptr ParseCall(int lineno, Tptr id, Tptr exp_list);
-    Tptr ParseCall(int lineno, Tptr id);
-    Tptr ParseExplist(int lineno, Tptr exp);
-    Tptr ParseExplist(int lineno, Tptr exp, Tptr exp_list);
-
-    STypeCTypePtr ParseInt(int lineno);
-    STypeCTypePtr ParseByte(int lineno);
-    STypeCTypePtr ParseBool(int lineno);
-
-    Tptr ParseParentheses(int lineno, Tptr exp);
-    Tptr ParseBinop(int lineno, Tptr exp1, Tptr exp2);
-    Tptr ParseID(int lineno, Tptr id);
-    Tptr ParseCallExp(int lineno, Tptr call_exp);
-
-    STypeNumberPtr ParseNum(int lineno, Tptr num);
-
-    Tptr ParseNumB(int lineno, Tptr num);
-
-    STypeStringPtr ParseString(int lineno, Tptr stype_string);
-
-    STypeBoolPtr ParseTrue(int lineno);
-    STypeBoolPtr ParseFalse(int lineno);
-
-    Tptr ParseNot(int lineno, Tptr bool_exp);
-    Tptr ParseAnd(int lineno, Tptr bool_exp1, Tptr bool_exp2);
-    Tptr ParseOr(int lineno, Tptr bool_exp1, Tptr bool_exp2);
-
-    STypeBoolPtr ParseRelOp(int lineno, Tptr exp1, Tptr exp2);
-
-    Tptr ParseCast(int lineno, Tptr type, Tptr exp);
-
-    void ParsePushStatementScope(int lineno);
-    void ParsePushWhileScope(int lineno);
-    void ParsePopScope(int lineno);
-    void ParseCheckBool(int lineno, Tptr bool_exp);
-
+    // rm - changed names of funcs and types and order
     static Utils &instance();
+    void pCheckBool(int ln, Tptr bool_exp);
+    void pPopScope(int ln);
+    void pAddWhileScope(int ln);
+    void pAddStateScope(int ln);
+    void parseStateRet(int ln);
+    void parseStatemeWhile(int ln){};
+    void pProgram(int ln);
+    void parseStateOfState(int ln){};
+    void parseState(int ln){};
+    void parseStateType(int ln, Tptr type, Tptr id);
+    void parseStateContinue(int ln);
+    void parseStateTypeAssignment(int ln, Tptr type, Tptr id, Tptr exp);
+    void parseStateAssignment(int ln, Tptr id, Tptr exp);
+    void parseStateBreak(int ln);
+    void pFunctions(int ln){};
+    void parseStateRetExpression(int ln, Tptr exp);
+    void parseStateCallFunc(int ln){};
+    void parseStateElseIF(int ln){};
+    void parseStateIf(int ln){};
+    void pFunctionDeclaration(int ln){};
+    Tptr pReturnType(int ln, Tptr type);
+    SymListPtr pFormals(int ln, Tptr formals);
+    TypePtr pReturnType(int ln);
+    Tptr pOr(int ln, Tptr bool_exp1, Tptr bool_exp2);
+    BoolTypePtr pRelOprator(int ln, Tptr exp1, Tptr exp2);
+    SymListPtr pFormList(int ln, Tptr formal, Tptr formals_list);
+    SymbolPtr ParseFormalDecl(int ln, Tptr type, Tptr id);
+    Tptr pCallExpression(int ln, Tptr call_exp);
+    Tptr pParen(int ln, Tptr exp);
+    Tptr pBinaryOp(int ln, Tptr exp1, Tptr exp2);
+    BoolTypePtr pFalse(int ln);
+    TypePtr pByte(int ln);
+    TypePtr pBool(int ln);
+    Tptr pCast(int ln, Tptr type, Tptr exp);
+    Tptr pAnd(int ln, Tptr bool_exp1, Tptr bool_exp2);
+    StringTypePtr pString(int ln, Tptr stype_string);
+    NumberTypePtr pNum(int ln, Tptr n);
+    Tptr pNumB(int ln, Tptr n);
+    Tptr pNot(int ln, Tptr bool_exp);
+    SymListPtr pFormList(int ln, Tptr formal);
+    SymListPtr pFormals(int ln);
+    Tptr parseFunctionDef(int ln, Tptr ret_type, Tptr id, Tptr formals);
+    Tptr pCall(int ln, Tptr id, Tptr exp_list);
+    Tptr pCall(int ln, Tptr id);
+    Tptr pExpressionList(int ln, Tptr exp);
+    Tptr pExpressionList(int ln, Tptr exp, Tptr exp_list);
+    TypePtr pInt(int ln);
+    BoolTypePtr pTrue(int ln);
+    Tptr pId(int ln, Tptr id);
+    
+    
+
+    
+
+    
+    
+    
 
     // TODO - add auto
 };

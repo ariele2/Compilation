@@ -29,7 +29,7 @@ void SymbolTable::PushScope(ScopeType scope_type) {
     Type ret_type;
     bool inside_while;
 
-    if (scope_type == GLOBAL_SCOPE) {
+    if (scope_type == SCOPE_GLOBAL) {
         ret_type = OTHER_TYPE;
         inside_while = false;
     } else {
@@ -38,7 +38,7 @@ void SymbolTable::PushScope(ScopeType scope_type) {
         inside_while = scope_stack.top()->inside_while;
     }
 
-    if (scope_type == WHILE_SCOPE) {
+    if (scope_type == SCOPE_WHILE) {
         inside_while = true;
     }
 
@@ -56,17 +56,17 @@ void SymbolTable::PushFunctionScope(ScopeType scope_type, Type ret_type, STypeFu
 }
 
 void SymbolTable::PopScope() {
-    endScope();
+    endOfScope();
 
     // in global scope - functions only; in non-global scope - variables only
-    if (scope_stack.top()->scope_type == GLOBAL_SCOPE) {
+    if (scope_stack.top()->scope_type == SCOPE_GLOBAL) {
         for (const auto &func_symbol:scope_stack.top()->symbols) {
             assert(func_symbol->general_type == FUNCTION_TYPE);
             auto dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(func_symbol);
             std::vector<std::string> string_types;
             SSListToStrings(dynamic_cast_func->parameters, string_types);
             std::string ret_type = TypeToString(dynamic_cast_func->ret_type);
-            printID(dynamic_cast_func->name, 0, makeFunctionType(ret_type, string_types));
+            idPrint(dynamic_cast_func->name, 0, makeFunctionType(ret_type, string_types));
             symbols_map.erase(dynamic_cast_func->name);
         }
 
@@ -74,7 +74,7 @@ void SymbolTable::PopScope() {
         for (const auto &basic_symbol:scope_stack.top()->symbols) {
             assert(basic_symbol->general_type != FUNCTION_TYPE);
             std::string type = TypeToString(basic_symbol->general_type);
-            printID(basic_symbol->name, basic_symbol->offset, type);
+            idPrint(basic_symbol->name, basic_symbol->offset, type);
             symbols_map.erase(basic_symbol->name);
         }
     }
@@ -85,18 +85,18 @@ void SymbolTable::PopScope() {
 }
 
 SymbolTable::SymbolTable() : current_offset(0), symbols_map(), scope_stack() {
-    PushScope(GLOBAL_SCOPE);
+    PushScope(SCOPE_GLOBAL);
     PushDefaultFunctions();
 
 }
 
-void SymbolTable::AddParam(const SimpleSymbolPtr &symbol) {
+void SymbolTable::AddParam(const SymbolPtr &symbol) {
     assert(!scope_stack.empty());
     scope_stack.top()->symbols.push_back(symbol);
     symbols_map.emplace(symbol->name, symbol);
 }
 
-void SymbolTable::AddVariable(const SimpleSymbolPtr &symbol) {
+void SymbolTable::AddVariable(const SymbolPtr &symbol) {
     // add params only after adding the function
     assert(!scope_stack.empty());
     symbol->offset = current_offset++;
@@ -122,7 +122,7 @@ bool SymbolTable::IsSymbolDefined(std::string &symbol_name) {
     return (symbols_map.find(symbol_name) != symbols_map.end());
 }
 
-SimpleSymbolPtr SymbolTable::GetDefinedSymbol(std::string &symbol_name) {
+SymbolPtr SymbolTable::GetDefinedSymbol(std::string &symbol_name) {
     return symbols_map[symbol_name];
 }
 

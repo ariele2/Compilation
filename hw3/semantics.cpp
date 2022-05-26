@@ -2,7 +2,7 @@
 
 SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table) {} // c'tor
 
-bool SemanticChecks::IsSymbolDefined(string &name) {
+bool SemanticChecks::checkSymbolDefined(string &name) {
     return table_ref.IsSymbolDefined(name);
 }
 

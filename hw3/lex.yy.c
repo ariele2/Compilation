@@ -1003,7 +1003,7 @@ case 36:
 YY_RULE_SETUP
 #line 53 "scanner.lex"
 {
-                                output::errorLex(yylineno); 
+                                output::errorInLexical(yylineno); 
                                 exit(0); 
                                 }
 	YY_BREAK

@@ -65,117 +65,117 @@ void yyerror(const char* message);
 Program: Funcs
     {}
 Funcs:  %empty
-    {Utils::instance().ParseFuncs(yylineno);}
+    {Utils::instance().pFunctions(yylineno);}
 Funcs: FuncDecl Funcs
-    {Utils::instance().ParseFuncs(yylineno);}
+    {Utils::instance().pFunctions(yylineno);}
 FuncDecl: FuncHead LBRACE Statements  RBRACE PopScope  // pushing scope inside FuncHead too
-    {Utils::instance().ParseFuncDecl(yylineno);}
+    {Utils::instance().pFunctionDeclaration(yylineno);}
 FuncHead: RetType ID LPAREN Formals RPAREN
-    {$$ = Utils::instance().ParseFuncHead(yylineno, $1, $2, $4);}
+    {$$ = Utils::instance().parseFunctionDef(yylineno, $1, $2, $4);}
 RetType: Type
-    {$$ = Utils::instance().ParseRetType(yylineno, $1);}
+    {$$ = Utils::instance().pReturnType(yylineno, $1);}
 RetType: VOID
-    {$$ = Utils::instance().ParseRetType(yylineno);}
+    {$$ = Utils::instance().pReturnType(yylineno);}
 Formals: %empty
-    {$$ = Utils::instance().ParseFormals(yylineno);}
+    {$$ = Utils::instance().pFormals(yylineno);}
 Formals: FormalsList
-    {$$ = Utils::instance().ParseFormals(yylineno, $1);}
+    {$$ = Utils::instance().pFormals(yylineno, $1);}
 FormalsList: FormalDecl
-    {$$ = Utils::instance().ParseFormalsList(yylineno, $1);}
+    {$$ = Utils::instance().pFormList(yylineno, $1);}
 FormalsList: FormalDecl COMMA FormalsList
-    {$$ = Utils::instance().ParseFormalsList(yylineno, $1, $3);}
+    {$$ = Utils::instance().pFormList(yylineno, $1, $3);}
 FormalDecl: Type ID
     {$$ = Utils::instance().ParseFormalDecl(yylineno, $1, $2);}
 Statements: Statement
-    {Utils::instance().ParseStatements(yylineno);}
+    {Utils::instance().parseState(yylineno);}
 Statements: Statements Statement
-    {Utils::instance().ParseStatements(yylineno);}
+    {Utils::instance().parseState(yylineno);}
 Statement: PushStatementScope LBRACE Statements RBRACE PopScope
-    {Utils::instance().ParseStatementOfStatements(yylineno);}
+    {Utils::instance().parseStateOfState(yylineno);}
 Statement: Type ID SC
-    {Utils::instance().ParseStatementType(yylineno, $1, $2);}
+    {Utils::instance().parseStateType(yylineno, $1, $2);}
 Statement: Type ID ASSIGN Exp SC
-    {Utils::instance().ParseStatementTypeAssign(yylineno, $1, $2, $4);}
+    {Utils::instance().parseStateTypeAssignment(yylineno, $1, $2, $4);}
 Statement: ID ASSIGN Exp SC
-    {Utils::instance().ParseStatementAssign(yylineno, $1, $3);}
+    {Utils::instance().parseStateAssignment(yylineno, $1, $3);}
 Statement: Call SC
-    {Utils::instance().ParseStatementCall(yylineno);}
+    {Utils::instance().parseStateCallFunc(yylineno);}
 Statement: RETURN SC
-    {Utils::instance().ParseStatementReturn(yylineno);}
+    {Utils::instance().parseStateRet(yylineno);}
 Statement: RETURN Exp SC
-    {Utils::instance().ParseStatementReturnExp(yylineno, $2);}
+    {Utils::instance().parseStateRetExpression(yylineno, $2);}
 Statement: IF LPAREN Exp CheckBool RPAREN PushStatementScope Statement PopScope
-    {Utils::instance().ParseStatementIf(yylineno);}
+    {Utils::instance().parseStateIf(yylineno);}
 Statement: IF LPAREN Exp CheckBool RPAREN PushStatementScope Statement PopScope ELSE PushStatementScope Statement PopScope
-    {Utils::instance().ParseStatementIfElse(yylineno);}
+    {Utils::instance().parseStateElseIF(yylineno);}
 Statement: WHILE LPAREN Exp CheckBool RPAREN PushWhileScope Statement PopScope
-    {Utils::instance().ParseStatementWhile(yylineno);}
+    {Utils::instance().parseStatemeWhile(yylineno);}
 Statement: BREAK SC
-    {Utils::instance().ParseStatementBreak(yylineno);}
+    {Utils::instance().parseStateBreak(yylineno);}
 Statement: CONTINUE SC
-    {Utils::instance().ParseStatementContinue(yylineno);}
+    {Utils::instance().parseStateContinue(yylineno);}
 Call: ID LPAREN ExpList RPAREN
-    {$$ = Utils::instance().ParseCall(yylineno, $1, $3);}
+    {$$ = Utils::instance().pCall(yylineno, $1, $3);}
 Call: ID LPAREN RPAREN
-    {$$ = Utils::instance().ParseCall(yylineno, $1);}
+    {$$ = Utils::instance().pCall(yylineno, $1);}
 ExpList: Exp
-    {$$ = Utils::instance().ParseExplist(yylineno, $1);}
+    {$$ = Utils::instance().pExpressionList(yylineno, $1);}
 ExpList: Exp COMMA ExpList
-    {$$ = Utils::instance().ParseExplist(yylineno, $1, $3);}
+    {$$ = Utils::instance().pExpressionList(yylineno, $1, $3);}
 Type: INT
-    {$$ = Utils::instance().ParseInt(yylineno);}
+    {$$ = Utils::instance().pInt(yylineno);}
 Type: BYTE
-    {$$ = Utils::instance().ParseByte(yylineno);}
+    {$$ = Utils::instance().pByte(yylineno);}
 Type: BOOL
-    {$$ = Utils::instance().ParseBool(yylineno);}
+    {$$ = Utils::instance().pBool(yylineno);}
 Exp: LPAREN Exp RPAREN
-    {$$ = Utils::instance().ParseParentheses(yylineno, $2);}
+    {$$ = Utils::instance().pParen(yylineno, $2);}
 Exp: Exp ADD Exp
-    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+    {$$ = Utils::instance().pBinaryOp(yylineno, $1, $3);}
 Exp: Exp SUB Exp
-    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+    {$$ = Utils::instance().pBinaryOp(yylineno, $1, $3);}
 Exp: Exp MUL Exp
-    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+    {$$ = Utils::instance().pBinaryOp(yylineno, $1, $3);}
 Exp: Exp DIV Exp
-    {$$ = Utils::instance().ParseBinop(yylineno, $1, $3);}
+    {$$ = Utils::instance().pBinaryOp(yylineno, $1, $3);}
 Exp: ID
-    {$$ = Utils::instance().ParseID(yylineno, $1);}
+    {$$ = Utils::instance().pId(yylineno, $1);}
 Exp: Call
-    {$$ = Utils::instance().ParseCallExp(yylineno, $1);}
+    {$$ = Utils::instance().pCallExpression(yylineno, $1);}
 Exp: NUM
-    {$$ = Utils::instance().ParseNum(yylineno, $1);}
+    {$$ = Utils::instance().pNum(yylineno, $1);}
 Exp: NUM B
-    {$$ = Utils::instance().ParseNumB(yylineno, $1);}
+    {$$ = Utils::instance().pNumB(yylineno, $1);}
 Exp: STRING
-    {$$ = Utils::instance().ParseString(yylineno, $1);}
+    {$$ = Utils::instance().pString(yylineno, $1);}
 Exp: TRUE
-    {$$ = Utils::instance().ParseTrue(yylineno);}
+    {$$ = Utils::instance().pTrue(yylineno);}
 Exp: FALSE
-    {$$ = Utils::instance().ParseFalse(yylineno);}
+    {$$ = Utils::instance().pFalse(yylineno);}
 Exp: NOT Exp
-    {$$ = Utils::instance().ParseNot(yylineno, $2);}
+    {$$ = Utils::instance().pNot(yylineno, $2);}
 Exp: Exp AND Exp
-    {$$ = Utils::instance().ParseAnd(yylineno, $1, $3);}
+    {$$ = Utils::instance().pAnd(yylineno, $1, $3);}
 Exp: Exp OR Exp
-    {$$ = Utils::instance().ParseOr(yylineno, $1, $3);}
+    {$$ = Utils::instance().pOr(yylineno, $1, $3);}
 Exp: Exp EQUAL_UNEQUAL Exp
-    {$$ = Utils::instance().ParseRelOp(yylineno, $1, $3);}
+    {$$ = Utils::instance().pRelOprator(yylineno, $1, $3);}
 Exp: Exp NOT_EQUALITY Exp
-    {$$ = Utils::instance().ParseRelOp(yylineno, $1, $3);}
+    {$$ = Utils::instance().pRelOprator(yylineno, $1, $3);}
 Exp: LPAREN Type RPAREN Exp
-    {$$ = Utils::instance().ParseCast(yylineno, $2, $4);}
+    {$$ = Utils::instance().pCast(yylineno, $2, $4);}
 PushStatementScope: %empty
-    {Utils::instance().ParsePushStatementScope(yylineno);}
+    {Utils::instance().pAddStateScope(yylineno);}
 PushWhileScope: %empty
-    {Utils::instance().ParsePushWhileScope(yylineno);}
+    {Utils::instance().pAddWhileScope(yylineno);}
 PopScope: %empty
-    {Utils::instance().ParsePopScope(yylineno);}
+    {Utils::instance().pPopScope(yylineno);}
 CheckBool : %empty
-    {Utils::instance().ParseCheckBool(yylineno, $0);}
+    {Utils::instance().pCheckBool(yylineno, $0);}
 %%
 
 void yyerror(const char * message)
 {
-	errorSyn(yylineno);
+	errorInSyntax(yylineno);
 	exit(0);
 }

@@ -7,7 +7,7 @@ public:
     SymbolTable &table_ref;
     explicit SemanticChecks(SymbolTable &table);
 
-    bool IsSymbolDefined(string &name);
+    bool checkSymbolDefined(string &name);
     bool IsMainDefined();
     bool IsLegalAssignTypes(Type first, Type second);
     bool IsLegalCallTypes(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list);

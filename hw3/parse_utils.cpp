@@ -128,37 +128,52 @@ void Utils::parseStateType(int ln, Tptr type, Tptr id)
 
 void Utils::parseStateTypeAssignment(int ln, Tptr type, Tptr id, Tptr exp)
 {
+    // std::cout << "[DEBUG] start parseStateTypeAssignment" << std::endl;
+    // std::cout << "[DEBUG] type: " << type->general_type << std::endl;
+    // std::cout << "[DEBUG] exp: " << exp->general_type << std::endl;
     bool check_semantics;
     auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
-    auto dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
-    
+    if (type->general_type == AUTO_TYPE) {
+        type->general_type = exp->general_type;
+        // std::cout << "[DEBUG] changed type: " << type->general_type << std::endl;
+    }
+    TypePtr dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
+    // std::cout << dynamic_cast_type << std::endl;
+    if (type->general_type == AUTO_TYPE) {
+        // std::cout << "[DEBUG] id token : " << dynamic_cast_id->token <<std::endl;
+        // std::cout << "[DEBUG] found auto type!" <<std::endl;
+        // std::cout << "[DEBUG] Casting to: " << exp->general_type <<std::endl;
+        // std::cout << "[DEBUG] dynamic_cast_type: " << dynamic_cast_type->general_type <<std::endl;
+    }
+    // std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dynamic_cast_id->general_type <<std::endl;
     check_semantics = semantic_checks.IsFunctionType(exp->general_type);
     if (check_semantics)
     {
+        // std::cout << "[DEBUG] inside IsFunctionType " << std::endl;
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
         errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-    // Auto type needs to be casted to the right hand expression's type
-    if (dynamic_cast_type->general_type == AUTO_TYPE) {
-        // if (exp->general_type == INT_TYPE) {
-        //     // cast id to int?
-        // }
-        dynamic_cast_type->general_type = exp->general_type;
+    // std::cout << "[DEBUG] 1 " << std::endl;
+    if (type->general_type != AUTO_TYPE) {
+        check_semantics = semantic_checks.IsLegalAssignTypes(dynamic_cast_type->general_type, exp->general_type);
+        if (!check_semantics)
+        {
+            // std::cout << "[DEBUG] inside IsLegalAssignTypes " << std::endl;
+            errorDoesNotMatch(ln);
+            exit(0);
+        }
     }
-    check_semantics = semantic_checks.IsLegalAssignTypes(dynamic_cast_type->general_type, exp->general_type);
-    if (!check_semantics)
-    {
-        errorDoesNotMatch(ln);
-        exit(0);
-    }
+    // std::cout << "[DEBUG] 2 " << std::endl;
     check_semantics = semantic_checks.checkSymbolDefined(dynamic_cast_id->token);
     if (check_semantics)
     {
+        // std::cout << "[DEBUG] inside checkSymbolDefined " << std::endl;
         errorInDefintion(ln, dynamic_cast_id->token);
         exit(0);
     }
     const auto symbol = make_shared<SimpleSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
+    // std::cout << "[DEBUG] Adding Variable... " << std::endl;
     symbol_table.AddVariable(symbol);
 }
 
@@ -349,6 +364,10 @@ TypePtr Utils::pByte(int ln)
 TypePtr Utils::pBool(int ln)
 {
     return std::make_shared<STypeCType>(BOOL_TYPE);
+}
+
+TypePtr Utils::pAuto(int ln) {
+    return std::make_shared<STypeCType>(AUTO_TYPE);
 }
 
 Tptr Utils::pParen(int ln, Tptr exp)

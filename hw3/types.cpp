@@ -31,8 +31,6 @@ std::string TypeToString(Type type) {
             return "INT";
         case VOID_TYPE:
             return "VOID";
-        case AUTO_TYPE:
-            return "AUTO";
         default:
             return "UNRECOGNIZED";
     }

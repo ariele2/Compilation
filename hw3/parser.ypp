@@ -96,8 +96,8 @@ Statement: Type ID SC
     {Utils::instance().parseStateType(yylineno, $1, $2);}
 Statement: Type ID ASSIGN Exp SC
     {Utils::instance().parseStateTypeAssignment(yylineno, $1, $2, $4);}
-Statement: AUTO ID ASSIGN Exp SC
-    {Utils::instance().parseStateTypeAssignment(yylineno, $1, $2, $4);}
+Statement: Pre_Auto AUTO ID ASSIGN Exp SC
+    {Utils::instance().parseStateTypeAssignment(yylineno, $1, $3, $5);}
 Statement: ID ASSIGN Exp SC
     {Utils::instance().parseStateAssignment(yylineno, $1, $3);}
 Statement: Call SC
@@ -130,6 +130,8 @@ Type: BYTE
     {$$ = Utils::instance().pByte(yylineno);}
 Type: BOOL
     {$$ = Utils::instance().pBool(yylineno);}
+Pre_Auto: %empty
+    {$$ = Utils::instance().pAuto(yylineno);}
 Exp: LPAREN Exp RPAREN
     {$$ = Utils::instance().pParen(yylineno, $2);}
 Exp: Exp ADD Exp

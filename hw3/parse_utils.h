@@ -52,6 +52,7 @@ public:
     BoolTypePtr pFalse(int ln);
     TypePtr pByte(int ln);
     TypePtr pBool(int ln);
+    TypePtr pAuto(int ln);
     Tptr pCast(int ln, Tptr type, Tptr exp);
     Tptr pAnd(int ln, Tptr bool_exp1, Tptr bool_exp2);
     StringTypePtr pString(int ln, Tptr stype_string);

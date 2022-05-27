@@ -39,7 +39,7 @@ continue				  return LexToken(CONTINUE, yytext);
 \) 						  return LexToken(RPAREN, yytext);
 \{ 						  return LexToken(LBRACE, yytext);
 \} 						  return LexToken(RBRACE, yytext);
-{equalUnequal}		return LexToken(EQUAL_UNEQUAL, yytext);
+{equalUnequal}		      return LexToken(EQUAL_UNEQUAL, yytext);
 {notEquality}			return LexToken(NOT_EQUALITY, yytext);
 \= 						  return LexToken(ASSIGN, yytext);
 \*				        return LexToken(MUL, yytext);

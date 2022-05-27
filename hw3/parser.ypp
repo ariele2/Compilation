@@ -96,6 +96,8 @@ Statement: Type ID SC
     {Utils::instance().parseStateType(yylineno, $1, $2);}
 Statement: Type ID ASSIGN Exp SC
     {Utils::instance().parseStateTypeAssignment(yylineno, $1, $2, $4);}
+Statement: AUTO ID ASSIGN Exp SC
+    {Utils::instance().parseStateTypeAssignment(yylineno, $1, $2, $4);}
 Statement: ID ASSIGN Exp SC
     {Utils::instance().parseStateAssignment(yylineno, $1, $3);}
 Statement: Call SC

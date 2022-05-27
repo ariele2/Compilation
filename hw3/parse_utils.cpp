@@ -108,12 +108,14 @@ SymbolPtr Utils::ParseFormalDecl(int ln, Tptr type, Tptr id)
 
 void Utils::parseStateType(int ln, Tptr type, Tptr id)
 {
-    auto dyn_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
-    auto dyn_cast_id = std::dynamic_pointer_cast<STypeString>(id);
+    auto dyn_cast_type = std::dynamic_pointer_cast<STypeCType>(type);   // initialize token's type
+    auto dyn_cast_id = std::dynamic_pointer_cast<STypeString>(id);  // initalize token's name
 
+    // validate that there is no other symbol with the same name
     if (!semantic_checks.checkSymbolDefined(dyn_cast_id->token))
     {
     const auto symbol = make_shared<SimpleSymbol>(dyn_cast_id->token, 0, dyn_cast_type->general_type);
+    // add the symbol which holds: (token's name, offset, type)
     symbol_table.AddVariable(symbol);
     }
     else{
@@ -137,7 +139,14 @@ void Utils::parseStateTypeAssignment(int ln, Tptr type, Tptr id, Tptr exp)
         errorIsUndefined(ln, cast_function->name);
         exit(0);
     }
-    check_semantics= semantic_checks.IsLegalAssignTypes(dynamic_cast_type->general_type, exp->general_type);
+    // Auto type needs to be casted to the right hand expression's type
+    if (dynamic_cast_type->general_type == AUTO_TYPE) {
+        // if (exp->general_type == INT_TYPE) {
+        //     // cast id to int?
+        // }
+        dynamic_cast_type->general_type = exp->general_type;
+    }
+    check_semantics = semantic_checks.IsLegalAssignTypes(dynamic_cast_type->general_type, exp->general_type);
     if (!check_semantics)
     {
         errorDoesNotMatch(ln);

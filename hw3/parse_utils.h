@@ -68,14 +68,6 @@ public:
     TypePtr pInt(int ln);
     BoolTypePtr pTrue(int ln);
     Tptr pId(int ln, Tptr id);
-    
-    
-
-    
-
-    
-    
-    
 
     // TODO - add auto
 };

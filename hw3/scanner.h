@@ -11,6 +11,9 @@ int LexToken(int bison_enum, std::string token) {
     Tptr result = nullptr;
 
     switch (bison_enum) {
+        case AUTO: {
+            result.reset(new AutoType(token));
+        }
         case NUM: {
             result.reset(new STypeNumber(token));
 

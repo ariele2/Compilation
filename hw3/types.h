@@ -25,6 +25,7 @@ enum GeneralTypeEnum {
     BYTE_TYPE,
     BOOL_TYPE,
     STRING_TYPE,
+    AUTO_TYPE,
     FUNCTION_TYPE,
     OTHER_TYPE
 };
@@ -82,6 +83,15 @@ public:
 };
 
 typedef std::shared_ptr<STypeBool> BoolTypePtr;
+
+class AutoType : public TBase {
+    public:
+    std::string token;
+    explicit AutoType(std::string& token);
+    // add methods of casting
+};
+
+typedef std::shared_ptr<AutoType> AutoTypePtr;
 
 
 // its the base of a symbol inside the table which has a general type, name and offset

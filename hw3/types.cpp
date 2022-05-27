@@ -8,15 +8,15 @@ TBase::TBase(Type type) : general_type(type) {}
 STypeString::STypeString(std::string &token) : TBase(STRING_TYPE), token(token) {}
 
 STypeNumber::STypeNumber(std::string &token_string) : TBase(INT_TYPE) {
-    token = stoi(token_string);
+    token = std::stoi(token_string);
 }
 
-STypeBool::STypeBool(bool token) : TBase(BOOL_TYPE), token(token) {
-}
+STypeBool::STypeBool(bool token) : TBase(BOOL_TYPE), token(token) {}
 
-STypeCType::STypeCType(Type type) : TBase(type) {
+AutoType::AutoType(std::string& token) : TBase(AUTO_TYPE), token(token) {}
 
-}
+STypeCType::STypeCType(Type type) : TBase(type) {}
+
 
 std::string TypeToString(Type type) {
 
@@ -31,8 +31,10 @@ std::string TypeToString(Type type) {
             return "INT";
         case VOID_TYPE:
             return "VOID";
+        case AUTO_TYPE:
+            return "AUTO";
         default:
-            return "UNRECOGNIZED"; // OH NOES
+            return "UNRECOGNIZED";
     }
 }
 
@@ -44,28 +46,16 @@ void SSListToStrings(SSList &symbols_list, std::vector<std::string> &string_vect
 }
 
 SimpleSymbol::SimpleSymbol(std::string &name, int offset, Type type) : TBase(type), name(name),
-                                                                offset(offset) {
-
-}
+                                                                offset(offset) {}
 
 
-SimpleSymbolList::SimpleSymbolList() : symbols_list() {
+SimpleSymbolList::SimpleSymbolList() : symbols_list() {}
 
-}
-
-SimpleSymbolList::SimpleSymbolList(SSList &symbols_list) : symbols_list(symbols_list) {
-
-}
+SimpleSymbolList::SimpleSymbolList(SSList &symbols_list) : symbols_list(symbols_list) {}
 
 STypeFunctionSymbol::STypeFunctionSymbol(std::string &symbol_name, Type symbol_type, SSList &symbols_list)
-        : SimpleSymbol(symbol_name, 0, FUNCTION_TYPE), parameters(symbols_list), ret_type(symbol_type) {
+        : SimpleSymbol(symbol_name, 0, FUNCTION_TYPE), parameters(symbols_list), ret_type(symbol_type) {}
 
-}
+STypeExpList::STypeExpList() : exp_list() {}
 
-STypeExpList::STypeExpList() : exp_list() {
-
-}
-
-STypeExpList::STypeExpList(ExpList &exp_list) : exp_list(exp_list) {
-
-}
+STypeExpList::STypeExpList(ExpList &exp_list) : exp_list(exp_list) {}

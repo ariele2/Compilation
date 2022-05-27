@@ -23,6 +23,7 @@ bool						  return LexToken(BOOL, yytext);
 and 					    return LexToken(AND, yytext);
 or 						    return LexToken(OR, yytext);
 not 						  return LexToken(NOT, yytext);
+auto                          return LexToken(AUTO, yytext);
 true 						  return LexToken(TRUE, yytext);
 false 					  return LexToken(FALSE, yytext);
 return 					  return LexToken(RETURN, yytext);

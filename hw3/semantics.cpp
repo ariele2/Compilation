@@ -1,12 +1,12 @@
 #include "semantics.h"
 
-SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table) {} // c'tor
+checkSemantics::checkSemantics(SymbolTable &table) : table_ref(table) {} // c'tor
 
-bool SemanticChecks::checkSymbolDefined(string &name) {
+bool checkSemantics::checkSymbolDefined(string &name) {
     return table_ref.IsSymbolDefined(name);
 }
 
-bool SemanticChecks::IsMainDefined() {
+bool checkSemantics::checkMainIsDefined() {
     for (auto map_pair:table_ref.symbols_map) {
         if (map_pair.second->general_type == FUNCTION_TYPE) {
             auto dynamic_cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(map_pair.second);
@@ -22,7 +22,7 @@ bool SemanticChecks::IsMainDefined() {
     return false;
 }
 
-bool SemanticChecks::IsLegalAssignTypes(Type first, Type second) {
+bool checkSemantics::checkAssigned(Type first, Type second) {
     if (first == second) {
         return true;
     }
@@ -33,13 +33,13 @@ bool SemanticChecks::IsLegalAssignTypes(Type first, Type second) {
     return false;
 }
 
-bool SemanticChecks::IsLegalCallTypes(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list) {
+bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list) {
     if (func->parameters.size() != exp_list->exp_list.size()) {
         return false;
     }
 
     for (size_t i = 0; i < func->parameters.size(); ++i) {
-        if (!IsLegalAssignTypes(func->parameters[i].general_type, exp_list->exp_list[i].general_type)) {
+        if (!checkAssigned(func->parameters[i].general_type, exp_list->exp_list[i].general_type)) {
             return false;
         }
     }
@@ -47,36 +47,36 @@ bool SemanticChecks::IsLegalCallTypes(STypeFunctionSymbolPtr &func, STypeExpList
     return true;
 }
 
-bool SemanticChecks::IsLegalReturnType(Type type) {
+bool checkSemantics::checkReturn(Type type) {
     auto required_return_type = table_ref.scope_stack.top()->ret_type;
-    return IsLegalAssignTypes(required_return_type, type);
+    return checkAssigned(required_return_type, type);
 }
 
-bool SemanticChecks::IsBoolType(Type type) {
+bool checkSemantics::checkBool(Type type) {
     return (type == BOOL_TYPE);
 }
 
-bool SemanticChecks::IsVoidType(Type type) {
+bool checkSemantics::checkVoid(Type type) {
     return (type == VOID_TYPE);
 }
 
-bool SemanticChecks::IsFunctionType(Type type) {
+bool checkSemantics::checkFunction(Type type) {
     return (type == FUNCTION_TYPE);
 }
 
-bool SemanticChecks::IsLegalBreak() {
+bool checkSemantics::checkBreak() {
     return (table_ref.scope_stack.top()->inside_while);
 }
 
-bool SemanticChecks::IsLegalContinue() {
+bool checkSemantics::checkContinue() {
     return (table_ref.scope_stack.top()->inside_while);
 }
 
-bool SemanticChecks::IsByteOverflow(int &num) {
+bool checkSemantics::checkOFByte(int &num) {
     return (num >= 0 && num <= 255);
 }
 
-bool SemanticChecks::IsLegalRelopTypes(Type first, Type second) {
+bool checkSemantics::checkRelop(Type first, Type second) {
     // all numeric types are ok
     if (first == INT_TYPE || first == BYTE_TYPE) {
         if (second == INT_TYPE || second == BYTE_TYPE) {
@@ -86,8 +86,8 @@ bool SemanticChecks::IsLegalRelopTypes(Type first, Type second) {
     return false;
 }
 
-Type SemanticChecks::CheckAndGetBinOpType(Type first, Type second) {
-    if (!IsLegalRelopTypes(first, second)) {
+Type checkSemantics::checkBinop(Type first, Type second) {
+    if (!checkRelop(first, second)) {
         return OTHER_TYPE;
     }
     if (first == INT_TYPE || second == INT_TYPE) {
@@ -96,6 +96,6 @@ Type SemanticChecks::CheckAndGetBinOpType(Type first, Type second) {
     return BYTE_TYPE;
 }
 
-bool SemanticChecks::IsLegalCast(Type first, Type second) {
-    return IsLegalAssignTypes(first, second);
+bool checkSemantics::checkCast(Type first, Type second) {
+    return checkAssigned(first, second);
 }

@@ -14,12 +14,12 @@ class Utils
 {
 public:
     SymbolTable symbol_table;
-    SemanticChecks semantic_checks;
+    checkSemantics semantic_checks;
 
     Utils();
     // rm - changed names of funcs and types and order
     static Utils &instance();
-    void pCheckBool(int ln, Tptr bool_exp);
+    void pCheckBool( Tptr bool_exp, int ln);
     void pPopScope(int ln);
     void pAddWhileScope(int ln);
     void pAddStateScope(int ln);
@@ -28,47 +28,47 @@ public:
     void pProgram(int ln);
     void parseStateOfState(int ln){};
     void parseState(int ln){};
-    void parseStateType(int ln, Tptr type, Tptr id);
+    void parseStateType(  Tptr type, Tptr id, int ln);
     void parseStateContinue(int ln);
-    void parseStateTypeAssignment(int ln, Tptr type, Tptr id, Tptr exp);
-    void parseStateAssignment(int ln, Tptr id, Tptr exp);
+    void parseStateTypeAssignment(  Tptr type, Tptr id, Tptr exp, int ln);
+    void parseStateAssignment(  Tptr id, Tptr exp, int ln);
     void parseStateBreak(int ln);
     void pFunctions(int ln){};
-    void parseStateRetExpression(int ln, Tptr exp);
+    void parseStateRetExpression(  Tptr exp, int ln);
     void parseStateCallFunc(int ln){};
     void parseStateElseIF(int ln){};
     void parseStateIf(int ln){};
     void pFunctionDeclaration(int ln){};
-    Tptr pReturnType(int ln, Tptr type);
-    SymListPtr pFormals(int ln, Tptr formals);
+    Tptr pReturnType(  Tptr type, int ln);
+    SymListPtr pFormals(  Tptr formals, int ln);
     TypePtr pReturnType(int ln);
-    Tptr pOr(int ln, Tptr bool_exp1, Tptr bool_exp2);
-    BoolTypePtr pRelOprator(int ln, Tptr exp1, Tptr exp2);
-    SymListPtr pFormList(int ln, Tptr formal, Tptr formals_list);
-    SymbolPtr ParseFormalDecl(int ln, Tptr type, Tptr id);
-    Tptr pCallExpression(int ln, Tptr call_exp);
-    Tptr pParen(int ln, Tptr exp);
-    Tptr pBinaryOp(int ln, Tptr exp1, Tptr exp2);
+    Tptr pOr(  Tptr bool_exp1, Tptr bool_exp2, int ln);
+    BoolTypePtr pRelOprator(  Tptr exp1, Tptr exp2, int ln);
+    SymListPtr pFormList(  Tptr formal, Tptr formals_list, int ln);
+    SymbolPtr ParseFormalDecl(  Tptr type, Tptr id, int ln);
+    Tptr pCallExpression(  Tptr call_exp, int ln);
+    Tptr pParen(  Tptr exp, int ln);
+    Tptr pBinaryOp(  Tptr exp1, Tptr exp2, int ln);
     BoolTypePtr pFalse(int ln);
     TypePtr pByte(int ln);
     TypePtr pBool(int ln);
     TypePtr pAuto(int ln);
-    Tptr pCast(int ln, Tptr type, Tptr exp);
-    Tptr pAnd(int ln, Tptr bool_exp1, Tptr bool_exp2);
-    StringTypePtr pString(int ln, Tptr stype_string);
-    NumberTypePtr pNum(int ln, Tptr n);
-    Tptr pNumB(int ln, Tptr n);
-    Tptr pNot(int ln, Tptr bool_exp);
-    SymListPtr pFormList(int ln, Tptr formal);
+    Tptr pCast(  Tptr type, Tptr exp, int ln);
+    Tptr pAnd(  Tptr bool_exp1, Tptr bool_exp2, int ln);
+    StringTypePtr pString(  Tptr stype_string, int ln);
+    NumberTypePtr pNum(  Tptr n, int ln);
+    Tptr pNumB(  Tptr n, int ln);
+    Tptr pNot(  Tptr bool_exp, int ln);
+    SymListPtr pFormList(  Tptr formal, int ln);
     SymListPtr pFormals(int ln);
-    Tptr parseFunctionDef(int ln, Tptr ret_type, Tptr id, Tptr formals);
-    Tptr pCall(int ln, Tptr id, Tptr exp_list);
-    Tptr pCall(int ln, Tptr id);
-    Tptr pExpressionList(int ln, Tptr exp);
-    Tptr pExpressionList(int ln, Tptr exp, Tptr exp_list);
+    Tptr parseFunctionDef( Tptr ret_type, Tptr id, Tptr formals, int ln);
+    Tptr pCall(  Tptr id, Tptr exp_list, int ln);
+    Tptr pCall(  Tptr id, int ln);
+    Tptr pExpressionList(  Tptr exp, int ln);
+    Tptr pExpressionList(  Tptr exp, Tptr exp_list, int ln);
     TypePtr pInt(int ln);
     BoolTypePtr pTrue(int ln);
-    Tptr pId(int ln, Tptr id);
+    Tptr pId(  Tptr id, int ln);
 
     // TODO - add auto
 };

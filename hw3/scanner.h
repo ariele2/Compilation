@@ -7,31 +7,61 @@
 
 using namespace output;
 
-int LexToken(int bison_enum, std::string token) {
+int LexToken(int bison_enum, std::string token)
+{
     Tptr result = nullptr;
 
-    switch (bison_enum) {
-        case NUM: {
-            result.reset(new STypeNumber(token));
-        }
-            break;
-        case MUL:
-        case DIV:
-        case ADD:
-        case SUB:
-        case ID:
-        case STRING:
-        case NOT_EQUALITY:
-        case EQUAL_UNEQUAL: {
-            result.reset(new STypeString(token));
-        }
-            break;
-        case AUTO: {
-            result.reset(new AutoType(token));
-        }
-            break;
-        default:
-            break;
+    switch (bison_enum)
+    {
+    case NUM:
+    {
+        result.reset(new STypeNumber(token));
+    }
+    break;
+    case AUTO:
+    {
+        result.reset(new AutoType(token));
+    }
+    break;
+    case MUL:
+    case STRING:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+    case NOT_EQUALITY:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+    case ADD:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+    case SUB:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+    case DIV:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+    case ID:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+    case EQUAL_UNEQUAL:
+    {
+        result.reset(new STypeString(token));
+    }
+    break;
+
+    default:
+        break;
     }
 
     yylval = result;
@@ -39,9 +69,10 @@ int LexToken(int bison_enum, std::string token) {
     return bison_enum;
 }
 
-void errorLexAndExit(int lineno){
+void errorLexAndExit(int lineno)
+{
     errorInLexical(lineno);
     exit(0);
 }
 
-#endif //HW3_SCANNER_H
+#endif // HW3_SCANNER_H

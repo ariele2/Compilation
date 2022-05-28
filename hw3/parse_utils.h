@@ -17,7 +17,6 @@ public:
     checkSemantics semantic_checks;
 
     Utils();
-    // rm - changed names of funcs and types and order
     static Utils &instance();
     void pCheckBool( Tptr bool_exp, int ln);
     void pPopScope(int ln);
@@ -69,8 +68,8 @@ public:
     TypePtr pInt(int ln);
     BoolTypePtr pTrue(int ln);
     Tptr pId(  Tptr id, int ln);
-
-    // TODO - add auto
+    void handleErrorDoesNotMatch( int ln);
+    
 };
 
 #endif // HW3_PARSE_UTILS_H

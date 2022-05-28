@@ -1,101 +1,140 @@
 #include "semantics.h"
 
-checkSemantics::checkSemantics(SymbolTable &table) : table_ref(table) {} // c'tor
+#define LOWER 0
+#define UPPER 255
 
-bool checkSemantics::checkSymbolDefined(string &name) {
-    return table_ref.IsSymbolDefined(name);
+bool checkSemantics::checkFunction(Type type)
+{
+    bool is_ok = (FUNCTION_TYPE == type);
+    return is_ok;
 }
 
-bool checkSemantics::checkMainIsDefined() {
-    for (auto map_pair:table_ref.symbols_map) {
-        if (map_pair.second->general_type == FUNCTION_TYPE) {
-            auto dynamic_cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(map_pair.second);
-            if (dynamic_cast_function->name == "main") {
-                if (dynamic_cast_function->parameters.empty() && dynamic_cast_function->ret_type == VOID_TYPE) {
-                    return true;
-                } else {
+bool checkSemantics::checkContinue()
+{
+    return checkBreak();
+}
+
+bool checkSemantics::checkRelop(Type f, Type s)
+{
+
+    return (s == BYTE_TYPE || s == INT_TYPE) && (f == BYTE_TYPE || f == INT_TYPE);
+}
+
+bool checkSemantics::checkBreak()
+{
+    return (table_ref.scope_stack.top()->inside_while);
+}
+
+Type checkSemantics::checkBinop(Type f, Type s)
+{
+    if (!checkRelop(f, s))
+    {
+        return OTHER_TYPE;
+    }
+    else if (INT_TYPE == s || INT_TYPE == f)
+    {
+        return INT_TYPE;
+    }
+    else
+        return BYTE_TYPE;
+}
+
+bool checkSemantics::checkMainIsDefined()
+{
+    for (std::pair<const std::string, SymbolPtr> map_pair : table_ref.symbols_map)
+    {
+        if (map_pair.second->general_type == FUNCTION_TYPE)
+        {
+            std::shared_ptr<STypeFunctionSymbol> dynamic_cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(map_pair.second);
+            if (dynamic_cast_function->name == "main")
+            {
+                if (!dynamic_cast_function->ret_type == VOID_TYPE || !dynamic_cast_function->parameters.empty())
                     return false;
-                }
+                else
+                    return true;
             }
         }
     }
     return false;
 }
 
-bool checkSemantics::checkAssigned(Type first, Type second) {
-    if (first == second) {
-        return true;
-    }
-    if (first == INT_TYPE && second == BYTE_TYPE) {
-        return true;
-    }
-
-    return false;
+bool checkSemantics::checkOFByte(int &num)
+{
+    bool is_of = (num <= UPPER && num >= LOWER);
+    return is_of;
 }
 
-bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list) {
-    if (func->parameters.size() != exp_list->exp_list.size()) {
+bool checkSemantics::checkSymbolDefined(string &name)
+{
+    return table_ref.IsSymbolDefined(name);
+}
+
+bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list)
+{
+    if (exp_list->exp_list.size() != func->parameters.size())
+    {
         return false;
     }
-
-    for (size_t i = 0; i < func->parameters.size(); ++i) {
-        if (!checkAssigned(func->parameters[i].general_type, exp_list->exp_list[i].general_type)) {
+    for (size_t i = 0; i < func->parameters.size(); ++i)
+    {
+        if (!checkAssigned(func->parameters[i].general_type, exp_list->exp_list[i].general_type))
+        {
             return false;
         }
     }
-
     return true;
 }
 
-bool checkSemantics::checkReturn(Type type) {
-    auto required_return_type = table_ref.scope_stack.top()->ret_type;
-    return checkAssigned(required_return_type, type);
-}
-
-bool checkSemantics::checkBool(Type type) {
-    return (type == BOOL_TYPE);
-}
-
-bool checkSemantics::checkVoid(Type type) {
-    return (type == VOID_TYPE);
-}
-
-bool checkSemantics::checkFunction(Type type) {
-    return (type == FUNCTION_TYPE);
-}
-
-bool checkSemantics::checkBreak() {
-    return (table_ref.scope_stack.top()->inside_while);
-}
-
-bool checkSemantics::checkContinue() {
-    return (table_ref.scope_stack.top()->inside_while);
-}
-
-bool checkSemantics::checkOFByte(int &num) {
-    return (num >= 0 && num <= 255);
-}
-
-bool checkSemantics::checkRelop(Type first, Type second) {
-    // all numeric types are ok
-    if (first == INT_TYPE || first == BYTE_TYPE) {
-        if (second == INT_TYPE || second == BYTE_TYPE) {
-            return true;
-        }
+bool checkSemantics::checkAssigned(Type f, Type s)
+{
+    bool is_correct_case = (BYTE_TYPE == s && INT_TYPE == f);
+    if (s == f)
+    {
+        return true;
     }
-    return false;
+    else if (is_correct_case)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
-Type checkSemantics::checkBinop(Type first, Type second) {
-    if (!checkRelop(first, second)) {
-        return OTHER_TYPE;
-    }
-    if (first == INT_TYPE || second == INT_TYPE) {
-        return INT_TYPE;
-    }
-    return BYTE_TYPE;
+bool checkSemantics::checkVoid(Type type)
+{
+    bool is_ok = (VOID_TYPE == type);
+    return is_ok;
 }
 
-bool checkSemantics::checkCast(Type first, Type second) {
-    return checkAssigned(first, second);
+bool checkSemantics::checkReturn(Type type)
+{
+    return checkAssigned(table_ref.scope_stack.top()->ret_type, type);
 }
+
+bool checkSemantics::checkBool(Type type)
+{
+    bool is_ok = (BOOL_TYPE == type);
+    return is_ok;
+}
+
+bool checkSemantics::checkCast(Type f, Type s)
+{
+
+    bool is_correct_case = (BYTE_TYPE == s && INT_TYPE == f);
+    if (s == f)
+    {
+        return true;
+    }
+    else if (is_correct_case)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+checkSemantics::checkSemantics(SymbolTable &table) : table_ref(table) {}

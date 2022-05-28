@@ -2,6 +2,8 @@
 #include "hw3_output.hpp"
 #include <sstream>
 
+
+
 using namespace std;
 
 void output::endOfScope(){

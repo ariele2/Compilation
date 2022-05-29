@@ -104,7 +104,7 @@ Tptr Utils::parseFunctionDef(Tptr return_type, Tptr id, Tptr formals, int lnno)
 
 Tptr Utils::pExpressionList(Tptr exp, Tptr exp_list, int ln)
 {
-    std::shared_ptr<STypeExpList> dynamic_cast_exp_list = std::dynamic_pointer_cast<STypeExpList>(exp_list);
+    std::shared_ptr<TExpList> dynamic_cast_exp_list = std::dynamic_pointer_cast<TExpList>(exp_list);
 
     dynamic_cast_exp_list->expression_list.push_back(*exp);
     return dynamic_cast_exp_list;
@@ -204,6 +204,7 @@ void Utils::parseAutoTypeAssignment(Tptr type, Tptr id, Tptr exp, int ln)
 
 void Utils::parseStateTypeAssignment(Tptr type, Tptr id, Tptr exp, int ln)
 {
+    // std::cout << "[DEBUG] exp: " << exp->general_type << std::endl;
     bool check_semantics;
     auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
     TypePtr dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
@@ -413,11 +414,15 @@ Tptr Utils::pBinaryOp(Tptr exp1, Tptr exp2, int ln)
         handleErrorIsUndefined(ln, cast_function->n);
     }
 
-    if (semantic_checks.checkBinop(exp1->general_type, exp2->general_type) == OTHER_TYPE)
+    Type ret_type = semantic_checks.checkBinop(exp1->general_type, exp2->general_type);
+    if (ret_type == OTHER_TYPE)
     {
         handleErrorDoesNotMatch(ln);
     }
-    return exp1;
+    if (ret_type == exp1->general_type) {
+        return exp1;
+    }
+    return exp2;
 }
 
 Tptr Utils::pId(Tptr id, int ln)
@@ -520,9 +525,9 @@ Tptr Utils::pCall(Tptr id, Tptr exp_list, int ln)
         handleErrorUndefinedFunction(ln, dyn_cast_id->token);
     }
     std::shared_ptr<STypeFunctionSymbol> dyn_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(symbol_from_id);
-    auto dynamic_cast_exp_list = std::dynamic_pointer_cast<STypeExpList>(exp_list);
+    auto dynamic_cast_exp_list = std::dynamic_pointer_cast<TExpList>(exp_list);
 
-    auto reversed_exp_list = make_shared<STypeExpList>();
+    auto reversed_exp_list = make_shared<TExpList>();
     for (auto exp = dynamic_cast_exp_list->expression_list.rbegin();
          exp != dynamic_cast_exp_list->expression_list.rend(); exp++)
     {
@@ -561,7 +566,7 @@ Tptr Utils::pCall(Tptr id, int ln)
     }
 
     std::shared_ptr<STypeFunctionSymbol> dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(symbol_from_id);
-    auto empty_exp_list = make_shared<STypeExpList>();
+    auto empty_exp_list = make_shared<TExpList>();
 
     if (!semantic_checks.checkCall(dynamic_cast_func, empty_exp_list))
     {
@@ -601,7 +606,7 @@ SymListPtr Utils::pFormals(int ln)
 
 Tptr Utils::pExpressionList(Tptr exp, int ln)
 {
-    std::shared_ptr<STypeExpList> exp_list_pointer = make_shared<STypeExpList>();
+    std::shared_ptr<TExpList> exp_list_pointer = make_shared<TExpList>();
     exp_list_pointer->expression_list.push_back(*exp);
     return exp_list_pointer;
 }

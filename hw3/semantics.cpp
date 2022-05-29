@@ -16,7 +16,6 @@ bool checkSemantics::checkContinue()
 
 bool checkSemantics::checkRelop(Type f, Type s)
 {
-
     return (s == BYTE_TYPE || s == INT_TYPE) && (f == BYTE_TYPE || f == INT_TYPE);
 }
 
@@ -69,7 +68,7 @@ bool checkSemantics::checkSymbolDefined(string &name)
     return table_ref.checkIfSymbolDefined(name);
 }
 
-bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list)
+bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, TExpListPtr &exp_list)
 {
     if (exp_list->expression_list.size() != func->parameters.size())
     {
@@ -123,7 +122,7 @@ bool checkSemantics::checkCast(Type f, Type s)
 {
 
     bool is_correct_case = (BYTE_TYPE == s && INT_TYPE == f);
-    if (s == f)
+    if (s == f || (s == INT_TYPE && f == BYTE_TYPE) || (s == INT_TYPE && f == BYTE_TYPE))
     {
         return true;
     }

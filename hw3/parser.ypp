@@ -93,12 +93,12 @@ States: States State
 State: PushStatementScope LBRACE States RBRACE PopScope
     {Utils::instance().parseStateOfState(yylineno);}
 State: Type ID SC
-    {Utils::instance().parseStateType( $1, $2, yylineno);}
+    {Utils::instance().parseStateType($1, $2, yylineno);}
 State: Type ID ASSIGN  Expression SC
     {Utils::instance().parseStateTypeAssignment( $1, $2, $4, yylineno);}
-State: Pre_Auto AUTO ID ASSIGN  Expression SC
+State: Pre_Auto AUTO ID ASSIGN Expression SC
     {Utils::instance().parseAutoTypeAssignment( $1, $3, $5, yylineno);}
-State: ID ASSIGN  Expression SC
+State: ID ASSIGN Expression SC
     {Utils::instance().parseStateAssignment( $1, $3, yylineno);}
 State: Call SC
     {Utils::instance().parseStateCallFunc(yylineno);}
@@ -122,9 +122,9 @@ Call: ID LPAREN  ExpressionList RPAREN
     {$$ = Utils::instance().pCall( $1, $3, yylineno);}
 Call: ID LPAREN RPAREN
     {$$ = Utils::instance().pCall( $1, yylineno);}
- ExpressionList:  Expression
+ExpressionList:  Expression
     {$$ = Utils::instance().pExpressionList( $1, yylineno);}
- ExpressionList:  Expression COMMA  ExpressionList
+ExpressionList:  Expression COMMA  ExpressionList
     {$$ = Utils::instance().pExpressionList( $1, $3, yylineno);}
 
 Type: BOOL
@@ -136,45 +136,45 @@ Type: INT
 
 Pre_Auto: %empty
     {$$ = Utils::instance().pAuto(yylineno);}
- Expression: LPAREN  Expression RPAREN
+Expression: LPAREN  Expression RPAREN
     {$$ = Utils::instance().pParen( $2, yylineno);}
- Expression:  Expression DIV  Expression
+Expression:  Expression DIV  Expression
     {$$ = Utils::instance().pBinaryOp( $1, $3, yylineno);}
- Expression:  Expression MUL  Expression
+Expression:  Expression MUL  Expression
     {$$ = Utils::instance().pBinaryOp( $1, $3, yylineno);}
- Expression:  Expression SUB  Expression
+Expression:  Expression SUB  Expression
     {$$ = Utils::instance().pBinaryOp( $1, $3, yylineno);}
- Expression:  Expression ADD  Expression
+Expression:  Expression ADD  Expression
     {$$ = Utils::instance().pBinaryOp( $1, $3, yylineno);}
- Expression: ID
+Expression: ID
     {$$ = Utils::instance().pId( $1, yylineno);}
- Expression: Call
+Expression: Call
     {$$ = Utils::instance().pCallExpression( $1, yylineno);}
- Expression: NUM
+Expression: NUM
     {$$ = Utils::instance().pNum( $1, yylineno);}
- Expression: NUM B
+Expression: NUM B
     {$$ = Utils::instance().pNumB( $1, yylineno);}
- Expression: STRING
+Expression: STRING
     {$$ = Utils::instance().pString( $1, yylineno);}
 
- Expression: FALSE
+Expression: FALSE
     {$$ = Utils::instance().pFalse(yylineno);}
- Expression: TRUE
+Expression: TRUE
     {$$ = Utils::instance().pTrue(yylineno);}
 
- Expression: NOT  Expression
+Expression: NOT  Expression
     {$$ = Utils::instance().pNot( $2, yylineno);}
- Expression:  Expression OR  Expression
+Expression:  Expression OR  Expression
     {$$ = Utils::instance().pOr( $1, $3, yylineno);}
- Expression:  Expression AND  Expression
+Expression:  Expression AND  Expression
     {$$ = Utils::instance().pAnd( $1, $3, yylineno);}
- Expression:  Expression NOT_EQUALITY  Expression
+Expression:  Expression NOT_EQUALITY  Expression
     {$$ = Utils::instance().pRelOprator( $1, $3, yylineno);}
- Expression:  Expression EQUAL_UNEQUAL  Expression
+Expression:  Expression EQUAL_UNEQUAL  Expression
     {$$ = Utils::instance().pRelOprator( $1, $3, yylineno);}
 
- Expression: LPAREN Type RPAREN  Expression
-    {$$ = Utils::instance().pCast( $2, $4, yylineno);}
+Expression: LPAREN Type RPAREN  Expression
+    {$$ = Utils::instance().pCast($2, $4, yylineno);}
 PushStatementScope: %empty
     {Utils::instance().pAddStateScope(yylineno);}
 PushWhileScope: %empty

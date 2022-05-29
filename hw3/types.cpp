@@ -54,6 +54,6 @@ SimpleSymbolList::SimpleSymbolList(SSList &syms_list) : syms_list(syms_list) {}
 STypeFunctionSymbol::STypeFunctionSymbol(std::string &sym_name, Type sym_type, SSList &sym_list)
         : SimpleSymbol(sym_name, 0, FUNCTION_TYPE), parameters(sym_list), ret_type(sym_type) {}
 
-STypeExpList::STypeExpList() : expression_list() {}
+TExpList::TExpList() : expression_list() {}
 
-STypeExpList::STypeExpList(ExpList &expression_list) : expression_list(expression_list) {}
+TExpList::TExpList(ExpList &expression_list) : expression_list(expression_list) {}

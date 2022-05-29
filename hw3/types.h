@@ -46,16 +46,16 @@ public:
 typedef std::shared_ptr<TermianlBase> Tptr;
 typedef std::vector<TermianlBase> ExpList;
 
-class STypeExpList : public TermianlBase
+class TExpList : public TermianlBase
 {
 public:
     
-    STypeExpList();
+    TExpList();
     ExpList expression_list;
-    explicit STypeExpList(ExpList &exp_list);
+    explicit TExpList(ExpList &exp_list);
 };
 
-typedef std::shared_ptr<STypeExpList> STypeExpListPtr;
+typedef std::shared_ptr<TExpList> TExpListPtr;
 
 class STypeCType : public TermianlBase
 {

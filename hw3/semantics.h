@@ -17,7 +17,7 @@ public:
     SymTable &table_ref;
     explicit checkSemantics(SymTable &table);
     Type checkBinop(Type f, Type s);
-    bool checkCall(STypeFunctionSymbolPtr &function, STypeExpListPtr &expression_list);
+    bool checkCall(STypeFunctionSymbolPtr &function, TExpListPtr &expression_list);
     bool checkSymbolDefined(string &name);
     bool checkCast(Type f, Type s);
     bool checkVoid(Type t);

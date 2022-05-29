@@ -1,132 +1,147 @@
 #include "sym_table.h"
+#define MSG "message"
+#define NUMBER "number"
+#define PRINT "print"
+#define PRINTI "printi"
+#define INIT -1
 
-
-void SymbolTable::PushDefaultFunctions() {
-    // push print
-    std::string message_name = "message";
-    // SimpleSymbol(name, offset, type)
-    SimpleSymbol print_param_symbol(message_name, -1, STRING_TYPE);
-
-    std::string print_name = "print";
-    SSList print_args;
-    print_args.emplace_back(print_param_symbol);
-    // STypeFunctionSymbol(name, type, list of SimpleSymbol)
-    auto print_func = make_shared<STypeFunctionSymbol>(print_name, VOID_TYPE, print_args);
-    AddFunction(print_func);
-
-    // push printi
-    std::string number_name = "number";
-    SimpleSymbol printi_param_symbol(number_name, -1, INT_TYPE);
-
-    std::string printi_name = "printi";
-    SSList printi_args;
-    printi_args.emplace_back(printi_param_symbol);
-    auto printi_func = make_shared<STypeFunctionSymbol>(printi_name, VOID_TYPE, printi_args);
-    AddFunction(printi_func);
+SymTable::SymTable() : curr_offset(0), syms_map(), s_stack()
+{
+    addScope(SCOPE_GLOBAL);
+    addDefFunctions();
 }
 
-void SymbolTable::PushScope(ScopeType scope_type) {
-    Type ret_type;
-    bool inside_while;
-
-    if (scope_type == SCOPE_GLOBAL) {
-        ret_type = OTHER_TYPE;
-        inside_while = false;
-    } else {
-        assert(!scope_stack.empty());
-        ret_type = scope_stack.top()->ret_type;
-        inside_while = scope_stack.top()->inside_while;
-    }
-
-    if (scope_type == SCOPE_WHILE) {
-        inside_while = true;
-    }
-
-   
-
-    scope_stack.push(make_shared<Scope>(scope_type, current_offset, ret_type, inside_while));
+void SymTable::AddParameter(const SymbolPtr &sym)
+{
+    assert(!s_stack.empty());
+    s_stack.top()->syms.push_back(sym);
+    syms_map.emplace(sym->n, sym);
 }
 
-void SymbolTable::PushFunctionScope(ScopeType scope_type, Type ret_type, STypeFunctionSymbolPtr function_symbol) {
-    assert(!scope_stack.empty());
-    bool inside_while = scope_stack.top()->inside_while;
-    scope_stack.push(make_shared<Scope>(scope_type, current_offset, ret_type, inside_while));
-
-
-}
-
-void SymbolTable::PopScope() {
+void SymTable::removeScope()
+{
     endOfScope();
-
-    // in global scope - functions only; in non-global scope - variables only
-    if (scope_stack.top()->scope_type == SCOPE_GLOBAL) {
-        for (const auto &func_symbol:scope_stack.top()->symbols) {
-            assert(func_symbol->general_type == FUNCTION_TYPE);
-            auto dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(func_symbol);
+    if (s_stack.top()->s_type == SCOPE_GLOBAL)
+    {
+        for (const SymbolPtr &func_symbol : s_stack.top()->syms)
+        {
+            assert(FUNCTION_TYPE == func_symbol->general_type);
+            std::shared_ptr<STypeFunctionSymbol> dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(func_symbol);
             std::vector<std::string> string_types;
             SSListToStrings(dynamic_cast_func->parameters, string_types);
             std::string ret_type = TypeToString(dynamic_cast_func->ret_type);
-            idPrint(dynamic_cast_func->name, 0, makeFunctionType(ret_type, string_types));
-            symbols_map.erase(dynamic_cast_func->name);
+            idPrint(dynamic_cast_func->n, 0, makeFunctionType(ret_type, string_types));
+            syms_map.erase(dynamic_cast_func->n);
         }
-
-    } else {
-        for (const auto &basic_symbol:scope_stack.top()->symbols) {
-            assert(basic_symbol->general_type != FUNCTION_TYPE);
-            std::string type = TypeToString(basic_symbol->general_type);
-            idPrint(basic_symbol->name, basic_symbol->offset, type);
-            symbols_map.erase(basic_symbol->name);
+    }
+    else
+    {
+        for (const SymbolPtr &basic_sym : s_stack.top()->syms)
+        {
+            assert(FUNCTION_TYPE != basic_sym->general_type);
+            std::string type = TypeToString(basic_sym->general_type);
+            idPrint(basic_sym->n, basic_sym->offs, type);
+            syms_map.erase(basic_sym->n);
         }
     }
 
-
-    current_offset = scope_stack.top()->offset;
-    scope_stack.pop();
+    curr_offset = s_stack.top()->offset;
+    s_stack.pop();
 }
 
-SymbolTable::SymbolTable() : current_offset(0), symbols_map(), scope_stack() {
-    PushScope(SCOPE_GLOBAL);
-    PushDefaultFunctions();
-
+Scope::Scope(TypesOfScopes scope_type, int offset, Type ret_type, bool inside_while)
+    : s_type(scope_type), offset(offset), return_type(ret_type), is_in_while(inside_while)
+{
 }
 
-void SymbolTable::AddParam(const SymbolPtr &symbol) {
-    assert(!scope_stack.empty());
-    scope_stack.top()->symbols.push_back(symbol);
-    symbols_map.emplace(symbol->name, symbol);
+SymbolPtr SymTable::retDefinedSym(std::string &sym_name)
+{
+    return syms_map[sym_name];
 }
 
-void SymbolTable::AddVariable(const SymbolPtr &symbol) {
-    // add params only after adding the function
-    assert(!scope_stack.empty());
-    symbol->offset = current_offset++;
-    scope_stack.top()->symbols.push_back(symbol);
-    symbols_map.emplace(symbol->name, symbol);
+void SymTable::addDefFunctions()
+{
+
+    std::string message_name = MSG;
+    std::string print_name = PRINT;
+    std::string number_name = NUMBER;
+    std::string printi_name = PRINTI;
+
+    SimpleSymbol print_param_symbol(message_name, INIT, STRING_TYPE);
+
+    SSList print_args;
+    print_args.emplace_back(print_param_symbol);
+
+    auto print_func = make_shared<STypeFunctionSymbol>(print_name, VOID_TYPE, print_args);
+    AddFunc(print_func);
+
+    SimpleSymbol printi_param_symbol(number_name, INIT, INT_TYPE);
+
+    SSList printi_args;
+    printi_args.emplace_back(printi_param_symbol);
+    auto printi_func = make_shared<STypeFunctionSymbol>(printi_name, VOID_TYPE, printi_args);
+    AddFunc(printi_func);
 }
 
-void SymbolTable::AddFunction(const STypeFunctionSymbolPtr &symbol) {
-    assert(!scope_stack.empty());
+void SymTable::AddVar(const SymbolPtr &sym)
+{
 
-    // set offsets
-    symbol->offset = 0;
-    auto curr_param_offset = 0;
-    for (auto &param:symbol->parameters) {
-        param.offset = --curr_param_offset;
+    assert(!s_stack.empty());
+    sym->offs = curr_offset++;
+    s_stack.top()->syms.push_back(sym);
+    syms_map.emplace(sym->n, sym);
+}
+
+void SymTable::AddFunc(const STypeFunctionSymbolPtr &sym)
+{
+    assert(!s_stack.empty());
+    sym->offs = 0;
+    auto cur_offset = 0;
+    for (SimpleSymbol &param : sym->parameters)
+    {
+        param.offs = --cur_offset;
     }
 
-    scope_stack.top()->symbols.push_back(symbol);
-    symbols_map.emplace(symbol->name, symbol);
+    s_stack.top()->syms.push_back(sym);
+    syms_map.emplace(sym->n, sym);
 }
 
-bool SymbolTable::IsSymbolDefined(std::string &symbol_name) {
-    return (symbols_map.find(symbol_name) != symbols_map.end());
+void SymTable::addScope(TypesOfScopes scope_type)
+{
+    Type ret_type;
+    bool inside_while;
+
+    if (SCOPE_GLOBAL != scope_type)
+    {
+        assert(!s_stack.empty());
+        ret_type = s_stack.top()->return_type;
+        inside_while = s_stack.top()->is_in_while;
+    }
+    else
+    {
+        inside_while = false;
+        ret_type = OTHER_TYPE;
+    }
+
+    if (SCOPE_WHILE == scope_type)
+    {
+        inside_while = true;
+        s_stack.push(make_shared<Scope>(scope_type, curr_offset, ret_type, inside_while));
+    }
+    else
+    {
+        s_stack.push(make_shared<Scope>(scope_type, curr_offset, ret_type, inside_while));
+    }
 }
 
-SymbolPtr SymbolTable::GetDefinedSymbol(std::string &symbol_name) {
-    return symbols_map[symbol_name];
+void SymTable::addFunctionScope(TypesOfScopes scope_type, Type ret_type, STypeFunctionSymbolPtr function_symbol)
+{
+    assert(!s_stack.empty());
+    bool inside_while = s_stack.top()->is_in_while;
+    s_stack.push(make_shared<Scope>(scope_type, curr_offset, ret_type, inside_while));
 }
 
-
-Scope::Scope(ScopeType scope_type, int offset, Type ret_type, bool inside_while)
-        : scope_type(scope_type), offset(offset), ret_type(ret_type), inside_while(inside_while) {
+bool SymTable::checkIfSymbolDefined(std::string &sym_name)
+{
+    return (syms_map.end() != syms_map.find(sym_name));
 }

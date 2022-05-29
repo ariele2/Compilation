@@ -9,7 +9,6 @@
 #include <vector>
 #include <memory>
 
-
 #define YYSTYPE Tptr
 
 extern int yylineno;
@@ -17,66 +16,75 @@ extern char *yytext;
 
 extern int yylex();
 
+enum GeneralType
+{
 
-
-enum GeneralTypeEnum {
-    VOID_TYPE,
-    INT_TYPE,  // this might be a number literal or a variable (same for the others)
-    BYTE_TYPE,
     BOOL_TYPE,
-    STRING_TYPE,
-    AUTO_TYPE,
     FUNCTION_TYPE,
+    STRING_TYPE,
+    VOID_TYPE,
+    AUTO_TYPE,
+    BYTE_TYPE,
+    INT_TYPE,
     OTHER_TYPE
 };
 
-typedef GeneralTypeEnum Type;
+typedef GeneralType Type;
 
-class TBase {
-    // must have at least one virtual method
+class TermianlBase
+{
+
 public:
-    explicit TBase(Type type);  // also used for expressions and types
     Type general_type;
-    TBase();
-    virtual ~TBase() = default;
+     virtual ~TermianlBase() = default;
+    explicit TermianlBase(Type t);
+
+    TermianlBase();
+   
 };
 
-typedef std::shared_ptr<TBase> Tptr;
-typedef std::vector<TBase> ExpList;
+typedef std::shared_ptr<TermianlBase> Tptr;
+typedef std::vector<TermianlBase> ExpList;
 
-class STypeExpList : public TBase {
+class STypeExpList : public TermianlBase
+{
 public:
-    ExpList exp_list;
+    
     STypeExpList();
+    ExpList expression_list;
     explicit STypeExpList(ExpList &exp_list);
 };
 
 typedef std::shared_ptr<STypeExpList> STypeExpListPtr;
 
-class STypeCType : public TBase {
+class STypeCType : public TermianlBase
+{
 public:
-    explicit STypeCType(Type type);
+    explicit STypeCType(Type t);
 };
 
 typedef std::shared_ptr<STypeCType> TypePtr;
 
-class STypeString : public TBase {
+class STypeString : public TermianlBase
+{
 public:
     std::string token;
-    explicit STypeString(std::string& token);
+    explicit STypeString(std::string &token);
 };
 
 typedef std::shared_ptr<STypeString> StringTypePtr;
 
-class STypeNumber : public TBase {
+class STypeNumber : public TermianlBase
+{
 public:
     int token;
-    explicit STypeNumber(std::string& token_string);
+    explicit STypeNumber(std::string &token_string);
 };
 
 typedef std::shared_ptr<STypeNumber> NumberTypePtr;
 
-class STypeBool : public TBase {
+class STypeBool : public TermianlBase
+{
 public:
     bool token;
     explicit STypeBool(bool token);
@@ -84,41 +92,43 @@ public:
 
 typedef std::shared_ptr<STypeBool> BoolTypePtr;
 
-class AutoType : public TBase {
-    public:
+class AutoType : public TermianlBase
+{
+public:
     std::string token;
-    explicit AutoType(std::string& token);
-    // add methods of casting
+    explicit AutoType(std::string &token);
+   
 };
 
 typedef std::shared_ptr<AutoType> AutoTypePtr;
 
 
-// its the base of a symbol inside the table which has a general type, name and offset
-class SimpleSymbol : public TBase {
+class SimpleSymbol : public TermianlBase
+{
 public:
-    std::string name;
-    int offset;
-    SimpleSymbol(std::string &name, int offset, Type type);
+    std::string n;
+    int offs;
+    SimpleSymbol(std::string &name, int offset, Type t);
     virtual ~SimpleSymbol() = default;
 };
 
 typedef std::shared_ptr<SimpleSymbol> SymbolPtr;
 typedef std::vector<SimpleSymbol> SSList;
 
-// holds all of the symbol table arguments 
-class SimpleSymbolList : public TBase { 
+
+class SimpleSymbolList : public TermianlBase
+{
 public:
-    SSList symbols_list;
+    SSList syms_list;
     SimpleSymbolList();
     explicit SimpleSymbolList(SSList &symbols_list);
 };
 
 typedef std::shared_ptr<SimpleSymbolList> SymListPtr;
 
-
-// function symbol should have list of argumets and a return type in addition to the function name, offset and the general type
-class STypeFunctionSymbol : public SimpleSymbol { 
+// function symbol should have list of argumets and a return t in addition to the function name, offset and the general t
+class STypeFunctionSymbol : public SimpleSymbol
+{
 public:
     SSList parameters;
     Type ret_type;
@@ -127,7 +137,7 @@ public:
 
 typedef std::shared_ptr<STypeFunctionSymbol> STypeFunctionSymbolPtr;
 
-extern std::string TypeToString(Type type);
+extern std::string TypeToString(Type t);
 extern void SSListToStrings(SSList &symbols_list, std::vector<std::string> &string_vector);
 
 class Scope;

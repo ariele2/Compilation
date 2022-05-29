@@ -6,50 +6,41 @@
 
 using namespace output;
 
-enum ScopeType {
+enum TypesOfScopes
+{
     SCOPE_STATEMENT,
     SCOPE_FUNCTION,
     SCOPE_WHILE,
     SCOPE_GLOBAL
 };
 
-class Scope {
+class Scope
+{
 public:
-    ScopeType scope_type;
+    std::vector<SymbolPtr> syms;
+    Type return_type;
+    TypesOfScopes s_type;
     int offset;
-    std::vector<SymbolPtr> symbols;
-    Type ret_type;
-    bool inside_while;
-
-    Scope(ScopeType scope_type, int offset, Type ret_type, bool inside_while);
+    bool is_in_while;
+    Scope(TypesOfScopes s_type, int offset, Type return_type, bool inside_while);
 };
 
-class SymbolTable {
+class SymTable
+{
 public:
-    int current_offset;
-    std::unordered_map<std::string, SymbolPtr> symbols_map;
-    std::stack<ScopePtr> scope_stack;
-
-    void PushDefaultFunctions();
-
-    void PushScope(ScopeType scope_type);
-
-    void PushFunctionScope(ScopeType scope_type, Type ret_type, STypeFunctionSymbolPtr function_symbol);
-
-    void PopScope();
-
-    SymbolTable();
-
-    void AddParam(const SymbolPtr& symbol);
-
-    void AddVariable(const SymbolPtr& symbol);
-
-    void AddFunction(const STypeFunctionSymbolPtr & symbol);
-
-    bool IsSymbolDefined(std::string &symbol_name);
-
-    SymbolPtr GetDefinedSymbol(std::string& symbol_name);
-
+    int curr_offset;
+    std::stack<ScopePtr> s_stack;
+    std::unordered_map<std::string, SymbolPtr> syms_map;
+    void removeScope();
+    void AddFunc(const STypeFunctionSymbolPtr &symbol);
+    void addScope(TypesOfScopes s_type);
+    void AddParameter(const SymbolPtr &symbol);
+    void AddVar(const SymbolPtr &symbol);
+    void addDefFunctions();
+    void addFunctionScope(TypesOfScopes s_type, Type return_type, STypeFunctionSymbolPtr func_sym);
+    bool checkIfSymbolDefined(std::string &symbol_name);
+    SymbolPtr retDefinedSym(std::string &symbol_name);
+    SymTable();
 };
 
 #endif // SYM_TABLE_H

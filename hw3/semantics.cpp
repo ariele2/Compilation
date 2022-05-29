@@ -22,7 +22,7 @@ bool checkSemantics::checkRelop(Type f, Type s)
 
 bool checkSemantics::checkBreak()
 {
-    return (table_ref.scope_stack.top()->inside_while);
+    return (table_ref.s_stack.top()->is_in_while);
 }
 
 Type checkSemantics::checkBinop(Type f, Type s)
@@ -41,14 +41,14 @@ Type checkSemantics::checkBinop(Type f, Type s)
 
 bool checkSemantics::checkMainIsDefined()
 {
-    for (std::pair<const std::string, SymbolPtr> map_pair : table_ref.symbols_map)
+    for (std::pair<const std::string, SymbolPtr> map_pair : table_ref.syms_map)
     {
         if (map_pair.second->general_type == FUNCTION_TYPE)
         {
             std::shared_ptr<STypeFunctionSymbol> dynamic_cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(map_pair.second);
-            if (dynamic_cast_function->name == "main")
+            if (dynamic_cast_function->n == "main")
             {
-                if (!dynamic_cast_function->ret_type == VOID_TYPE || !dynamic_cast_function->parameters.empty())
+                if ((!(dynamic_cast_function->ret_type == VOID_TYPE)) || (!(dynamic_cast_function->parameters.empty())))
                     return false;
                 else
                     return true;
@@ -66,18 +66,18 @@ bool checkSemantics::checkOFByte(int &num)
 
 bool checkSemantics::checkSymbolDefined(string &name)
 {
-    return table_ref.IsSymbolDefined(name);
+    return table_ref.checkIfSymbolDefined(name);
 }
 
 bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list)
 {
-    if (exp_list->exp_list.size() != func->parameters.size())
+    if (exp_list->expression_list.size() != func->parameters.size())
     {
         return false;
     }
     for (size_t i = 0; i < func->parameters.size(); ++i)
     {
-        if (!checkAssigned(func->parameters[i].general_type, exp_list->exp_list[i].general_type))
+        if (!checkAssigned(func->parameters[i].general_type, exp_list->expression_list[i].general_type))
         {
             return false;
         }
@@ -110,7 +110,7 @@ bool checkSemantics::checkVoid(Type type)
 
 bool checkSemantics::checkReturn(Type type)
 {
-    return checkAssigned(table_ref.scope_stack.top()->ret_type, type);
+    return checkAssigned(table_ref.s_stack.top()->return_type, type);
 }
 
 bool checkSemantics::checkBool(Type type)
@@ -137,4 +137,4 @@ bool checkSemantics::checkCast(Type f, Type s)
     }
 }
 
-checkSemantics::checkSemantics(SymbolTable &table) : table_ref(table) {}
+checkSemantics::checkSemantics(SymTable &table) : table_ref(table) {}

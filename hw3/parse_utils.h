@@ -30,6 +30,7 @@ public:
     void parseStateType(  Tptr type, Tptr id, int ln);
     void parseStateContinue(int ln);
     void parseStateTypeAssignment(  Tptr type, Tptr id, Tptr exp, int ln);
+    void parseAutoTypeAssignment(Tptr type, Tptr id, Tptr exp, int ln);
     void parseStateAssignment(  Tptr id, Tptr exp, int ln);
     void parseStateBreak(int ln);
     void pFunctions(int ln){};

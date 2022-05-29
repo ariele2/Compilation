@@ -122,25 +122,24 @@ SymListPtr Utils::pFormList( Tptr formal, Tptr formals_list, int ln)
     return dyn_cast_formal_list;
 }
 
-void Utils::parseStateTypeAssignment( Tptr type, Tptr id, Tptr exp, int ln)
+void Utils::parseAutoTypeAssignment(Tptr type, Tptr id, Tptr exp, int ln)
 {
-    // std::cout << "[DEBUG] start parseStateTypeAssignment" << std::endl;
+    // std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
     // std::cout << "[DEBUG] type: " << type->general_type << std::endl;
     // std::cout << "[DEBUG] exp: " << exp->general_type << std::endl;
     bool check_semantics;
     auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
-    if (type->general_type == AUTO_TYPE) {
-        type->general_type = exp->general_type;
-        // std::cout << "[DEBUG] changed type: " << type->general_type << std::endl;
+    if (exp->general_type != INT_TYPE && exp->general_type != BYTE_TYPE && exp->general_type != BOOL_TYPE) {
+        errorDoesNotMatch(ln);
+        exit(0);
     }
+    type->general_type = exp->general_type;
     TypePtr dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
     // std::cout << dynamic_cast_type << std::endl;
-    if (type->general_type == AUTO_TYPE) {
-        // std::cout << "[DEBUG] id token : " << dynamic_cast_id->token <<std::endl;
-        // std::cout << "[DEBUG] found auto type!" <<std::endl;
-        // std::cout << "[DEBUG] Casting to: " << exp->general_type <<std::endl;
-        // std::cout << "[DEBUG] dynamic_cast_type: " << dynamic_cast_type->general_type <<std::endl;
-    }
+    // std::cout << "[DEBUG] id token : " << dynamic_cast_id->token <<std::endl;
+    // std::cout << "[DEBUG] found auto type!" <<std::endl;
+    // std::cout << "[DEBUG] Casting to: " << exp->general_type <<std::endl;
+    // std::cout << "[DEBUG] dynamic_cast_type: " << dynamic_cast_type->general_type <<std::endl;
     // std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dynamic_cast_id->general_type <<std::endl;
     check_semantics = semantic_checks.checkFunction(exp->general_type);
     if (check_semantics)
@@ -149,15 +148,39 @@ void Utils::parseStateTypeAssignment( Tptr type, Tptr id, Tptr exp, int ln)
         auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
         ERROR2
     }
+    // std::cout << "[DEBUG] 2 " << std::endl;
+    check_semantics = semantic_checks.checkSymbolDefined(dynamic_cast_id->token);
+    if (check_semantics)
+    {
+        // std::cout << "[DEBUG] inside checkSymbolDefined " << std::endl;
+        errorInDefintion(ln, dynamic_cast_id->token);
+        exit(0);
+    }
+    const auto symbol = make_shared<SimpleSymbol>(dynamic_cast_id->token, 0, dynamic_cast_type->general_type);
+    // std::cout << "[DEBUG] Adding Variable... " << std::endl;
+    symbol_table.AddVariable(symbol);
+}
+
+void Utils::parseStateTypeAssignment( Tptr type, Tptr id, Tptr exp, int ln)
+{
+    bool check_semantics;
+    auto dynamic_cast_id = std::dynamic_pointer_cast<STypeString>(id);
+    TypePtr dynamic_cast_type = std::dynamic_pointer_cast<STypeCType>(type);
+    // std::cout << dynamic_cast_type << std::endl;
+    check_semantics = semantic_checks.checkFunction(exp->general_type);
+    if (check_semantics)
+    {
+        // std::cout << "[DEBUG] inside IsFunctionType " << std::endl;
+        auto cast_function = std::dynamic_pointer_cast<STypeFunctionSymbol>(exp);
+        ERROR2
+    }
     // std::cout << "[DEBUG] 1 " << std::endl;
-    if (type->general_type != AUTO_TYPE) {
-        check_semantics = semantic_checks.checkAssigned(dynamic_cast_type->general_type, exp->general_type);
-        if (!check_semantics)
-        {
-            // std::cout << "[DEBUG] inside IsLegalAssignTypes " << std::endl;
-            errorDoesNotMatch(ln);
-            exit(0);
-        }
+    check_semantics = semantic_checks.checkAssigned(dynamic_cast_type->general_type, exp->general_type);
+    if (!check_semantics)
+    {
+        // std::cout << "[DEBUG] inside IsLegalAssignTypes " << std::endl;
+        errorDoesNotMatch(ln);
+        exit(0);
     }
     // std::cout << "[DEBUG] 2 " << std::endl;
     check_semantics = semantic_checks.checkSymbolDefined(dynamic_cast_id->token);

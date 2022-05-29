@@ -97,7 +97,7 @@ State: Type ID SC
 State: Type ID ASSIGN  Expression SC
     {Utils::instance().parseStateTypeAssignment( $1, $2, $4, yylineno);}
 State: Pre_Auto AUTO ID ASSIGN  Expression SC
-    {Utils::instance().parseStateTypeAssignment( $1, $3, $5, yylineno);}
+    {Utils::instance().parseAutoTypeAssignment( $1, $3, $5, yylineno);}
 State: ID ASSIGN  Expression SC
     {Utils::instance().parseStateAssignment( $1, $3, yylineno);}
 State: Call SC

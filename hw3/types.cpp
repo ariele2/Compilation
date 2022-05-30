@@ -1,9 +1,9 @@
 #include "types.h"
 
 
-TermianlBase::TermianlBase() : general_type(OTHER_TYPE) {}
+TermianlBase::TermianlBase() : g_type(OTHER_TYPE) {}
 
-TermianlBase::TermianlBase(Type type) : general_type(type) {}
+TermianlBase::TermianlBase(Type type) : g_type(type) {}
 
 StringType::StringType(std::string &token) : TermianlBase(STRING_TYPE), token(token) {}
 
@@ -40,7 +40,7 @@ std::string TypeToString(Type type) {
 void SSListToStrings(SimpleSymsList &symbols_list, std::vector<std::string> &string_list) {
     string_list.clear();
     for (const auto &expression:symbols_list) {
-        string_list.push_back(TypeToString(expression.general_type));
+        string_list.push_back(TypeToString(expression.g_type));
     }
 }
 

@@ -1,12 +1,12 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <iostream>
-#include <unordered_map>
-#include <cstdlib>
 #include <stack>
 #include <cassert>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <cstdlib>
 #include <memory>
 #include "hw3_output.hpp"
 
@@ -33,9 +33,10 @@ typedef GeneralType Type;
 
 class TermianlBase {
 public:
-    Type general_type;
+    Type g_type;
      virtual ~TermianlBase() = default;
     explicit TermianlBase(Type t);
+    const std::string class_name = "TerminalBase";
 
     TermianlBase();
    
@@ -46,7 +47,7 @@ typedef std::vector<TermianlBase> ExpList;
 
 class TExpList : public TermianlBase {
 public:
-    
+    const std::string class_name = "TExpList";
     TExpList();
     ExpList expression_list;
     explicit TExpList(ExpList &exp_list);
@@ -57,6 +58,7 @@ typedef std::shared_ptr<TExpList> TExpListPtr;
 class CType : public TermianlBase {
 public:
     explicit CType(Type t);
+    const std::string class_name = "CType";
 };
 
 typedef std::shared_ptr<CType> TypePtr;
@@ -64,6 +66,7 @@ typedef std::shared_ptr<CType> TypePtr;
 class StringType : public TermianlBase {
 public:
     std::string token;
+    const std::string class_name = "StringType";
     explicit StringType(std::string &token);
 };
 
@@ -72,6 +75,7 @@ typedef std::shared_ptr<StringType> StringTypePtr;
 class NumberType : public TermianlBase {
 public:
     int token;
+    const std::string class_name = "NumberType";
     explicit NumberType(std::string &token_string);
 };
 
@@ -80,6 +84,7 @@ typedef std::shared_ptr<NumberType> NumberTypePtr;
 class BoolType : public TermianlBase {
 public:
     bool token;
+    const std::string class_name = "BoolType";
     explicit BoolType(bool token);
 };
 
@@ -88,6 +93,7 @@ typedef std::shared_ptr<BoolType> BoolTypePtr;
 class AutoType : public TermianlBase {
 public:
     std::string token;
+    const std::string class_name = "AutoType";
     explicit AutoType(std::string &token);
    
 };
@@ -99,6 +105,7 @@ class SimpleSymbol : public TermianlBase {
 public:
     std::string n;
     int offs;
+    const std::string class_name = "SimpleSymbol";
     SimpleSymbol(std::string &name, int offset, Type t);
     virtual ~SimpleSymbol() = default;
 };
@@ -110,6 +117,7 @@ typedef std::vector<SimpleSymbol> SimpleSymsList;
 class SimpleSymbolList : public TermianlBase {
 public:
     SimpleSymsList syms_list;
+    const std::string class_name = "SimpleSymbolList";
     SimpleSymbolList();
     explicit SimpleSymbolList(SimpleSymsList &symbols_list);
 };
@@ -120,6 +128,7 @@ class FuncSymType : public SimpleSymbol {
 public:
     SimpleSymsList parameters;
     Type ret_type;
+    const std::string class_name = "FuncSymType";
     FuncSymType(std::string &sym_n, Type sym_t, SimpleSymsList &symbols_list);
 };
 

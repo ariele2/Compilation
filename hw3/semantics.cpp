@@ -3,35 +3,29 @@
 #define LOWER 0
 #define UPPER 255
 
-bool checkSemantics::checkFunction(Type type)
-{
+bool checkSemantics::checkFunction(Type type) {
     bool is_ok = (FUNCTION_TYPE == type);
     return is_ok;
 }
 
-bool checkSemantics::checkContinue()
-{
+bool checkSemantics::checkContinue() {
     return checkBreak();
 }
 
-bool checkSemantics::checkRelop(Type f, Type s)
-{
+bool checkSemantics::checkRelop(Type f, Type s) {
     return (s == BYTE_TYPE || s == INT_TYPE) && (f == BYTE_TYPE || f == INT_TYPE);
 }
 
-bool checkSemantics::checkBreak()
-{
+bool checkSemantics::checkBreak() {
     return (table_ref.s_stack.top()->is_in_while);
 }
 
 Type checkSemantics::checkBinop(Type f, Type s)
 {
-    if (!checkRelop(f, s))
-    {
+    if (!checkRelop(f, s)) {
         return OTHER_TYPE;
     }
-    else if (INT_TYPE == s || INT_TYPE == f)
-    {
+    else if (INT_TYPE == s || INT_TYPE == f) {
         return INT_TYPE;
     }
     else
@@ -76,62 +70,39 @@ bool checkSemantics::checkCall(STypeFunctionSymbolPtr &func, TExpListPtr &exp_li
     }
     for (size_t i = 0; i < func->parameters.size(); ++i)
     {
-        if (!checkAssigned(func->parameters[i].general_type, exp_list->expression_list[i].general_type))
-        {
+        if (!checkAssigned(func->parameters[i].general_type, exp_list->expression_list[i].general_type)) {
             return false;
         }
     }
     return true;
 }
 
-bool checkSemantics::checkAssigned(Type f, Type s)
-{
-    bool is_correct_case = (BYTE_TYPE == s && INT_TYPE == f);
-    if (s == f)
-    {
+bool checkSemantics::checkAssigned(Type f, Type s) {
+    if (s == f || (BYTE_TYPE == s && INT_TYPE == f)) {
         return true;
     }
-    else if (is_correct_case)
-    {
-        return true;
-    }
-    else
-    {
+    else {
         return false;
     }
 }
 
-bool checkSemantics::checkVoid(Type type)
-{
-    bool is_ok = (VOID_TYPE == type);
-    return is_ok;
+bool checkSemantics::checkVoid(Type type) {
+    return VOID_TYPE == type;
 }
 
-bool checkSemantics::checkReturn(Type type)
-{
+bool checkSemantics::checkReturn(Type type) {
     return checkAssigned(table_ref.s_stack.top()->return_type, type);
 }
 
-bool checkSemantics::checkBool(Type type)
-{
-    bool is_ok = (BOOL_TYPE == type);
-    return is_ok;
+bool checkSemantics::checkBool(Type type) {
+    return BOOL_TYPE == type;
 }
 
-bool checkSemantics::checkCast(Type f, Type s)
-{
-
-    bool is_correct_case = (BYTE_TYPE == s && INT_TYPE == f);
-    if (s == f || (s == INT_TYPE && f == BYTE_TYPE) || (s == INT_TYPE && f == BYTE_TYPE))
-    {
+bool checkSemantics::checkCast(Type f, Type s) {
+    if (s == f || (s == INT_TYPE && f == BYTE_TYPE) || (s == BYTE_TYPE && f == INT_TYPE)) {
         return true;
     }
-    else if (is_correct_case)
-    {
-        return true;
-    }
-    else
-    {
+    else {
         return false;
     }
 }

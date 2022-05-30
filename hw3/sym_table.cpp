@@ -11,7 +11,7 @@ SymTable::SymTable() : curr_offset(0), syms_map(), s_stack()
     addDefFunctions();
 }
 
-void SymTable::AddParameter(const SymbolPtr &sym)
+void SymTable::AddParameter(const SymPtr &sym)
 {
     assert(!s_stack.empty());
     s_stack.top()->syms.push_back(sym);
@@ -23,10 +23,10 @@ void SymTable::removeScope()
     endOfScope();
     if (s_stack.top()->s_type == SCOPE_GLOBAL)
     {
-        for (const SymbolPtr &func_symbol : s_stack.top()->syms)
+        for (const SymPtr &func_symbol : s_stack.top()->syms)
         {
             assert(FUNCTION_TYPE == func_symbol->general_type);
-            std::shared_ptr<STypeFunctionSymbol> dynamic_cast_func = std::dynamic_pointer_cast<STypeFunctionSymbol>(func_symbol);
+            std::shared_ptr<FuncSymType> dynamic_cast_func = std::dynamic_pointer_cast<FuncSymType>(func_symbol);
             std::vector<std::string> string_types;
             SSListToStrings(dynamic_cast_func->parameters, string_types);
             std::string ret_type = TypeToString(dynamic_cast_func->ret_type);
@@ -36,7 +36,7 @@ void SymTable::removeScope()
     }
     else
     {
-        for (const SymbolPtr &basic_sym : s_stack.top()->syms)
+        for (const SymPtr &basic_sym : s_stack.top()->syms)
         {
             assert(FUNCTION_TYPE != basic_sym->general_type);
             std::string type = TypeToString(basic_sym->general_type);
@@ -54,7 +54,7 @@ Scope::Scope(TypesOfScopes scope_type, int offset, Type ret_type, bool inside_wh
 {
 }
 
-SymbolPtr SymTable::retDefinedSym(std::string &sym_name)
+SymPtr SymTable::retDefinedSym(std::string &sym_name)
 {
     return syms_map[sym_name];
 }
@@ -69,21 +69,21 @@ void SymTable::addDefFunctions()
 
     SimpleSymbol print_param_symbol(message_name, INIT, STRING_TYPE);
 
-    SSList print_args;
+    SimpleSymsList print_args;
     print_args.emplace_back(print_param_symbol);
 
-    auto print_func = make_shared<STypeFunctionSymbol>(print_name, VOID_TYPE, print_args);
+    auto print_func = make_shared<FuncSymType>(print_name, VOID_TYPE, print_args);
     AddFunc(print_func);
 
     SimpleSymbol printi_param_symbol(number_name, INIT, INT_TYPE);
 
-    SSList printi_args;
+    SimpleSymsList printi_args;
     printi_args.emplace_back(printi_param_symbol);
-    auto printi_func = make_shared<STypeFunctionSymbol>(printi_name, VOID_TYPE, printi_args);
+    auto printi_func = make_shared<FuncSymType>(printi_name, VOID_TYPE, printi_args);
     AddFunc(printi_func);
 }
 
-void SymTable::AddVar(const SymbolPtr &sym)
+void SymTable::AddVar(const SymPtr &sym)
 {
 
     assert(!s_stack.empty());
@@ -92,7 +92,7 @@ void SymTable::AddVar(const SymbolPtr &sym)
     syms_map.emplace(sym->n, sym);
 }
 
-void SymTable::AddFunc(const STypeFunctionSymbolPtr &sym)
+void SymTable::AddFunc(const FuncSymTypePtr &sym)
 {
     assert(!s_stack.empty());
     sym->offs = 0;
@@ -134,7 +134,7 @@ void SymTable::addScope(TypesOfScopes scope_type)
     }
 }
 
-void SymTable::addFunctionScope(TypesOfScopes scope_type, Type ret_type, STypeFunctionSymbolPtr function_symbol)
+void SymTable::addFunctionScope(TypesOfScopes scope_type, Type ret_type, FuncSymTypePtr function_symbol)
 {
     assert(!s_stack.empty());
     bool inside_while = s_stack.top()->is_in_while;

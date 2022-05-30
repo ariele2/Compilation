@@ -8,7 +8,9 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "hw3_output.hpp"
 
+using namespace output;
 #define YYSTYPE Tptr
 
 extern int yylineno;
@@ -16,9 +18,7 @@ extern char *yytext;
 
 extern int yylex();
 
-enum GeneralType
-{
-
+enum GeneralType {
     BOOL_TYPE,
     FUNCTION_TYPE,
     STRING_TYPE,
@@ -31,9 +31,7 @@ enum GeneralType
 
 typedef GeneralType Type;
 
-class TermianlBase
-{
-
+class TermianlBase {
 public:
     Type general_type;
      virtual ~TermianlBase() = default;
@@ -46,8 +44,7 @@ public:
 typedef std::shared_ptr<TermianlBase> Tptr;
 typedef std::vector<TermianlBase> ExpList;
 
-class TExpList : public TermianlBase
-{
+class TExpList : public TermianlBase {
 public:
     
     TExpList();
@@ -57,43 +54,38 @@ public:
 
 typedef std::shared_ptr<TExpList> TExpListPtr;
 
-class STypeCType : public TermianlBase
-{
+class CType : public TermianlBase {
 public:
-    explicit STypeCType(Type t);
+    explicit CType(Type t);
 };
 
-typedef std::shared_ptr<STypeCType> TypePtr;
+typedef std::shared_ptr<CType> TypePtr;
 
-class STypeString : public TermianlBase
-{
+class StringType : public TermianlBase {
 public:
     std::string token;
-    explicit STypeString(std::string &token);
+    explicit StringType(std::string &token);
 };
 
-typedef std::shared_ptr<STypeString> StringTypePtr;
+typedef std::shared_ptr<StringType> StringTypePtr;
 
-class STypeNumber : public TermianlBase
-{
+class NumberType : public TermianlBase {
 public:
     int token;
-    explicit STypeNumber(std::string &token_string);
+    explicit NumberType(std::string &token_string);
 };
 
-typedef std::shared_ptr<STypeNumber> NumberTypePtr;
+typedef std::shared_ptr<NumberType> NumberTypePtr;
 
-class STypeBool : public TermianlBase
-{
+class BoolType : public TermianlBase {
 public:
     bool token;
-    explicit STypeBool(bool token);
+    explicit BoolType(bool token);
 };
 
-typedef std::shared_ptr<STypeBool> BoolTypePtr;
+typedef std::shared_ptr<BoolType> BoolTypePtr;
 
-class AutoType : public TermianlBase
-{
+class AutoType : public TermianlBase {
 public:
     std::string token;
     explicit AutoType(std::string &token);
@@ -103,8 +95,7 @@ public:
 typedef std::shared_ptr<AutoType> AutoTypePtr;
 
 
-class SimpleSymbol : public TermianlBase
-{
+class SimpleSymbol : public TermianlBase {
 public:
     std::string n;
     int offs;
@@ -112,35 +103,33 @@ public:
     virtual ~SimpleSymbol() = default;
 };
 
-typedef std::shared_ptr<SimpleSymbol> SymbolPtr;
-typedef std::vector<SimpleSymbol> SSList;
+typedef std::shared_ptr<SimpleSymbol> SymPtr;
+typedef std::vector<SimpleSymbol> SimpleSymsList;
 
 
-class SimpleSymbolList : public TermianlBase
-{
+class SimpleSymbolList : public TermianlBase {
 public:
-    SSList syms_list;
+    SimpleSymsList syms_list;
     SimpleSymbolList();
-    explicit SimpleSymbolList(SSList &symbols_list);
+    explicit SimpleSymbolList(SimpleSymsList &symbols_list);
 };
 
 typedef std::shared_ptr<SimpleSymbolList> SymListPtr;
 
-// function symbol should have list of argumets and a return t in addition to the function name, offset and the general t
-class STypeFunctionSymbol : public SimpleSymbol
-{
+class FuncSymType : public SimpleSymbol {
 public:
-    SSList parameters;
+    SimpleSymsList parameters;
     Type ret_type;
-    STypeFunctionSymbol(std::string &symbol_name, Type symbol_type, SSList &symbols_list);
+    FuncSymType(std::string &sym_n, Type sym_t, SimpleSymsList &symbols_list);
 };
 
-typedef std::shared_ptr<STypeFunctionSymbol> STypeFunctionSymbolPtr;
 
-extern std::string TypeToString(Type t);
-extern void SSListToStrings(SSList &symbols_list, std::vector<std::string> &string_vector);
 
 class Scope;
 typedef std::shared_ptr<Scope> ScopePtr;
+extern void SSListToStrings(SimpleSymsList &symbols_list, std::vector<std::string> &string_vector);
+extern std::string TypeToString(Type t);
+
+typedef std::shared_ptr<FuncSymType> FuncSymTypePtr;
 
 #endif // TYPES_H

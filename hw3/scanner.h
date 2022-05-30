@@ -15,7 +15,7 @@ int LexToken(int bison_enum, std::string token)
     {
     case NUM:
     {
-        result.reset(new STypeNumber(token));
+        result.reset(new NumberType(token));
     }
     break;
     case AUTO:
@@ -26,37 +26,37 @@ int LexToken(int bison_enum, std::string token)
     case MUL:
     case STRING:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
     case NOT_EQUALITY:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
     case ADD:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
     case SUB:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
     case DIV:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
     case ID:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
     case EQUAL_UNEQUAL:
     {
-        result.reset(new STypeString(token));
+        result.reset(new StringType(token));
     }
     break;
 

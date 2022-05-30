@@ -17,7 +17,7 @@ enum TypesOfScopes
 class Scope
 {
 public:
-    std::vector<SymbolPtr> syms;
+    std::vector<SymPtr> syms;
     Type return_type;
     TypesOfScopes s_type;
     int offset;
@@ -30,16 +30,16 @@ class SymTable
 public:
     int curr_offset;
     std::stack<ScopePtr> s_stack;
-    std::unordered_map<std::string, SymbolPtr> syms_map;
+    std::unordered_map<std::string, SymPtr> syms_map;
     void removeScope();
-    void AddFunc(const STypeFunctionSymbolPtr &symbol);
+    void AddFunc(const FuncSymTypePtr &symbol);
     void addScope(TypesOfScopes s_type);
-    void AddParameter(const SymbolPtr &symbol);
-    void AddVar(const SymbolPtr &symbol);
+    void AddParameter(const SymPtr &symbol);
+    void AddVar(const SymPtr &symbol);
     void addDefFunctions();
-    void addFunctionScope(TypesOfScopes s_type, Type return_type, STypeFunctionSymbolPtr func_sym);
+    void addFunctionScope(TypesOfScopes s_type, Type return_type, FuncSymTypePtr func_sym);
     bool checkIfSymbolDefined(std::string &symbol_name);
-    SymbolPtr retDefinedSym(std::string &symbol_name);
+    SymPtr retDefinedSym(std::string &symbol_name);
     SymTable();
 };
 

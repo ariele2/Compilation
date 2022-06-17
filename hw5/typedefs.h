@@ -24,53 +24,48 @@ using std::to_string;
 using std::unordered_map;
 using std::vector;
 
+extern const bool PRINT_DEBUG;
 extern int yylineno;
+extern char textbuff[1024];
 extern char *yytext;
-
+extern char *textbuffptr;
 extern int yylex();
 
-extern char textbuff[1024];
-extern char *textbuffptr;
-extern const bool PRINT_DEBUG;
+class Scope;
+typedef shared_ptr<Scope> ScopePtr;
 
 enum GeneralType
 {
-    VOID_TYPE,
-    INT_TYPE, // this might be a number literal or a variable (same for the others)
-    BYTE_TYPE,
     BOOL_TYPE,
-    STRING_TYPE,
     FUNCTION_TYPE,
+    STRING_TYPE,
+    VOID_TYPE,
+    AUTO_TYPE,
+    BYTE_TYPE,
     STATEMENT_TYPE,
+    INT_TYPE,
     ERROR_TYPE
 };
 
-typedef GeneralType Type;
-typedef string register_name;
-typedef string label_name;
-
+typedef pair<int, string> p_case_label;
+typedef vector<p_case_label> case_label_list;
+typedef shared_ptr<case_label_list> case_label_list_ptr;
 typedef pair<int, BranchLabelIndex> branch_pair;
 typedef vector<branch_pair> branch_list;
 typedef shared_ptr<branch_list> branch_list_ptr;
-
-typedef pair<int, string> case_label_pair;
-typedef vector<case_label_pair> case_label_list;
-typedef shared_ptr<case_label_list> case_label_list_ptr;
-
+typedef string label_name;
+typedef string register_name;
+typedef GeneralType Type;
 
 class TerminalBase
 {
-    
+
 public:
-    explicit TerminalBase(Type type); 
-
-    Type g_type;
-
-    TerminalBase();
-
-    virtual ~TerminalBase() = default;
-
+    explicit TerminalBase(Type type);
     const std::string class_name = "TerminalBase";
+    virtual ~TerminalBase() = default;
+    Type g_type;
+    TerminalBase();
 };
 
 typedef shared_ptr<TerminalBase> BaseTypePtr;
@@ -79,12 +74,9 @@ typedef vector<BaseTypePtr> ExpList;
 class TExpList : public TerminalBase
 {
 public:
-    ExpList exp_list;
-
-    const std::string class_name = "TExpList";
-
     TExpList();
-
+    ExpList exp_list;
+    const std::string class_name = "TExpList";
     explicit TExpList(ExpList &exp_list);
 };
 
@@ -93,8 +85,8 @@ typedef shared_ptr<TExpList> ExpListTypePtr;
 class CType : public TerminalBase
 {
 public:
-    explicit CType(Type type);
     const std::string class_name = "CType";
+    explicit CType(Type type);
 };
 
 typedef shared_ptr<CType> CTypePtr;
@@ -102,10 +94,9 @@ typedef shared_ptr<CType> CTypePtr;
 class StringType : public TerminalBase
 {
 public:
-    string token;
-
     explicit StringType(string &token);
     const std::string class_name = "StringType";
+    string token;
 };
 
 typedef shared_ptr<StringType> StringTypePtr;
@@ -113,10 +104,9 @@ typedef shared_ptr<StringType> StringTypePtr;
 class RegisterType : public TerminalBase
 {
 public:
-    register_name reg_name;
-
     RegisterType(register_name reg_name, Type type);
     const std::string class_name = "RegisterType";
+    register_name reg_name;
 };
 
 typedef shared_ptr<RegisterType> RegisterTypePtr;
@@ -124,11 +114,10 @@ typedef shared_ptr<RegisterType> RegisterTypePtr;
 class BoolExpType : public TerminalBase
 {
 public:
-    branch_list true_list;
-    branch_list false_list;
     const std::string class_name = "BoolExpType";
-
     BoolExpType(branch_list true_list, branch_list false_list);
+    branch_list false_list;
+    branch_list true_list;
 };
 
 typedef shared_ptr<BoolExpType> BoolExpTypePtr;
@@ -136,9 +125,9 @@ typedef shared_ptr<BoolExpType> BoolExpTypePtr;
 class AutoType : public TerminalBase
 {
 public:
+    explicit AutoType(std::string &token);
     std::string token;
     const std::string class_name = "AutoType";
-    explicit AutoType(std::string &token);
 };
 
 typedef std::shared_ptr<AutoType> AutoTypePtr;
@@ -146,10 +135,9 @@ typedef std::shared_ptr<AutoType> AutoTypePtr;
 class StatementType : public TerminalBase
 {
 public:
-    branch_list next_list;
-    const std::string class_name = "StatementType";
-
     explicit StatementType(branch_list next_list);
+    const std::string class_name = "StatementType";
+    branch_list next_list;
 };
 
 typedef shared_ptr<StatementType> StatementTypePtr;
@@ -157,37 +145,34 @@ typedef shared_ptr<StatementType> StatementTypePtr;
 class NumberType : public TerminalBase
 {
 public:
+    explicit NumberType(string &token_string);
     int token;
     const std::string class_name = "NumberType";
-
-    explicit NumberType(string &token_string);
 };
 
 typedef shared_ptr<NumberType> NumberTypePtr;
 
 class SymbolType : public TerminalBase
 {
-    // no virtual method needed
+    
 public:
+    SymbolType(string &name, int offset, Type type);
+    const std::string class_name = "SymbolType";
     string name;
     int offset;
-    const std::string class_name = "SymbolType";
-
-    SymbolType(string &name, int offset, Type type);
+    
 };
 
-typedef shared_ptr<SymbolType> SymbolTypePtr;
 typedef vector<SymbolType> ArgList;
+typedef shared_ptr<SymbolType> SymbolTypePtr;
 
 class ArgListType : public TerminalBase
 {
 public:
+explicit ArgListType(ArgList &arg_list);
+    ArgListType();
     ArgList arg_list;
     const std::string class_name = "ArgListType";
-
-    ArgListType();
-
-    explicit ArgListType(ArgList &arg_list);
 };
 
 typedef shared_ptr<ArgListType> ArgListTypePtr;
@@ -195,11 +180,12 @@ typedef shared_ptr<ArgListType> ArgListTypePtr;
 class FuncSymType : public SymbolType
 {
 public:
-    ArgList params;
-    Type ret_type;
+    
     const std::string class_name = "FuncSymType";
-
+    Type ret_type;
     FuncSymType(string &symbol_name, Type symbol_type, ArgList &arg_list);
+    ArgList params;
+    
 };
 
 typedef shared_ptr<FuncSymType> FuncSymbolTypePtr;
@@ -207,12 +193,11 @@ typedef shared_ptr<FuncSymType> FuncSymbolTypePtr;
 class CaseListType : public TerminalBase
 {
 public:
-    case_label_list case_list;
-    string default_label;
-    branch_list next_list;
-    const std::string class_name = "CaseListType";
-
     CaseListType(case_label_list case_list, string default_label, branch_list next_list);
+    case_label_list case_list;
+    const std::string class_name = "CaseListType";
+    branch_list next_list;
+    string default_label;
 };
 
 typedef shared_ptr<CaseListType> CaseListTypePtr;
@@ -220,12 +205,12 @@ typedef shared_ptr<CaseListType> CaseListTypePtr;
 class CaseDeclType : public TerminalBase
 {
 public:
-    int case_num;
-    string case_label;
-    branch_list next_list;
-    const std::string class_name = "CaseDeclType";
-
     CaseDeclType(int case_num, string case_label, branch_list next_list);
+    string case_label;
+    const std::string class_name = "CaseDeclType";
+    branch_list next_list;
+    int case_num;
+   
 };
 
 typedef shared_ptr<CaseDeclType> CaseDeclTypePtr;
@@ -234,8 +219,6 @@ extern string TypeToString(Type type);
 
 extern void ArgListToStrings(ArgList &arg_list, vector<string> &string_vector);
 
-class Scope;
 
-typedef shared_ptr<Scope> ScopePtr;
 
 #endif // HWw3_TYPEDEFS_H

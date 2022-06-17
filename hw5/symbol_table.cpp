@@ -6,22 +6,22 @@
 void SymbolTable::PushDefaultFunctions() {
     // push print
     string message_name = "message";
-    STypeSymbol print_param_symbol(message_name, -1, STRING_TYPE);
+    SymbolType print_param_symbol(message_name, -1, STRING_TYPE);
 
     string print_name = "print";
     ArgList print_args;
     print_args.emplace_back(print_param_symbol);
-    auto print_func = make_shared<STypeFunctionSymbol>(print_name, VOID_TYPE, print_args);
+    auto print_func = make_shared<FuncSymType>(print_name, VOID_TYPE, print_args);
     AddFunction(print_func);
 
     // push printi
     string number_name = "number";
-    STypeSymbol printi_param_symbol(number_name, -1, INT_TYPE);
+    SymbolType printi_param_symbol(number_name, -1, INT_TYPE);
 
     string printi_name = "printi";
     ArgList printi_args;
     printi_args.emplace_back(printi_param_symbol);
-    auto printi_func = make_shared<STypeFunctionSymbol>(printi_name, VOID_TYPE, printi_args);
+    auto printi_func = make_shared<FuncSymType>(printi_name, VOID_TYPE, printi_args);
     AddFunction(printi_func);
 }
 
@@ -39,7 +39,7 @@ void SymbolTable::PushScope(ScopeType scope_type) {
         inside_switch = false;
     } else {
         assert(!scope_stack.empty());
-        ret_type = scope_stack.top()->ret_type;
+        ret_type = scope_stack.top()->return_type;
         inside_while = scope_stack.top()->inside_while;
         inside_switch = scope_stack.top()->inside_switch;
         while_continue_label = scope_stack.top()->while_continue_label;
@@ -52,7 +52,7 @@ void SymbolTable::PushScope(ScopeType scope_type) {
 
 void SymbolTable::PushFunctionScope(Type ret_type) {
     PushScope(FUNCTION_SCOPE);
-    scope_stack.top()->ret_type = ret_type;
+    scope_stack.top()->return_type = ret_type;
 
 }
 
@@ -64,10 +64,10 @@ void SymbolTable::PopScope() {
     // in global scope - functions only; in non-global scope - variables only
     if (scope_stack.top()->scope_type == GLOBAL_SCOPE) {
         for (const auto &func_symbol:scope_stack.top()->symbols) {
-            assert(func_symbol->general_type == FUNCTION_TYPE);
-            auto dynamic_cast_func = dynamic_pointer_cast<STypeFunctionSymbol>(func_symbol);
+            assert(func_symbol->g_type == FUNCTION_TYPE);
+            auto dynamic_cast_func = dynamic_pointer_cast<FuncSymType>(func_symbol);
             vector<string> string_types;
-            ArgListToStrings(dynamic_cast_func->parameters, string_types);
+            ArgListToStrings(dynamic_cast_func->params, string_types);
             string ret_type = TypeToString(dynamic_cast_func->ret_type);
             if (PRINT_DEBUG) {
                 printID(dynamic_cast_func->name, 0, makeFunctionType(ret_type, string_types));
@@ -77,8 +77,8 @@ void SymbolTable::PopScope() {
 
     } else {
         for (const auto &basic_symbol:scope_stack.top()->symbols) {
-            assert(basic_symbol->general_type != FUNCTION_TYPE);
-            string type = TypeToString(basic_symbol->general_type);
+            assert(basic_symbol->g_type != FUNCTION_TYPE);
+            string type = TypeToString(basic_symbol->g_type);
             if (PRINT_DEBUG) {
                 printID(basic_symbol->name, basic_symbol->offset, type);
             }
@@ -97,13 +97,13 @@ SymbolTable::SymbolTable() : current_offset(0), symbols_map(), scope_stack() {
 
 }
 
-void SymbolTable::AddParam(const STypeSymbolPtr &symbol) {
+void SymbolTable::AddParam(const SymbolTypePtr &symbol) {
     assert(!scope_stack.empty());
     scope_stack.top()->symbols.push_back(symbol);
     symbols_map.emplace(symbol->name, symbol);
 }
 
-void SymbolTable::AddVariable(const STypeSymbolPtr &symbol) {
+void SymbolTable::AddVariable(const SymbolTypePtr &symbol) {
     // add params only after adding the function
     assert(!scope_stack.empty());
     current_offset+= 4;
@@ -112,13 +112,13 @@ void SymbolTable::AddVariable(const STypeSymbolPtr &symbol) {
     symbols_map.emplace(symbol->name, symbol);
 }
 
-void SymbolTable::AddFunction(const STypeFunctionSymbolPtr &symbol) {
+void SymbolTable::AddFunction(const FuncSymbolTypePtr &symbol) {
     assert(!scope_stack.empty());
 
     // set offsets
     symbol->offset = 0;
     auto curr_param_offset = 0;
-    for (auto &param:symbol->parameters) {
+    for (auto &param:symbol->params) {
         param.offset = --curr_param_offset;
     }
 
@@ -130,7 +130,7 @@ bool SymbolTable::IsSymbolDefined(string &symbol_name) {
     return (symbols_map.find(symbol_name) != symbols_map.end());
 }
 
-STypeSymbolPtr SymbolTable::GetDefinedSymbol(string &symbol_name) {
+SymbolTypePtr SymbolTable::GetDefinedSymbol(string &symbol_name) {
     return symbols_map[symbol_name];
 }
 
@@ -138,7 +138,7 @@ STypeSymbolPtr SymbolTable::GetDefinedSymbol(string &symbol_name) {
 // the labels are initialized empty
 Scope::Scope(ScopeType scope_type, int offset, Type ret_type, bool inside_while, bool inside_switch,
              string while_continue_label, branch_list_ptr break_list) :
-        scope_type(scope_type), offset(offset), ret_type(ret_type),
+        scope_type(scope_type), offset(offset), return_type(ret_type),
         inside_while(inside_while), inside_switch(inside_switch),
         while_continue_label(move(while_continue_label)), break_list(move(break_list)) {
 

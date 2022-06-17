@@ -1,3 +1,4 @@
+
 %{
 #include "scanner.h"
 %}
@@ -47,9 +48,8 @@ plusMinus       (\+|-)
 "while" 					return LexToken(WHILE, yytext);
 "break" 					return LexToken(BREAK, yytext);
 "continue"					return LexToken(CONTINUE, yytext);
-"switch"					return LexToken(SWITCH, yytext);
-"case"		    			return LexToken(CASE, yytext);
-"default"					return LexToken(DEFAULT, yytext);
+
+
 ":"	        				return LexToken(COLON, yytext);
 ";" 						return LexToken(SC, yytext);
 "," 						return LexToken(COMMA, yytext);
@@ -80,16 +80,7 @@ plusMinus       (\+|-)
 <STRES>"0"					*textbuffptr = '\0';	textbuffptr++;	BEGIN(STR);
 <STRES>"x"					BEGIN(STRESX);
 <STRES>.					textbuffptr = textbuff;	*textbuffptr++ = *yytext; BEGIN(STRESE);
-<STRESX>[0-7]{hexdigit}     *textbuffptr = HexaToChar(yytext[0], yytext[1]);	textbuffptr++;	BEGIN(STR);
-<STRESX>{strsign}			errorLexAndExit(yylineno);
-<STRESX>({lf}|{cr})			errorLexAndExit(yylineno);
-<STRESX>.{strsign}			errorLexAndExit(yylineno);
-<STRESX>.({lf}|{cr})		errorLexAndExit(yylineno);
-<STRESX>..					textbuffptr = textbuff; *textbuffptr++ = 'x';*textbuffptr++ = yytext[0]; *textbuffptr++ = yytext[1]; BEGIN(STRESE);
-<STRESE>{strsign}			errorLexAndExit(yylineno);
-<STRESE>({lf}|{cr})			errorLexAndExit(yylineno);
-<STRESE>.					;
-<STR,STRES,STRESX><<EOF>>	errorLexAndExit(yylineno);
+
 {whitespace}				;
 .							errorLexAndExit(yylineno);
 

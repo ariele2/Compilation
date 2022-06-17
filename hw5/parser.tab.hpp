@@ -1,9 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.7.6.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
-   Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,7 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,10 +30,6 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
-
 #ifndef YY_YY_PARSER_TAB_HPP_INCLUDED
 # define YY_YY_PARSER_TAB_HPP_INCLUDED
 /* Debug traces.  */
@@ -45,54 +40,47 @@
 extern int yydebug;
 #endif
 
-/* Token kinds.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    VOID = 258,                    /* VOID  */
-    INT = 259,                     /* INT  */
-    BYTE = 260,                    /* BYTE  */
-    B = 261,                       /* B  */
-    BOOL = 262,                    /* BOOL  */
-    TRUE = 263,                    /* TRUE  */
-    FALSE = 264,                   /* FALSE  */
-    RETURN = 265,                  /* RETURN  */
-    IF = 266,                      /* IF  */
-    WHILE = 267,                   /* WHILE  */
-    BREAK = 268,                   /* BREAK  */
-    CONTINUE = 269,                /* CONTINUE  */
-    SC = 270,                      /* SC  */
-    COMMA = 271,                   /* COMMA  */
-    ID = 272,                      /* ID  */
-    NUM = 273,                     /* NUM  */
-    STRING = 274,                  /* STRING  */
-    DOTS = 275,                    /* DOTS  */
-    SWITCH = 276,                  /* SWITCH  */
-    CASE = 277,                    /* CASE  */
-    DEFAULT = 278,                 /* DEFAULT  */
-    COLON = 279,                   /* COLON  */
-    ASSIGN = 280,                  /* ASSIGN  */
-    OR = 281,                      /* OR  */
-    AND = 282,                     /* AND  */
-    EQUAL_UNEQUAL = 283,           /* EQUAL_UNEQUAL  */
-    INEQUALITY = 284,              /* INEQUALITY  */
-    PLUS_MINUS = 285,              /* PLUS_MINUS  */
-    MULT_DIV = 286,                /* MULT_DIV  */
-    NOT = 287,                     /* NOT  */
-    LBRACKET = 288,                /* LBRACKET  */
-    RBRACKET = 289,                /* RBRACKET  */
-    LBRACE = 290,                  /* LBRACE  */
-    RBRACE = 291,                  /* RBRACE  */
-    LPAREN = 292,                  /* LPAREN  */
-    RPAREN = 293,                  /* RPAREN  */
-    ELSE = 294                     /* ELSE  */
+    RETURN = 258,
+    IF = 259,
+    FALSE = 260,
+    BOOL = 261,
+    COLON = 262,
+    BREAK = 263,
+    CONTINUE = 264,
+    SC = 265,
+    WHILE = 266,
+    COMMA = 267,
+    ID = 268,
+    NUM = 269,
+    VOID = 270,
+    AUTO = 271,
+    INT = 272,
+    BYTE = 273,
+    B = 274,
+    STRING = 275,
+    DOTS = 276,
+    TRUE = 277,
+    ASSIGN = 278,
+    OR = 279,
+    AND = 280,
+    EQUAL_UNEQUAL = 281,
+    INEQUALITY = 282,
+    PLUS_MINUS = 283,
+    MULT_DIV = 284,
+    NOT = 285,
+    LBRACKET = 286,
+    RBRACKET = 287,
+    LBRACE = 288,
+    RBRACE = 289,
+    LPAREN = 290,
+    RPAREN = 291,
+    ELSE = 292
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */

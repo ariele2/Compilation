@@ -18,8 +18,8 @@ class Scope {
 public:
     ScopeType scope_type;
     int offset;
-    vector<STypeSymbolPtr> symbols;
-    Type ret_type;
+    vector<SymbolTypePtr> symbols;
+    Type return_type;
     bool inside_while;
     bool inside_switch;
     string while_continue_label;
@@ -32,7 +32,7 @@ public:
 class SymbolTable {
 public:
     int current_offset;
-    unordered_map<string, STypeSymbolPtr> symbols_map;
+    unordered_map<string, SymbolTypePtr> symbols_map;
     stack<ScopePtr> scope_stack;
 
     void PushDefaultFunctions();
@@ -45,15 +45,15 @@ public:
 
     SymbolTable();
 
-    void AddParam(const STypeSymbolPtr& symbol);
+    void AddParam(const SymbolTypePtr& symbol);
 
-    void AddVariable(const STypeSymbolPtr& symbol);
+    void AddVariable(const SymbolTypePtr& symbol);
 
-    void AddFunction(const STypeFunctionSymbolPtr & symbol);
+    void AddFunction(const FuncSymbolTypePtr & symbol);
 
     bool IsSymbolDefined(string &symbol_name);
 
-    STypeSymbolPtr GetDefinedSymbol(string& symbol_name);
+    SymbolTypePtr GetDefinedSymbol(string& symbol_name);
 
 };
 

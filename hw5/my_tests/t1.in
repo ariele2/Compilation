@@ -1,0 +1,23 @@
+void main(){
+    byte x = 4b;
+    while (x>3){
+        switch(x){
+            case 4:
+                int i=3;
+                while(i>0)
+                    break;
+                print("why");
+            case 5:
+                print("hi");
+                break;
+            default:
+                print("bye");
+        }
+
+        if (x>6){
+            break;
+        }
+        x = x+1b;
+        printi(x);
+    }
+}

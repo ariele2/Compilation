@@ -1,0 +1,32 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+define void @main() {
+%r0 = alloca i32, i32 200
+br label %label3_while_head  ; start/end of while
+  label3_while_head:
+br label %label5_while_body
+  label5_while_body:
+call void @printi(i32 1)
+br label %label9_next  ; end of statement
+br label %label9_next  ; end of statement
+  label9_next:
+br label %label14_next  ; break
+br label %label3_while_head  ; end of statement
+br label %label3_while_head  ; start/end of while
+br label %label14_next  ; end of statement
+  label14_next:
+ret void
+}

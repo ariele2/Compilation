@@ -1,0 +1,130 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+define void @main() {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, 0
+%r2 = getelementptr i32, i32* %r0, i32 4
+store i32 %r1, i32* %r2
+br label %label7_next  ; end of statement
+br label %label7_next  ; end of statement
+  label7_next:
+%r4 = getelementptr i32, i32* %r0, i32 4
+%r3 = load i32, i32* %r4
+call void @printi(i32 %r3)
+br label %label13_next  ; end of statement
+br label %label13_next  ; end of statement
+  label13_next:
+%r7 = getelementptr i32, i32* %r0, i32 4
+%r6 = load i32, i32* %r7
+%r8 = mul i32 %r6, 2
+%r9 = and i32 %r8, 255
+call void @printi(i32 %r9)
+br label %label21_next  ; end of statement
+br label %label21_next  ; end of statement
+  label21_next:
+%r12 = getelementptr i32, i32* %r0, i32 4
+%r11 = load i32, i32* %r12
+%r13 = add i32 %r11, 1
+%r14 = and i32 %r13, 255
+call void @printi(i32 %r14)
+br label %label29_next  ; end of statement
+br label %label29_next  ; end of statement
+  label29_next:
+%r16 = sub i32 0, 1
+%r17 = and i32 %r16, 255
+call void @printi(i32 %r17)
+br label %label35_next  ; end of statement
+br label %label35_next  ; end of statement
+  label35_next:
+%r20 = getelementptr i32, i32* %r0, i32 4
+%r19 = load i32, i32* %r20
+%r22 = icmp eq i32 1, 0
+br i1 %r22, label %label40_err_zero, label %label45_non_zero
+  label40_err_zero:
+%r23 = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0
+call void (i8*) @print(i8* %r23)
+call void (i32) @exit(i32 0)
+unreachable
+  label45_non_zero:
+%r21 = sdiv i32 %r19, 1
+%r24 = and i32 %r21, 255
+call void @printi(i32 %r24)
+br label %label51_next  ; end of statement
+br label %label51_next  ; end of statement
+  label51_next:
+%r26 = add i32 250, 250
+%r27 = and i32 %r26, 255
+call void @printi(i32 %r27)
+br label %label57_next  ; end of statement
+br label %label57_next  ; end of statement
+  label57_next:
+%r29 = mul i32 250, 2
+%r30 = and i32 %r29, 255
+call void @printi(i32 %r30)
+br label %label63_next  ; end of statement
+br label %label63_next  ; end of statement
+  label63_next:
+%r33 = icmp eq i32 2, 0
+br i1 %r33, label %label66_err_zero, label %label71_non_zero
+  label66_err_zero:
+%r34 = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0
+call void (i8*) @print(i8* %r34)
+call void (i32) @exit(i32 0)
+unreachable
+  label71_non_zero:
+%r32 = sdiv i32 8, 2
+%r35 = and i32 %r32, 255
+call void @printi(i32 %r35)
+br label %label77_next  ; end of statement
+br label %label77_next  ; end of statement
+  label77_next:
+%r38 = icmp eq i32 4, 0
+br i1 %r38, label %label80_err_zero, label %label85_non_zero
+  label80_err_zero:
+%r39 = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0
+call void (i8*) @print(i8* %r39)
+call void (i32) @exit(i32 0)
+unreachable
+  label85_non_zero:
+%r37 = sdiv i32 10, 4
+%r40 = and i32 %r37, 255
+call void @printi(i32 %r40)
+br label %label91_next  ; end of statement
+br label %label91_next  ; end of statement
+  label91_next:
+%r43 = getelementptr i32, i32* %r0, i32 4
+%r42 = load i32, i32* %r43
+%r45 = getelementptr i32, i32* %r0, i32 4
+%r44 = load i32, i32* %r45
+%r47 = icmp eq i32 %r44, 0
+br i1 %r47, label %label98_err_zero, label %label103_non_zero
+  label98_err_zero:
+%r48 = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0
+call void (i8*) @print(i8* %r48)
+call void (i32) @exit(i32 0)
+unreachable
+  label103_non_zero:
+%r46 = sdiv i32 %r42, %r44
+%r49 = and i32 %r46, 255
+call void @printi(i32 %r49)
+br label %label109_next  ; end of statement
+br label %label109_next  ; end of statement
+  label109_next:
+ret void
+br label %label112_next  ; end of statement
+  label112_next:
+ret void
+}

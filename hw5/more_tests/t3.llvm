@@ -1,0 +1,75 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+define void @fallthrough(i32) {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, %0
+br label %label27_switch_init  ; start of switch
+br label %label5_case  ; start of case
+  label5_case:
+call void @printi(i32 1)
+br label %label9_next  ; end of statement
+br label %label9_next  ; end of statement
+  label9_next:
+br label %label38_next  ; break
+br label %label12_next  ; end of statement
+  label12_next:
+br label %label14_case  ; start of case
+  label14_case:
+call void @printi(i32 2)
+br label %label17_next  ; end of statement
+  label17_next:
+br label %label19_case  ; start of case
+  label19_case:
+call void @printi(i32 3)
+br label %label22_next  ; end of statement
+  label22_next:
+br label %label24_default  ; start of default
+  label24_default:
+call void @printi(i32 0)
+br label %label38_next  ; end of statement
+  label27_switch_init:
+%r6 = icmp eq i32 %r1, 3
+br i1 %r6, label %label19_case, label %label30_switch_comparison
+  label30_switch_comparison:
+%r7 = icmp eq i32 %r1, 2
+br i1 %r7, label %label14_case, label %label33_switch_comparison
+  label33_switch_comparison:
+%r8 = icmp eq i32 %r1, 1
+br i1 %r8, label %label5_case, label %label24_default
+br label %label24_default
+br label %label38_next  ; end of statement
+  label38_next:
+ret void
+}
+define void @main() {
+%r9 = alloca i32, i32 200
+call void @fallthrough(i32 1)
+br label %label46_next  ; end of statement
+br label %label46_next  ; end of statement
+  label46_next:
+call void @fallthrough(i32 2)
+br label %label50_next  ; end of statement
+br label %label50_next  ; end of statement
+  label50_next:
+call void @fallthrough(i32 3)
+br label %label54_next  ; end of statement
+br label %label54_next  ; end of statement
+  label54_next:
+call void @fallthrough(i32 4)
+br label %label57_next  ; end of statement
+  label57_next:
+ret void
+}

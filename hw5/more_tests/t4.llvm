@@ -1,0 +1,46 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+@r2 = constant [24 x i8] c"testing print functions\00"
+@r5 = constant [2 x i8] c"a\00"
+define void @main() {
+%r0 = alloca i32, i32 200
+%r1 = getelementptr [24 x i8], [24 x i8]* @r2, i32 0, i32 0
+call void @print(i8* %r1)
+br label %label6_next  ; end of statement
+br label %label6_next  ; end of statement
+  label6_next:
+%r4 = getelementptr [2 x i8], [2 x i8]* @r5, i32 0, i32 0
+call void @print(i8* %r4)
+br label %label11_next  ; end of statement
+br label %label11_next  ; end of statement
+  label11_next:
+call void @printi(i32 1)
+br label %label15_next  ; end of statement
+br label %label15_next  ; end of statement
+  label15_next:
+%r8 = add i32 123, 0
+%r9 = getelementptr i32, i32* %r0, i32 4
+store i32 %r8, i32* %r9
+br label %label21_next  ; end of statement
+br label %label21_next  ; end of statement
+  label21_next:
+%r11 = getelementptr i32, i32* %r0, i32 4
+%r10 = load i32, i32* %r11
+call void @printi(i32 %r10)
+br label %label26_next  ; end of statement
+  label26_next:
+ret void
+}

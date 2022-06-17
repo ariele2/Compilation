@@ -1,0 +1,177 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+@r7 = constant [2 x i8] c"0\00"
+@r31 = constant [7 x i8] c"case 0\00"
+@r34 = constant [7 x i8] c"case 1\00"
+@r42 = constant [7 x i8] c"case 2\00"
+@r45 = constant [8 x i8] c"default\00"
+define i32 @printb(i32) {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, %0
+%r2 = trunc i32 %r1 to i1
+br i1 %r2, label %label5_if, label %label10_next
+  label5_if:
+call void @printi(i32 1)
+br label %label10_next  ; end of if
+br label %label10_next  ; end of statement
+br label %label10_next  ; end of statement
+  label10_next:
+%r4 = add i32 0, %0
+%r5 = trunc i32 %r4 to i1
+br i1 %r5, label %label20_next, label %label14_if
+  label14_if:
+%r6 = getelementptr [2 x i8], [2 x i8]* @r7, i32 0, i32 0
+call void @print(i8* %r6)
+br label %label20_next  ; end of if
+br label %label20_next  ; end of statement
+br label %label20_next  ; end of statement
+  label20_next:
+%r9 = add i32 0, %0
+%r10 = trunc i32 %r9 to i1
+br i1 %r10, label %label24_convert_true, label %label26_convert_false
+  label24_convert_true:
+br label %label28_convert_final
+  label26_convert_false:
+br label %label28_convert_final
+  label28_convert_final:
+%r11 = phi i32 [1, %label24_convert_true], [0, %label26_convert_false]
+ret i32 %r11
+br label %label32_next  ; end of statement
+  label32_next:
+ret i32 0
+}
+define void @main() {
+%r12 = alloca i32, i32 200
+%r13 = add i32 0, 0
+%r14 = getelementptr i32, i32* %r12, i32 4
+store i32 %r13, i32* %r14
+br label %label42_next  ; end of statement
+br label %label42_next  ; end of statement
+  label42_next:
+%r15 = add i32 0, 0
+%r16 = getelementptr i32, i32* %r12, i32 8
+store i32 %r15, i32* %r16
+br label %label48_next  ; end of statement
+br label %label48_next  ; end of statement
+  label48_next:
+br label %label50_while_head  ; start/end of while
+  label50_while_head:
+%r18 = getelementptr i32, i32* %r12, i32 4
+%r17 = load i32, i32* %r18
+%r19 = icmp slt i32 %r17, 5
+br i1 %r19, label %label55_while_body, label %label154_next
+  label55_while_body:
+%r21 = getelementptr i32, i32* %r12, i32 8
+%r20 = load i32, i32* %r21
+%r22 = icmp eq i32 %r20, 10
+br i1 %r22, label %label60_if, label %label71_next
+  label60_if:
+%r24 = getelementptr i32, i32* %r12, i32 4
+%r23 = load i32, i32* %r24
+%r25 = add i32 %r23, 1
+%r26 = add i32 %r25, 0
+%r27 = getelementptr i32, i32* %r12, i32 4
+store i32 %r26, i32* %r27
+br label %label71_next  ; end of statement
+br label %label71_next  ; end of if
+br label %label71_next  ; end of statement
+br label %label71_next  ; end of statement
+  label71_next:
+%r29 = getelementptr i32, i32* %r12, i32 4
+%r28 = load i32, i32* %r29
+br label %label123_switch_init  ; start of switch
+br label %label76_case  ; start of case
+  label76_case:
+%r30 = getelementptr [7 x i8], [7 x i8]* @r31, i32 0, i32 0
+call void @print(i8* %r30)
+br label %label81_next  ; end of statement
+br label %label81_next  ; end of statement
+  label81_next:
+br label %label135_next  ; break
+br label %label85_next  ; end of statement
+br label %label85_next  ; end of statement
+  label85_next:
+br label %label87_case  ; start of case
+  label87_case:
+%r33 = getelementptr [7 x i8], [7 x i8]* @r34, i32 0, i32 0
+call void @print(i8* %r33)
+br label %label92_next  ; end of statement
+br label %label92_next  ; end of statement
+  label92_next:
+%r37 = getelementptr i32, i32* %r12, i32 8
+%r36 = load i32, i32* %r37
+%r38 = add i32 %r36, 1
+%r39 = add i32 %r38, 0
+%r40 = getelementptr i32, i32* %r12, i32 8
+store i32 %r39, i32* %r40
+br label %label101_next  ; end of statement
+br label %label101_next  ; end of statement
+  label101_next:
+br label %label50_while_head
+br label %label105_next  ; end of statement
+br label %label105_next  ; end of statement
+  label105_next:
+br label %label107_case  ; start of case
+  label107_case:
+%r41 = getelementptr [7 x i8], [7 x i8]* @r42, i32 0, i32 0
+call void @print(i8* %r41)
+br label %label112_next  ; end of statement
+br label %label112_next  ; end of statement
+  label112_next:
+br label %label114_default  ; start of default
+  label114_default:
+%r44 = getelementptr [8 x i8], [8 x i8]* @r45, i32 0, i32 0
+call void @print(i8* %r44)
+br label %label119_next  ; end of statement
+br label %label119_next  ; end of statement
+  label119_next:
+br label %label135_next  ; break
+br label %label135_next  ; end of statement
+br label %label135_next  ; end of statement
+  label123_switch_init:
+%r47 = icmp eq i32 %r28, 2
+br i1 %r47, label %label107_case, label %label126_switch_comparison
+  label126_switch_comparison:
+%r48 = icmp eq i32 %r28, 1
+br i1 %r48, label %label87_case, label %label129_switch_comparison
+  label129_switch_comparison:
+%r49 = icmp eq i32 %r28, 0
+br i1 %r49, label %label76_case, label %label114_default
+br label %label114_default
+br label %label135_next  ; end of statement
+br label %label135_next  ; end of statement
+  label135_next:
+%r51 = getelementptr i32, i32* %r12, i32 8
+%r50 = load i32, i32* %r51
+%r53 = getelementptr i32, i32* %r12, i32 4
+%r52 = load i32, i32* %r53
+%r54 = add i32 %r50, %r52
+call void @printi(i32 %r54)
+br label %label144_next  ; end of statement
+br label %label144_next  ; end of statement
+  label144_next:
+%r57 = getelementptr i32, i32* %r12, i32 4
+%r56 = load i32, i32* %r57
+%r58 = add i32 %r56, 1
+%r59 = add i32 %r58, 0
+%r60 = getelementptr i32, i32* %r12, i32 4
+store i32 %r59, i32* %r60
+br label %label50_while_head  ; end of statement
+br label %label50_while_head  ; start/end of while
+br label %label154_next  ; end of statement
+  label154_next:
+ret void
+}

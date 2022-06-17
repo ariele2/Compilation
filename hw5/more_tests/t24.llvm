@@ -1,0 +1,286 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+@r7 = constant [2 x i8] c"0\00"
+@r45 = constant [6 x i8] c"i < 3\00"
+@r72 = constant [6 x i8] c"i < 7\00"
+define i32 @printb(i32) {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, %0
+%r2 = trunc i32 %r1 to i1
+br i1 %r2, label %label5_if, label %label10_next
+  label5_if:
+call void @printi(i32 1)
+br label %label10_next  ; end of if
+br label %label10_next  ; end of statement
+br label %label10_next  ; end of statement
+  label10_next:
+%r4 = add i32 0, %0
+%r5 = trunc i32 %r4 to i1
+br i1 %r5, label %label20_next, label %label14_if
+  label14_if:
+%r6 = getelementptr [2 x i8], [2 x i8]* @r7, i32 0, i32 0
+call void @print(i8* %r6)
+br label %label20_next  ; end of if
+br label %label20_next  ; end of statement
+br label %label20_next  ; end of statement
+  label20_next:
+%r9 = add i32 0, %0
+%r10 = trunc i32 %r9 to i1
+br i1 %r10, label %label24_convert_true, label %label26_convert_false
+  label24_convert_true:
+br label %label28_convert_final
+  label26_convert_false:
+br label %label28_convert_final
+  label28_convert_final:
+%r11 = phi i32 [1, %label24_convert_true], [0, %label26_convert_false]
+ret i32 %r11
+br label %label32_next  ; end of statement
+  label32_next:
+ret i32 0
+}
+define void @main() {
+%r12 = alloca i32, i32 200
+%r13 = add i32 0, 0
+%r14 = getelementptr i32, i32* %r12, i32 4
+store i32 %r13, i32* %r14
+br label %label42_next  ; end of statement
+br label %label42_next  ; end of statement
+  label42_next:
+%r15 = add i32 0, 0
+%r16 = getelementptr i32, i32* %r12, i32 8
+store i32 %r15, i32* %r16
+br label %label48_next  ; end of statement
+br label %label48_next  ; end of statement
+  label48_next:
+%r17 = add i32 5, 0
+%r18 = getelementptr i32, i32* %r12, i32 12
+store i32 %r17, i32* %r18
+br label %label54_next  ; end of statement
+br label %label54_next  ; end of statement
+  label54_next:
+%r19 = add i32 2, 0
+%r20 = getelementptr i32, i32* %r12, i32 16
+store i32 %r19, i32* %r20
+br label %label60_next  ; end of statement
+br label %label60_next  ; end of statement
+  label60_next:
+%r21 = add i32 0, 0
+%r22 = getelementptr i32, i32* %r12, i32 20
+store i32 %r21, i32* %r22
+br label %label66_next  ; end of statement
+br label %label66_next  ; end of statement
+  label66_next:
+br label %label68_while_head  ; start/end of while
+  label68_while_head:
+%r24 = getelementptr i32, i32* %r12, i32 4
+%r23 = load i32, i32* %r24
+%r25 = icmp slt i32 %r23, 15
+br i1 %r25, label %label73_while_body, label %label265_next
+  label73_while_body:
+%r27 = getelementptr i32, i32* %r12, i32 4
+%r26 = load i32, i32* %r27
+%r28 = icmp slt i32 %r26, 1
+br i1 %r28, label %label78_convert_true, label %label80_convert_false
+  label78_convert_true:
+br label %label82_convert_final
+  label80_convert_false:
+br label %label82_convert_final
+  label82_convert_final:
+%r29 = phi i32 [1, %label78_convert_true], [0, %label80_convert_false]
+%r30 = call i32 @printb(i32 %r29)
+%r31 = trunc i32 %r30 to i1
+br i1 %r31, label %label87_and, label %label120_else
+  label87_and:
+%r33 = getelementptr i32, i32* %r12, i32 4
+%r32 = load i32, i32* %r33
+%r34 = icmp sgt i32 %r32, 2
+br i1 %r34, label %label92_convert_true, label %label94_convert_false
+  label92_convert_true:
+br label %label96_convert_final
+  label94_convert_false:
+br label %label96_convert_final
+  label96_convert_final:
+%r35 = phi i32 [1, %label92_convert_true], [0, %label94_convert_false]
+%r36 = call i32 @printb(i32 %r35)
+%r37 = trunc i32 %r36 to i1
+br i1 %r37, label %label101_and, label %label120_else
+  label101_and:
+%r39 = getelementptr i32, i32* %r12, i32 4
+%r38 = load i32, i32* %r39
+%r40 = icmp slt i32 %r38, 3
+br i1 %r40, label %label106_convert_true, label %label108_convert_false
+  label106_convert_true:
+br label %label110_convert_final
+  label108_convert_false:
+br label %label110_convert_final
+  label110_convert_final:
+%r41 = phi i32 [1, %label106_convert_true], [0, %label108_convert_false]
+%r42 = call i32 @printb(i32 %r41)
+%r43 = trunc i32 %r42 to i1
+br i1 %r43, label %label115_if, label %label120_else
+  label115_if:
+%r44 = getelementptr [6 x i8], [6 x i8]* @r45, i32 0, i32 0
+call void @print(i8* %r44)
+br label %label183_next  ; end of statement
+br label %label183_next  ; end of if
+  label120_else:
+%r48 = getelementptr i32, i32* %r12, i32 4
+%r47 = load i32, i32* %r48
+%r49 = icmp slt i32 %r47, 7
+br i1 %r49, label %label125_convert_true, label %label127_convert_false
+  label125_convert_true:
+br label %label129_convert_final
+  label127_convert_false:
+br label %label129_convert_final
+  label129_convert_final:
+%r50 = phi i32 [1, %label125_convert_true], [0, %label127_convert_false]
+%r51 = call i32 @printb(i32 %r50)
+%r52 = trunc i32 %r51 to i1
+br i1 %r52, label %label176_if, label %label134_or
+  label134_or:
+%r54 = getelementptr i32, i32* %r12, i32 4
+%r53 = load i32, i32* %r54
+%r55 = icmp slt i32 %r53, 5
+br i1 %r55, label %label139_convert_true, label %label141_convert_false
+  label139_convert_true:
+br label %label143_convert_final
+  label141_convert_false:
+br label %label143_convert_final
+  label143_convert_final:
+%r56 = phi i32 [1, %label139_convert_true], [0, %label141_convert_false]
+%r57 = call i32 @printb(i32 %r56)
+%r58 = trunc i32 %r57 to i1
+br i1 %r58, label %label148_and, label %label162_or
+  label148_and:
+%r60 = getelementptr i32, i32* %r12, i32 4
+%r59 = load i32, i32* %r60
+%r61 = icmp slt i32 %r59, 6
+br i1 %r61, label %label153_convert_true, label %label155_convert_false
+  label153_convert_true:
+br label %label157_convert_final
+  label155_convert_false:
+br label %label157_convert_final
+  label157_convert_final:
+%r62 = phi i32 [1, %label153_convert_true], [0, %label155_convert_false]
+%r63 = call i32 @printb(i32 %r62)
+%r64 = trunc i32 %r63 to i1
+br i1 %r64, label %label176_if, label %label162_or
+  label162_or:
+%r66 = getelementptr i32, i32* %r12, i32 4
+%r65 = load i32, i32* %r66
+%r67 = icmp slt i32 %r65, 4
+br i1 %r67, label %label167_convert_true, label %label169_convert_false
+  label167_convert_true:
+br label %label171_convert_final
+  label169_convert_false:
+br label %label171_convert_final
+  label171_convert_final:
+%r68 = phi i32 [1, %label167_convert_true], [0, %label169_convert_false]
+%r69 = call i32 @printb(i32 %r68)
+%r70 = trunc i32 %r69 to i1
+br i1 %r70, label %label176_if, label %label183_next
+  label176_if:
+%r71 = getelementptr [6 x i8], [6 x i8]* @r72, i32 0, i32 0
+call void @print(i8* %r71)
+br label %label183_next  ; end of statement
+br label %label183_next  ; end of if
+br label %label183_next  ; end of statement
+br label %label183_next  ; end of statement
+  label183_next:
+br label %label185_while_head  ; start/end of while
+  label185_while_head:
+%r75 = getelementptr i32, i32* %r12, i32 20
+%r74 = load i32, i32* %r75
+%r77 = getelementptr i32, i32* %r12, i32 12
+%r76 = load i32, i32* %r77
+%r79 = getelementptr i32, i32* %r12, i32 16
+%r78 = load i32, i32* %r79
+%r80 = mul i32 %r76, %r78
+%r81 = icmp slt i32 %r74, %r80
+br i1 %r81, label %label195_while_body, label %label241_next
+  label195_while_body:
+%r83 = getelementptr i32, i32* %r12, i32 20
+%r82 = load i32, i32* %r83
+%r85 = getelementptr i32, i32* %r12, i32 16
+%r84 = load i32, i32* %r85
+%r86 = add i32 %r82, %r84
+%r87 = add i32 %r86, 0
+%r88 = getelementptr i32, i32* %r12, i32 20
+store i32 %r87, i32* %r88
+br label %label206_next  ; end of statement
+br label %label206_next  ; end of statement
+  label206_next:
+%r90 = getelementptr i32, i32* %r12, i32 20
+%r89 = load i32, i32* %r90
+%r92 = icmp eq i32 3, 0
+br i1 %r92, label %label211_err_zero, label %label216_non_zero
+  label211_err_zero:
+%r93 = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0
+call void (i8*) @print(i8* %r93)
+call void (i32) @exit(i32 0)
+unreachable
+  label216_non_zero:
+%r91 = sdiv i32 %r89, 3
+%r94 = icmp eq i32 %r91, 0
+br i1 %r94, label %label220_and, label %label185_while_head
+  label220_and:
+%r96 = getelementptr i32, i32* %r12, i32 20
+%r95 = load i32, i32* %r96
+%r98 = icmp eq i32 5, 0
+br i1 %r98, label %label225_err_zero, label %label230_non_zero
+  label225_err_zero:
+%r99 = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0
+call void (i8*) @print(i8* %r99)
+call void (i32) @exit(i32 0)
+unreachable
+  label230_non_zero:
+%r97 = sdiv i32 %r95, 5
+%r100 = icmp eq i32 %r97, 0
+br i1 %r100, label %label234_if, label %label185_while_head
+  label234_if:
+br label %label241_next  ; break
+br label %label185_while_head  ; end of if
+br label %label185_while_head  ; end of statement
+br label %label185_while_head  ; start/end of while
+br label %label241_next  ; end of statement
+br label %label241_next  ; end of statement
+  label241_next:
+%r102 = getelementptr i32, i32* %r12, i32 12
+%r101 = load i32, i32* %r102
+call void @printi(i32 %r101)
+br label %label247_next  ; end of statement
+br label %label247_next  ; end of statement
+  label247_next:
+%r105 = getelementptr i32, i32* %r12, i32 20
+%r104 = load i32, i32* %r105
+%r106 = add i32 %r104, 0
+%r107 = getelementptr i32, i32* %r12, i32 12
+store i32 %r106, i32* %r107
+br label %label255_next  ; end of statement
+br label %label255_next  ; end of statement
+  label255_next:
+%r109 = getelementptr i32, i32* %r12, i32 4
+%r108 = load i32, i32* %r109
+%r110 = add i32 %r108, 1
+%r111 = add i32 %r110, 0
+%r112 = getelementptr i32, i32* %r12, i32 4
+store i32 %r111, i32* %r112
+br label %label68_while_head  ; end of statement
+br label %label68_while_head  ; start/end of while
+br label %label265_next  ; end of statement
+  label265_next:
+ret void
+}

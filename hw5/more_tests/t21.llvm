@@ -1,0 +1,168 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+define void @main() {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, 0
+%r2 = getelementptr i32, i32* %r0, i32 4
+store i32 %r1, i32* %r2
+br label %label7_next  ; end of statement
+br label %label7_next  ; end of statement
+  label7_next:
+%r3 = add i32 0, 0
+%r4 = getelementptr i32, i32* %r0, i32 8
+store i32 %r3, i32* %r4
+br label %label13_next  ; end of statement
+br label %label13_next  ; end of statement
+  label13_next:
+%r5 = add i32 1, 0
+%r6 = getelementptr i32, i32* %r0, i32 12
+store i32 %r5, i32* %r6
+br label %label19_next  ; end of statement
+br label %label19_next  ; end of statement
+  label19_next:
+%r7 = add i32 10, 0
+%r8 = getelementptr i32, i32* %r0, i32 16
+store i32 %r7, i32* %r8
+br label %label25_next  ; end of statement
+br label %label25_next  ; end of statement
+  label25_next:
+%r9 = add i32 100, 0
+%r10 = getelementptr i32, i32* %r0, i32 20
+store i32 %r9, i32* %r10
+br label %label31_next  ; end of statement
+br label %label31_next  ; end of statement
+  label31_next:
+%r11 = add i32 0, 0
+%r12 = getelementptr i32, i32* %r0, i32 24
+store i32 %r11, i32* %r12
+br label %label37_next  ; end of statement
+br label %label37_next  ; end of statement
+  label37_next:
+br label %label39_while_head  ; start/end of while
+  label39_while_head:
+%r14 = getelementptr i32, i32* %r0, i32 24
+%r13 = load i32, i32* %r14
+%r15 = icmp slt i32 %r13, 4
+br i1 %r15, label %label44_while_body, label %label150_next
+  label44_while_body:
+%r17 = getelementptr i32, i32* %r0, i32 8
+%r16 = load i32, i32* %r17
+%r19 = getelementptr i32, i32* %r0, i32 4
+%r18 = load i32, i32* %r19
+%r20 = icmp sgt i32 %r16, %r18
+br i1 %r20, label %label51_if, label %label60_next
+  label51_if:
+%r22 = getelementptr i32, i32* %r0, i32 8
+%r21 = load i32, i32* %r22
+%r23 = add i32 %r21, 0
+%r24 = getelementptr i32, i32* %r0, i32 4
+store i32 %r23, i32* %r24
+br label %label60_next  ; end of if
+br label %label60_next  ; end of statement
+br label %label60_next  ; end of statement
+  label60_next:
+%r26 = getelementptr i32, i32* %r0, i32 12
+%r25 = load i32, i32* %r26
+%r28 = getelementptr i32, i32* %r0, i32 4
+%r27 = load i32, i32* %r28
+%r29 = icmp sgt i32 %r25, %r27
+br i1 %r29, label %label67_if, label %label76_next
+  label67_if:
+%r31 = getelementptr i32, i32* %r0, i32 12
+%r30 = load i32, i32* %r31
+%r32 = add i32 %r30, 0
+%r33 = getelementptr i32, i32* %r0, i32 4
+store i32 %r32, i32* %r33
+br label %label76_next  ; end of if
+br label %label76_next  ; end of statement
+br label %label76_next  ; end of statement
+  label76_next:
+%r35 = getelementptr i32, i32* %r0, i32 16
+%r34 = load i32, i32* %r35
+%r37 = getelementptr i32, i32* %r0, i32 4
+%r36 = load i32, i32* %r37
+%r38 = icmp sgt i32 %r34, %r36
+br i1 %r38, label %label83_if, label %label93_next
+  label83_if:
+%r40 = getelementptr i32, i32* %r0, i32 16
+%r39 = load i32, i32* %r40
+%r41 = add i32 %r39, 0
+%r42 = getelementptr i32, i32* %r0, i32 4
+store i32 %r41, i32* %r42
+br label %label93_next  ; end of statement
+br label %label93_next  ; end of if
+br label %label93_next  ; end of statement
+br label %label93_next  ; end of statement
+  label93_next:
+%r44 = getelementptr i32, i32* %r0, i32 20
+%r43 = load i32, i32* %r44
+%r46 = getelementptr i32, i32* %r0, i32 4
+%r45 = load i32, i32* %r46
+%r47 = icmp sgt i32 %r43, %r45
+br i1 %r47, label %label100_if, label %label110_next
+  label100_if:
+%r49 = getelementptr i32, i32* %r0, i32 20
+%r48 = load i32, i32* %r49
+%r50 = add i32 %r48, 0
+%r51 = getelementptr i32, i32* %r0, i32 4
+store i32 %r50, i32* %r51
+br label %label110_next  ; end of statement
+br label %label110_next  ; end of if
+br label %label110_next  ; end of statement
+br label %label110_next  ; end of statement
+  label110_next:
+%r53 = getelementptr i32, i32* %r0, i32 4
+%r52 = load i32, i32* %r53
+call void @printi(i32 %r52)
+br label %label116_next  ; end of statement
+br label %label116_next  ; end of statement
+  label116_next:
+%r55 = add i32 0, 0
+%r56 = getelementptr i32, i32* %r0, i32 4
+store i32 %r55, i32* %r56
+br label %label122_next  ; end of statement
+br label %label122_next  ; end of statement
+  label122_next:
+%r58 = getelementptr i32, i32* %r0, i32 20
+%r57 = load i32, i32* %r58
+%r59 = sub i32 0, %r57
+%r60 = add i32 %r59, 0
+%r61 = getelementptr i32, i32* %r0, i32 20
+store i32 %r60, i32* %r61
+br label %label131_next  ; end of statement
+br label %label131_next  ; end of statement
+  label131_next:
+%r63 = getelementptr i32, i32* %r0, i32 12
+%r62 = load i32, i32* %r63
+%r64 = mul i32 %r62, 9
+%r65 = add i32 %r64, 0
+%r66 = getelementptr i32, i32* %r0, i32 12
+store i32 %r65, i32* %r66
+br label %label140_next  ; end of statement
+br label %label140_next  ; end of statement
+  label140_next:
+%r68 = getelementptr i32, i32* %r0, i32 24
+%r67 = load i32, i32* %r68
+%r69 = add i32 %r67, 1
+%r70 = add i32 %r69, 0
+%r71 = getelementptr i32, i32* %r0, i32 24
+store i32 %r70, i32* %r71
+br label %label39_while_head  ; end of statement
+br label %label39_while_head  ; start/end of while
+br label %label150_next  ; end of statement
+  label150_next:
+ret void
+}

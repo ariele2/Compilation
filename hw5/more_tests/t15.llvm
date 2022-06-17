@@ -1,0 +1,72 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+@r5 = constant [5 x i8] c"abcd\00"
+@r19 = constant [5 x i8] c"abcd\00"
+define void @main() {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, 0
+%r2 = getelementptr i32, i32* %r0, i32 4
+store i32 %r1, i32* %r2
+br label %label7_next  ; end of statement
+br label %label7_next  ; end of statement
+  label7_next:
+call void @printi(i32 123)
+br label %label11_next  ; end of statement
+br label %label11_next  ; end of statement
+  label11_next:
+%r4 = getelementptr [5 x i8], [5 x i8]* @r5, i32 0, i32 0
+call void @print(i8* %r4)
+br label %label16_next  ; end of statement
+br label %label16_next  ; end of statement
+  label16_next:
+br label %label18_while_head  ; start/end of while
+  label18_while_head:
+%r8 = getelementptr i32, i32* %r0, i32 4
+%r7 = load i32, i32* %r8
+%r9 = icmp slt i32 %r7, 10
+br i1 %r9, label %label23_while_body, label %label52_next
+  label23_while_body:
+%r11 = getelementptr i32, i32* %r0, i32 4
+%r10 = load i32, i32* %r11
+call void @printi(i32 %r10)
+br label %label29_next  ; end of statement
+br label %label29_next  ; end of statement
+  label29_next:
+%r14 = getelementptr i32, i32* %r0, i32 4
+%r13 = load i32, i32* %r14
+%r15 = add i32 %r13, 1
+%r16 = add i32 %r15, 0
+%r17 = getelementptr i32, i32* %r0, i32 4
+store i32 %r16, i32* %r17
+br label %label38_next  ; end of statement
+br label %label38_next  ; end of statement
+  label38_next:
+br label %label18_while_head
+br label %label42_next  ; end of statement
+br label %label42_next  ; end of statement
+  label42_next:
+%r18 = getelementptr [5 x i8], [5 x i8]* @r19, i32 0, i32 0
+call void @print(i8* %r18)
+br label %label47_next  ; end of statement
+br label %label47_next  ; end of statement
+  label47_next:
+br label %label52_next  ; break
+br label %label18_while_head  ; end of statement
+br label %label18_while_head  ; start/end of while
+br label %label52_next  ; end of statement
+  label52_next:
+ret void
+}

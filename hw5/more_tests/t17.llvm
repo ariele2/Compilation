@@ -1,0 +1,261 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+define i32 @printb(i32) {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, %0
+call void @printi(i32 %r1)
+br label %label6_next  ; end of statement
+br label %label6_next  ; end of statement
+  label6_next:
+%r3 = add i32 0, 0
+%r4 = getelementptr i32, i32* %r0, i32 4
+store i32 %r3, i32* %r4
+br label %label12_next  ; end of statement
+br label %label12_next  ; end of statement
+  label12_next:
+%r5 = add i32 0, %0
+br label %label52_switch_init  ; start of switch
+br label %label16_case  ; start of case
+  label16_case:
+%r6 = add i32 0, 0
+%r7 = getelementptr i32, i32* %r0, i32 4
+store i32 %r6, i32* %r7
+br label %label21_next  ; end of statement
+  label21_next:
+br label %label23_case  ; start of case
+  label23_case:
+br label %label27_convert_false
+  label25_convert_true:
+br label %label29_convert_final
+  label27_convert_false:
+br label %label29_convert_final
+  label29_convert_final:
+%r8 = phi i32 [1, %label25_convert_true], [0, %label27_convert_false]
+ret i32 %r8
+br label %label33_next  ; end of statement
+  label33_next:
+br label %label35_case  ; start of case
+  label35_case:
+%r9 = add i32 1, 0
+%r10 = getelementptr i32, i32* %r0, i32 4
+store i32 %r9, i32* %r10
+br label %label40_next  ; end of statement
+  label40_next:
+br label %label42_case  ; start of case
+  label42_case:
+br label %label44_convert_true
+  label44_convert_true:
+br label %label48_convert_final
+  label46_convert_false:
+br label %label48_convert_final
+  label48_convert_final:
+%r11 = phi i32 [1, %label44_convert_true], [0, %label46_convert_false]
+ret i32 %r11
+br label %label66_next  ; end of statement
+  label52_switch_init:
+%r12 = icmp eq i32 %r5, 2
+br i1 %r12, label %label42_case, label %label55_switch_comparison
+  label55_switch_comparison:
+%r13 = icmp eq i32 %r5, 1
+br i1 %r13, label %label35_case, label %label58_switch_comparison
+  label58_switch_comparison:
+%r14 = icmp eq i32 %r5, 3
+br i1 %r14, label %label23_case, label %label61_switch_comparison
+  label61_switch_comparison:
+%r15 = icmp eq i32 %r5, 0
+br i1 %r15, label %label16_case, label %label64_switch_comparison_end
+  label64_switch_comparison_end:
+br label %label66_next  ; end of statement
+  label66_next:
+ret i32 0
+}
+define void @main() {
+%r16 = alloca i32, i32 200
+br label %label72_convert_true
+  label72_convert_true:
+br label %label76_convert_final
+  label74_convert_false:
+br label %label76_convert_final
+  label76_convert_final:
+%r17 = phi i32 [1, %label72_convert_true], [0, %label74_convert_false]
+%r18 = getelementptr i32, i32* %r16, i32 4
+store i32 %r17, i32* %r18
+br label %label82_next  ; end of statement
+br label %label82_next  ; end of statement
+  label82_next:
+br label %label86_convert_false
+  label84_convert_true:
+br label %label88_convert_final
+  label86_convert_false:
+br label %label88_convert_final
+  label88_convert_final:
+%r19 = phi i32 [1, %label84_convert_true], [0, %label86_convert_false]
+%r20 = getelementptr i32, i32* %r16, i32 8
+store i32 %r19, i32* %r20
+br label %label94_next  ; end of statement
+br label %label94_next  ; end of statement
+  label94_next:
+%r21 = add i32 0, 0
+%r22 = getelementptr i32, i32* %r16, i32 12
+store i32 %r21, i32* %r22
+br label %label100_next  ; end of statement
+br label %label100_next  ; end of statement
+  label100_next:
+%r23 = call i32 @printb(i32 1)
+%r24 = trunc i32 %r23 to i1
+br i1 %r24, label %label108_convert_true, label %label104_or
+  label104_or:
+%r25 = call i32 @printb(i32 1)
+%r26 = trunc i32 %r25 to i1
+br i1 %r26, label %label108_convert_true, label %label110_convert_false
+  label108_convert_true:
+br label %label112_convert_final
+  label110_convert_false:
+br label %label112_convert_final
+  label112_convert_final:
+%r27 = phi i32 [1, %label108_convert_true], [0, %label110_convert_false]
+%r28 = getelementptr i32, i32* %r16, i32 12
+store i32 %r27, i32* %r28
+br label %label118_next  ; end of statement
+br label %label118_next  ; end of statement
+  label118_next:
+%r29 = call i32 @printb(i32 2)
+%r30 = trunc i32 %r29 to i1
+br i1 %r30, label %label126_convert_true, label %label122_or
+  label122_or:
+%r31 = call i32 @printb(i32 0)
+%r32 = trunc i32 %r31 to i1
+br i1 %r32, label %label126_convert_true, label %label128_convert_false
+  label126_convert_true:
+br label %label130_convert_final
+  label128_convert_false:
+br label %label130_convert_final
+  label130_convert_final:
+%r33 = phi i32 [1, %label126_convert_true], [0, %label128_convert_false]
+%r34 = getelementptr i32, i32* %r16, i32 12
+store i32 %r33, i32* %r34
+br label %label136_next  ; end of statement
+br label %label136_next  ; end of statement
+  label136_next:
+%r35 = call i32 @printb(i32 3)
+%r36 = trunc i32 %r35 to i1
+br i1 %r36, label %label144_convert_true, label %label140_or
+  label140_or:
+%r37 = call i32 @printb(i32 2)
+%r38 = trunc i32 %r37 to i1
+br i1 %r38, label %label144_convert_true, label %label146_convert_false
+  label144_convert_true:
+br label %label148_convert_final
+  label146_convert_false:
+br label %label148_convert_final
+  label148_convert_final:
+%r39 = phi i32 [1, %label144_convert_true], [0, %label146_convert_false]
+%r40 = getelementptr i32, i32* %r16, i32 12
+store i32 %r39, i32* %r40
+br label %label154_next  ; end of statement
+br label %label154_next  ; end of statement
+  label154_next:
+%r41 = call i32 @printb(i32 0)
+%r42 = trunc i32 %r41 to i1
+br i1 %r42, label %label162_convert_true, label %label158_or
+  label158_or:
+%r43 = call i32 @printb(i32 3)
+%r44 = trunc i32 %r43 to i1
+br i1 %r44, label %label162_convert_true, label %label164_convert_false
+  label162_convert_true:
+br label %label166_convert_final
+  label164_convert_false:
+br label %label166_convert_final
+  label166_convert_final:
+%r45 = phi i32 [1, %label162_convert_true], [0, %label164_convert_false]
+%r46 = getelementptr i32, i32* %r16, i32 12
+store i32 %r45, i32* %r46
+br label %label172_next  ; end of statement
+br label %label172_next  ; end of statement
+  label172_next:
+%r47 = call i32 @printb(i32 1)
+%r48 = trunc i32 %r47 to i1
+br i1 %r48, label %label176_and, label %label182_convert_false
+  label176_and:
+%r49 = call i32 @printb(i32 1)
+%r50 = trunc i32 %r49 to i1
+br i1 %r50, label %label180_convert_true, label %label182_convert_false
+  label180_convert_true:
+br label %label184_convert_final
+  label182_convert_false:
+br label %label184_convert_final
+  label184_convert_final:
+%r51 = phi i32 [1, %label180_convert_true], [0, %label182_convert_false]
+%r52 = getelementptr i32, i32* %r16, i32 12
+store i32 %r51, i32* %r52
+br label %label190_next  ; end of statement
+br label %label190_next  ; end of statement
+  label190_next:
+%r53 = call i32 @printb(i32 2)
+%r54 = trunc i32 %r53 to i1
+br i1 %r54, label %label194_and, label %label200_convert_false
+  label194_and:
+%r55 = call i32 @printb(i32 0)
+%r56 = trunc i32 %r55 to i1
+br i1 %r56, label %label198_convert_true, label %label200_convert_false
+  label198_convert_true:
+br label %label202_convert_final
+  label200_convert_false:
+br label %label202_convert_final
+  label202_convert_final:
+%r57 = phi i32 [1, %label198_convert_true], [0, %label200_convert_false]
+%r58 = getelementptr i32, i32* %r16, i32 12
+store i32 %r57, i32* %r58
+br label %label208_next  ; end of statement
+br label %label208_next  ; end of statement
+  label208_next:
+%r59 = call i32 @printb(i32 3)
+%r60 = trunc i32 %r59 to i1
+br i1 %r60, label %label212_and, label %label218_convert_false
+  label212_and:
+%r61 = call i32 @printb(i32 2)
+%r62 = trunc i32 %r61 to i1
+br i1 %r62, label %label216_convert_true, label %label218_convert_false
+  label216_convert_true:
+br label %label220_convert_final
+  label218_convert_false:
+br label %label220_convert_final
+  label220_convert_final:
+%r63 = phi i32 [1, %label216_convert_true], [0, %label218_convert_false]
+%r64 = getelementptr i32, i32* %r16, i32 12
+store i32 %r63, i32* %r64
+br label %label226_next  ; end of statement
+br label %label226_next  ; end of statement
+  label226_next:
+%r65 = call i32 @printb(i32 0)
+%r66 = trunc i32 %r65 to i1
+br i1 %r66, label %label230_and, label %label236_convert_false
+  label230_and:
+%r67 = call i32 @printb(i32 3)
+%r68 = trunc i32 %r67 to i1
+br i1 %r68, label %label234_convert_true, label %label236_convert_false
+  label234_convert_true:
+br label %label238_convert_final
+  label236_convert_false:
+br label %label238_convert_final
+  label238_convert_final:
+%r69 = phi i32 [1, %label234_convert_true], [0, %label236_convert_false]
+%r70 = getelementptr i32, i32* %r16, i32 12
+store i32 %r69, i32* %r70
+br label %label243_next  ; end of statement
+  label243_next:
+ret void
+}

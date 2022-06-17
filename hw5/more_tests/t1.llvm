@@ -1,0 +1,83 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+@err_zero = constant [23 x i8] c"Error division by zero\00"
+@r4 = constant [12 x i8] c"val is true\00"
+@r7 = constant [13 x i8] c"val is false\00"
+@r15 = constant [5 x i8] c"true\00"
+@r18 = constant [5 x i8] c"true\00"
+define void @printByValue(i32) {
+%r0 = alloca i32, i32 200
+%r1 = add i32 0, %0
+%r2 = trunc i32 %r1 to i1
+br i1 %r2, label %label5_if, label %label9_else
+  label5_if:
+%r3 = getelementptr [12 x i8], [12 x i8]* @r4, i32 0, i32 0
+call void @print(i8* %r3)
+br label %label14_next  ; end of if
+  label9_else:
+%r6 = getelementptr [13 x i8], [13 x i8]* @r7, i32 0, i32 0
+call void @print(i8* %r6)
+br label %label14_next  ; end of statement
+br label %label14_next  ; end of statement
+  label14_next:
+ret void
+}
+define void @main() {
+%r9 = alloca i32, i32 200
+br label %label20_convert_true
+  label20_convert_true:
+br label %label24_convert_final
+  label22_convert_false:
+br label %label24_convert_final
+  label24_convert_final:
+%r10 = phi i32 [1, %label20_convert_true], [0, %label22_convert_false]
+call void @printByValue(i32 %r10)
+br label %label29_next  ; end of statement
+br label %label29_next  ; end of statement
+  label29_next:
+br label %label33_convert_false
+  label31_convert_true:
+br label %label35_convert_final
+  label33_convert_false:
+br label %label35_convert_final
+  label35_convert_final:
+%r12 = phi i32 [1, %label31_convert_true], [0, %label33_convert_false]
+call void @printByValue(i32 %r12)
+br label %label40_next  ; end of statement
+br label %label40_next  ; end of statement
+  label40_next:
+br label %label42_if
+  label42_if:
+%r14 = getelementptr [5 x i8], [5 x i8]* @r15, i32 0, i32 0
+call void @print(i8* %r14)
+br label %label49_next  ; end of statement
+br label %label49_next  ; end of if
+br label %label49_next  ; end of statement
+br label %label49_next  ; end of statement
+  label49_next:
+br label %label51_or
+  label51_or:
+br label %label61_next
+  label53_and:
+br label %label55_if
+  label55_if:
+%r17 = getelementptr [5 x i8], [5 x i8]* @r18, i32 0, i32 0
+call void @print(i8* %r17)
+br label %label61_next  ; end of statement
+br label %label61_next  ; end of if
+br label %label61_next  ; end of statement
+  label61_next:
+ret void
+}

@@ -7,122 +7,107 @@
 
 using namespace output;
 
-char HexaToChar(const char f, const char s) {
-    int sum = 0;
-
-    switch (f) {
-        case 'a':
-            sum += 10;
-            break;
-        case 'b':
-            sum += 11;
-            break;
-        case 'c':
-            sum += 12;
-            break;
-        case 'd':
-            sum += 13;
-            break;
-        case 'e':
-            sum += 14;
-            break;
-        case 'f':
-            sum += 15;
-            break;
-        case 'A':
-            sum += 10;
-            break;
-        case 'B':
-            sum += 11;
-            break;
-        case 'C':
-            sum += 12;
-            break;
-        case 'D':
-            sum += 13;
-            break;
-        case 'E':
-            sum += 14;
-            break;
-        case 'F':
-            sum += 15;
-            break;
-        default:
-            sum += (f - '0');
-    }
-
-    sum *= 16;
-
-    switch (s) {
-        case 'a':
-            sum += 10;
-            break;
-        case 'b':
-            sum += 11;
-            break;
-        case 'c':
-            sum += 12;
-            break;
-        case 'd':
-            sum += 13;
-            break;
-        case 'e':
-            sum += 14;
-            break;
-        case 'f':
-            sum += 15;
-            break;
-        case 'A':
-            sum += 10;
-            break;
-        case 'B':
-            sum += 11;
-            break;
-        case 'C':
-            sum += 12;
-            break;
-        case 'D':
-            sum += 13;
-            break;
-        case 'E':
-            sum += 14;
-            break;
-        case 'F':
-            sum += 15;
-            break;
-        default:
-            sum += (s - '0');
-    }
-    return char(sum);
-}
-
-int LexToken(int bison_enum, string token) {
-    STypePtr result = nullptr;
-
-    switch (bison_enum) {
-        case NUM:
-            result.reset(new STypeNumber(token));
-            break;
-        case MULT_DIV:
-        case PLUS_MINUS:
-        case ID:
-        case STRING:
-        case INEQUALITY:
-        case EQUAL_UNEQUAL:
-            result.reset(new STypeString(token));
-            break;
-        default:
-            break;
-    }
-
-    yylval = result;
-
-    return bison_enum;
-}
-
-void errorLexAndExit(int lineno) {
+void errorLexAndExit(int lineno)
+{
     errorLex(lineno);
     exit(0);
 }
 
-#endif //HW3_SCANNER_H
+char HexaToChar(const char s1, const char s2)
+{
+    int s = 0;
+
+    if (s1 == 'a')
+        s = 10 + s;
+    else if (s1 == 'b')
+        s = 11 + s;
+    else if (s1 == 'c')
+        s = 12 + s;
+    else if (s1 == 'd')
+        s = 13 + s;
+    else if (s1 == 'e')
+        s = 14 + s;
+    else if (s1 == 'f')
+        s = 15 + s;
+    else if (s1 == 'A')
+        s = 10 + s;
+    else if (s1 == 'B')
+        s = 11 + s;
+    else if (s1 == 'C')
+        s = 12 + s;
+    else if (s1 == 'D')
+        s = 13 + s;
+    else if (s1 == 'E')
+        s = 14 + s;
+    else if (s1 == 'F')
+        s = 15 + s;
+    else
+        s = (s1 - '0') + s;
+
+    s = 16 * s;
+
+    if (s2 == 'a')
+        s = 10 + s;
+    else if (s2 == 'b')
+        s = 11 + s;
+    else if (s2 == 'c')
+        s = 12 + s;
+    else if (s2 == 'd')
+        s = 13 + s;
+    else if (s2 == 'e')
+        s = 14 + s;
+    else if (s2 == 'f')
+        s = 15 + s;
+    else if (s2 == 'A')
+        s = 10 + s;
+    else if (s2 == 'B')
+        s = 11 + s;
+    else if (s2 == 'C')
+        s = 12 + s;
+    else if (s2 == 'D')
+        s = 13 + s;
+    else if (s2 == 'E')
+        s = 14 + s;
+    else if (s2 == 'F')
+        s = 15 + s;
+    else
+        s = (s2 - '0') + s;
+
+    return char(s);
+}
+
+int LexToken(int b_enum, string token)
+{
+    BaseTypePtr result = nullptr;
+
+    switch (b_enum){
+    case NUM:
+        result.reset(new NumberType(token));
+        break;
+    case MULT_DIV:
+        result.reset(new StringType(token));
+        break;
+    case INEQUALITY:
+        result.reset(new StringType(token));
+        break;
+    case ID:
+        result.reset(new StringType(token));
+        break;
+    case STRING:
+        result.reset(new StringType(token));
+        break;
+    case EQUAL_UNEQUAL:
+        result.reset(new StringType(token));
+        break;
+    case PLUS_MINUS:
+        result.reset(new StringType(token));
+        break;
+    default:
+        break;
+    }
+
+    yylval = result;
+    return b_enum;
+}
+
+#endif // HW3_SCANNER_H

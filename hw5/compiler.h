@@ -28,163 +28,163 @@ public:
 
     void ParseFuncs(int lineno);
 
-    void ParseFuncDecl(int lineno, const STypePtr &statements, const STypePtr &next_label);
+    void ParseFuncDecl(int lineno, const BaseTypePtr &statements, const BaseTypePtr &next_label);
 
-    void ParseFuncHead(int lineno, const STypePtr &ret_type, const STypePtr &id, const STypePtr &formals);
+    void ParseFuncHead(int lineno, const BaseTypePtr &ret_type, const BaseTypePtr &id, const BaseTypePtr &formals);
 
-    static STypePtr ParseRetType(int lineno, STypePtr type);
+    static BaseTypePtr ParseRetType(int lineno, BaseTypePtr type);
 
-    static STypeCTypePtr ParseRetType(int lineno);
+    static CTypePtr ParseRetType(int lineno);
 
-    static STypeArgListPtr ParseFormals(int lineno);
+    static ArgListTypePtr ParseFormals(int lineno);
 
-    static STypeArgListPtr ParseFormals(int lineno, const STypePtr &formals);
+    static ArgListTypePtr ParseFormals(int lineno, const BaseTypePtr &formals);
 
-    static STypeArgListPtr ParseFormalsList(int lineno, const STypePtr &formal);
+    static ArgListTypePtr ParseFormalsList(int lineno, const BaseTypePtr &formal);
 
-    static STypeArgListPtr ParseFormalsList(int lineno, const STypePtr &formal, const STypePtr &formals_list);
+    static ArgListTypePtr ParseFormalsList(int lineno, const BaseTypePtr &formal, const BaseTypePtr &formals_list);
 
-    STypeSymbolPtr ParseFormalDecl(int lineno, const STypePtr &type, const STypePtr &id);
+    SymbolTypePtr ParseFormalDecl(int lineno, const BaseTypePtr &type, const BaseTypePtr &id);
 
-    static STypeStatementPtr
-    ParseStatements(int lineno, STypePtr &statement, const STypePtr &next_list_as_statement);
+    static StatementTypePtr
+    ParseStatements(int lineno, BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement);
 
-    STypeStatementPtr
-    ParseStatements(int lineno, const STypePtr &statements, const STypePtr &old_next_list_as_statement,
-                    const STypePtr &next_label,
-                    const STypePtr &next_statement, const STypePtr &my_next_list_as_statement);
+    StatementTypePtr
+    ParseStatements(int lineno, const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
+                    const BaseTypePtr &next_label,
+                    const BaseTypePtr &next_statement, const BaseTypePtr &my_next_list_as_statement);
 
-    static STypeStatementPtr ParseStatementOfStatements(int lineno, STypePtr &statements);
+    static StatementTypePtr ParseStatementOfStatements(int lineno, BaseTypePtr &statements);
 
-    STypeStatementPtr ParseStatementType(int lineno, const STypePtr &type, const STypePtr &id);
+    StatementTypePtr ParseStatementType(int lineno, const BaseTypePtr &type, const BaseTypePtr &id);
 
-    STypeStatementPtr
-    ParseStatementTypeAssign(int lineno, const STypePtr &type, const STypePtr &id, const STypePtr &exp);
+    StatementTypePtr
+    ParseStatementTypeAssign(int lineno, const BaseTypePtr &type, const BaseTypePtr &id, const BaseTypePtr &exp);
 
-    STypeStatementPtr ParseStatementAssign(int lineno, const STypePtr &id, const STypePtr &exp);
+    StatementTypePtr ParseStatementAssign(int lineno, const BaseTypePtr &id, const BaseTypePtr &exp);
 
-    static STypeStatementPtr ParseStatementCall(int lineno);
+    static StatementTypePtr ParseStatementCall(int lineno);
 
-    STypeStatementPtr ParseStatementReturn(int lineno);
+    StatementTypePtr ParseStatementReturn(int lineno);
 
-    STypeStatementPtr ParseStatementReturnExp(int lineno, const STypePtr &exp);
+    StatementTypePtr ParseStatementReturnExp(int lineno, const BaseTypePtr &exp);
 
-    STypeStatementPtr
-    ParseStatementIf(int lineno, const STypePtr &exp, const STypePtr &if_label, const STypePtr &if_statement,
-                     const STypePtr &if_list_as_statement);
+    StatementTypePtr
+    ParseStatementIf(int lineno, const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+                     const BaseTypePtr &if_list_as_statement);
 
-    STypeStatementPtr
-    ParseStatementIfElse(int lineno, const STypePtr &exp, const STypePtr &if_label, const STypePtr &if_statement,
-                         STypePtr if_list_as_statement, const STypePtr &else_label,
-                         const STypePtr &else_statement);
+    StatementTypePtr
+    ParseStatementIfElse(int lineno, const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+                         BaseTypePtr if_list_as_statement, const BaseTypePtr &else_label,
+                         const BaseTypePtr &else_statement);
 
-    STypeStatementPtr
-    ParseStatementWhile(int lineno, STypePtr start_list_as_statement, const STypePtr &while_head_label,
-                        const STypePtr &exp,
-                        const STypePtr &while_body_label, const STypePtr &while_statement,
-                        const STypePtr &end_list_as_statement);
+    StatementTypePtr
+    ParseStatementWhile(int lineno, BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label,
+                        const BaseTypePtr &exp,
+                        const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
+                        const BaseTypePtr &end_list_as_statement);
 
-    STypeStatementPtr ParseStatementBreak(int lineno);
+    StatementTypePtr ParseStatementBreak(int lineno);
 
-    STypeStatementPtr ParseStatementContinue(int lineno);
+    StatementTypePtr ParseStatementContinue(int lineno);
 
-    STypeStatementPtr
-    ParseStatementSwitch(int lineno, STypePtr exp, STypePtr switch_list_as_statement, STypePtr case_list);
+    StatementTypePtr
+    ParseStatementSwitch(int lineno, BaseTypePtr exp, BaseTypePtr switch_list_as_statement, BaseTypePtr case_list);
 
-    STypePtr ParseCall(int lineno, const STypePtr &id, const STypePtr &exp_list);
+    BaseTypePtr ParseCall(int lineno, const BaseTypePtr &id, const BaseTypePtr &exp_list);
 
-    STypePtr ParseCall(int lineno, const STypePtr &id);
+    BaseTypePtr ParseCall(int lineno, const BaseTypePtr &id);
 
-    static STypePtr ParseExplist(int lineno, const STypePtr &exp);
+    static BaseTypePtr ParseExplist(int lineno, const BaseTypePtr &exp);
 
-    static STypePtr ParseExplist(int lineno, const STypePtr &exp, const STypePtr &exp_list);
+    static BaseTypePtr ParseExplist(int lineno, const BaseTypePtr &exp, const BaseTypePtr &exp_list);
 
-    static STypeCTypePtr ParseInt(int lineno);
+    static CTypePtr ParseInt(int lineno);
 
-    static STypeCTypePtr ParseByte(int lineno);
+    static CTypePtr ParseByte(int lineno);
 
-    static STypeCTypePtr ParseBool(int lineno);
+    static CTypePtr ParseBool(int lineno);
 
-    static STypePtr ParseParentheses(int lineno, STypePtr exp);
+    static BaseTypePtr ParseParentheses(int lineno, BaseTypePtr exp);
 
-    STypeRegisterPtr ParseBinop(int lineno, const STypePtr &exp1, STypePtr &binop, const STypePtr &exp2);
+    RegisterTypePtr ParseBinop(int lineno, const BaseTypePtr &exp1, BaseTypePtr &binop, const BaseTypePtr &exp2);
 
-    STypePtr ParseID(int lineno, const STypePtr &id);
+    BaseTypePtr ParseID(int lineno, const BaseTypePtr &id);
 
-    STypePtr ParseCallExp(int lineno, STypePtr call_exp);
+    BaseTypePtr ParseCallExp(int lineno, BaseTypePtr call_exp);
 
-    static STypeNumberPtr ParseNum(int lineno, const STypePtr &num);
+    static NumberTypePtr ParseNum(int lineno, const BaseTypePtr &num);
 
-    STypePtr ParseNumB(int lineno, STypePtr num);
+    BaseTypePtr ParseNumB(int lineno, BaseTypePtr num);
 
-    STypeRegisterPtr ParseString(int lineno, const STypePtr &stype_string);
+    RegisterTypePtr ParseString(int lineno, const BaseTypePtr &stype_string);
 
-    STypeBoolExpPtr ParseTrue(int lineno);
+    BoolExpTypePtr ParseTrue(int lineno);
 
-    STypeBoolExpPtr ParseFalse(int lineno);
+    BoolExpTypePtr ParseFalse(int lineno);
 
-    STypeBoolExpPtr ParseNot(int lineno, const STypePtr &bool_exp);
+    BoolExpTypePtr ParseNot(int lineno, const BaseTypePtr &bool_exp);
 
-    STypeBoolExpPtr
-    ParseAnd(int lineno, const STypePtr &bool_exp1, const STypePtr &and_label, const STypePtr &bool_exp2);
+    BoolExpTypePtr
+    ParseAnd(int lineno, const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2);
 
-    STypeBoolExpPtr ParseOr(int lineno, const STypePtr &bool_exp1, const STypePtr &or_label, const STypePtr &bool_exp2);
+    BoolExpTypePtr ParseOr(int lineno, const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2);
 
-    STypeBoolExpPtr ParseRelOp(int lineno, const STypePtr &exp1, STypePtr &relop, const STypePtr &exp2);
+    BoolExpTypePtr ParseRelOp(int lineno, const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2);
 
-    STypeStringPtr ParseGenIfLabel(int lineno);
+    StringTypePtr ParseGenIfLabel(int lineno);
 
-    STypeStringPtr ParseGenElseLabel(int lineno);
+    StringTypePtr ParseGenElseLabel(int lineno);
 
-    STypeStringPtr ParseGenWhileHeadLabel(int lineno);
+    StringTypePtr ParseGenWhileHeadLabel(int lineno);
 
-    STypeStringPtr ParseGenWhileBodyLabel(int lineno);
+    StringTypePtr ParseGenWhileBodyLabel(int lineno);
 
-    STypeStringPtr ParseGenAndLabel(int lineno);
+    StringTypePtr ParseGenAndLabel(int lineno);
 
-    STypeStringPtr ParseGenOrLabel(int lineno);
+    StringTypePtr ParseGenOrLabel(int lineno);
 
-    STypeStringPtr ParseGenNextLabel(int lineno);
+    StringTypePtr ParseGenNextLabel(int lineno);
 
-    STypeStringPtr ParseGenDefaultLabel(int lineno);
+    StringTypePtr ParseGenDefaultLabel(int lineno);
 
-    STypeStringPtr ParseGenCaseDeclLabel(int lineno);
+    StringTypePtr ParseGenCaseDeclLabel(int lineno);
 
-    STypeCaseListPtr ParseCaseList(int lineno, STypePtr case_decl, STypePtr next_list, STypePtr case_list);
+    CaseListTypePtr ParseCaseList(int lineno, BaseTypePtr case_decl, BaseTypePtr next_list, BaseTypePtr case_list);
 
-    STypeCaseListPtr ParseCaseList(int lineno, STypePtr case_decl);
+    CaseListTypePtr ParseCaseList(int lineno, BaseTypePtr case_decl);
 
-    STypeCaseListPtr
-    ParseCaseDefault(int lineno, STypePtr list_as_statement, STypePtr default_label, STypePtr statements);
+    CaseListTypePtr
+    ParseCaseDefault(int lineno, BaseTypePtr list_as_statement, BaseTypePtr default_label, BaseTypePtr statements);
 
-    STypeCaseDeclPtr ParseCaseDecl(int lineno, STypePtr num, STypePtr list_as_statement, STypePtr case_decl_label,
-                                   STypePtr statements);
+    CaseDeclTypePtr ParseCaseDecl(int lineno, BaseTypePtr num, BaseTypePtr list_as_statement, BaseTypePtr case_decl_label,
+                                   BaseTypePtr statements);
 
     void ParsePushStatementScope(int lineno);
 
-    void ParsePushWhileScope(int lineno, const STypePtr &while_head_label);
+    void ParsePushWhileScope(int lineno, const BaseTypePtr &while_head_label);
 
-    void ParsePushSwitchScope(int lineno, const STypePtr &switch_head_label);
+    void ParsePushSwitchScope(int lineno, const BaseTypePtr &switch_head_label);
 
     void ParsePopScope(int lineno);
 
-    void ParseCheckSwitchExp(int lineno, const STypePtr &num_exp);
+    void ParseCheckSwitchExp(int lineno, const BaseTypePtr &num_exp);
 
-    void ParseCheckBool(int lineno, const STypePtr &bool_exp);
+    void ParseCheckBool(int lineno, const BaseTypePtr &bool_exp);
 
-    STypeStatementPtr ParseBranchNext(int lineno);
+    StatementTypePtr ParseBranchNext(int lineno);
 
-    STypeStatementPtr ParseBranchWhileHead(int lineno);
+    StatementTypePtr ParseBranchWhileHead(int lineno);
 
-    STypeStatementPtr ParseBranchIfNext(int lineno);
+    StatementTypePtr ParseBranchIfNext(int lineno);
 
-    STypeStatementPtr ParseBranchSwitchHead(int lineno);
+    StatementTypePtr ParseBranchSwitchHead(int lineno);
 
-    STypeStatementPtr ParseBranchCaseHead(int lineno);
+    StatementTypePtr ParseBranchCaseHead(int lineno);
 
-    STypeStatementPtr ParseBranchDefaultHead(int lineno);
+    StatementTypePtr ParseBranchDefaultHead(int lineno);
 
-    STypePtr ParseConvertBool(int lineno, STypePtr exp);
+    BaseTypePtr ParseConvertBool(int lineno, BaseTypePtr exp);
 
     static Compiler &instance();
 

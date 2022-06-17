@@ -10,19 +10,19 @@
 #include <cassert>
 #include "bp.hpp"
 
-#define YYSTYPE STypePtr
+#define YYSTYPE BaseTypePtr
 
 using std::cout;
+using std::dynamic_pointer_cast;
 using std::endl;
+using std::move;
+using std::pair;
+using std::shared_ptr;
 using std::stack;
 using std::string;
-using std::shared_ptr;
-using std::pair;
-using std::vector;
-using std::unordered_map;
-using std::dynamic_pointer_cast;
 using std::to_string;
-using std::move;
+using std::unordered_map;
+using std::vector;
 
 extern int yylineno;
 extern char *yytext;
@@ -33,20 +33,19 @@ extern char textbuff[1024];
 extern char *textbuffptr;
 extern const bool PRINT_DEBUG;
 
-
-enum GeneralTypeEnum {
+enum GeneralType
+{
     VOID_TYPE,
-    INT_TYPE,  // this might be a number literal or a variable (same for the others)
+    INT_TYPE, // this might be a number literal or a variable (same for the others)
     BYTE_TYPE,
     BOOL_TYPE,
     STRING_TYPE,
     FUNCTION_TYPE,
     STATEMENT_TYPE,
     ERROR_TYPE
-
 };
 
-typedef GeneralTypeEnum Type;
+typedef GeneralType Type;
 typedef string register_name;
 typedef string label_name;
 
@@ -58,144 +57,178 @@ typedef pair<int, string> case_label_pair;
 typedef vector<case_label_pair> case_label_list;
 typedef shared_ptr<case_label_list> case_label_list_ptr;
 
-// stands for... symbol? segfault? something? i dunno
-class STypeBase {
-    // must have at least one virtual method
+
+class TerminalBase
+{
+    
 public:
+    explicit TerminalBase(Type type); 
 
-    explicit STypeBase(Type type);  // also used for expressions and types
+    Type g_type;
 
-    Type general_type;
+    TerminalBase();
 
-    STypeBase();
+    virtual ~TerminalBase() = default;
 
-    virtual ~STypeBase() = default;
-
+    const std::string class_name = "TerminalBase";
 };
 
-typedef shared_ptr<STypeBase> STypePtr;
-typedef vector<STypePtr> ExpList;
+typedef shared_ptr<TerminalBase> BaseTypePtr;
+typedef vector<BaseTypePtr> ExpList;
 
-class STypeExpList : public STypeBase {
+class TExpList : public TerminalBase
+{
 public:
     ExpList exp_list;
 
-    STypeExpList();
+    const std::string class_name = "TExpList";
 
-    explicit STypeExpList(ExpList &exp_list);
+    TExpList();
+
+    explicit TExpList(ExpList &exp_list);
 };
 
-typedef shared_ptr<STypeExpList> STypeExpListPtr;
+typedef shared_ptr<TExpList> ExpListTypePtr;
 
-class STypeCType : public STypeBase {
+class CType : public TerminalBase
+{
 public:
-    explicit STypeCType(Type type);
+    explicit CType(Type type);
+    const std::string class_name = "CType";
 };
 
-typedef shared_ptr<STypeCType> STypeCTypePtr;
+typedef shared_ptr<CType> CTypePtr;
 
-class STypeString : public STypeBase {
+class StringType : public TerminalBase
+{
 public:
     string token;
 
-    explicit STypeString(string &token);
+    explicit StringType(string &token);
+    const std::string class_name = "StringType";
 };
 
-typedef shared_ptr<STypeString> STypeStringPtr;
+typedef shared_ptr<StringType> StringTypePtr;
 
-class STypeRegister : public STypeBase {
+class RegisterType : public TerminalBase
+{
 public:
     register_name reg_name;
 
-    STypeRegister(register_name reg_name, Type type);
+    RegisterType(register_name reg_name, Type type);
+    const std::string class_name = "RegisterType";
 };
 
-typedef shared_ptr<STypeRegister> STypeRegisterPtr;
+typedef shared_ptr<RegisterType> RegisterTypePtr;
 
-class STypeBoolExp : public STypeBase {
+class BoolExpType : public TerminalBase
+{
 public:
     branch_list true_list;
     branch_list false_list;
+    const std::string class_name = "BoolExpType";
 
-    STypeBoolExp(branch_list true_list, branch_list false_list);
+    BoolExpType(branch_list true_list, branch_list false_list);
 };
 
-typedef shared_ptr<STypeBoolExp> STypeBoolExpPtr;
+typedef shared_ptr<BoolExpType> BoolExpTypePtr;
 
-class STypeStatement : public STypeBase {
+class AutoType : public TerminalBase
+{
+public:
+    std::string token;
+    const std::string class_name = "AutoType";
+    explicit AutoType(std::string &token);
+};
+
+typedef std::shared_ptr<AutoType> AutoTypePtr;
+
+class StatementType : public TerminalBase
+{
 public:
     branch_list next_list;
+    const std::string class_name = "StatementType";
 
-    explicit STypeStatement(branch_list next_list);
+    explicit StatementType(branch_list next_list);
 };
 
-typedef shared_ptr<STypeStatement> STypeStatementPtr;
+typedef shared_ptr<StatementType> StatementTypePtr;
 
-class STypeNumber : public STypeBase {
+class NumberType : public TerminalBase
+{
 public:
     int token;
+    const std::string class_name = "NumberType";
 
-    explicit STypeNumber(string &token_string);
+    explicit NumberType(string &token_string);
 };
 
-typedef shared_ptr<STypeNumber> STypeNumberPtr;
+typedef shared_ptr<NumberType> NumberTypePtr;
 
-class STypeSymbol : public STypeBase {
+class SymbolType : public TerminalBase
+{
     // no virtual method needed
 public:
     string name;
     int offset;
+    const std::string class_name = "SymbolType";
 
-    STypeSymbol(string &name, int offset, Type type);
+    SymbolType(string &name, int offset, Type type);
 };
 
-typedef shared_ptr<STypeSymbol> STypeSymbolPtr;
-typedef vector<STypeSymbol> ArgList;
+typedef shared_ptr<SymbolType> SymbolTypePtr;
+typedef vector<SymbolType> ArgList;
 
-class STypeArgList : public STypeBase {
+class ArgListType : public TerminalBase
+{
 public:
     ArgList arg_list;
+    const std::string class_name = "ArgListType";
 
-    STypeArgList();
+    ArgListType();
 
-    explicit STypeArgList(ArgList &arg_list);
+    explicit ArgListType(ArgList &arg_list);
 };
 
-typedef shared_ptr<STypeArgList> STypeArgListPtr;
+typedef shared_ptr<ArgListType> ArgListTypePtr;
 
-
-class STypeFunctionSymbol : public STypeSymbol {
+class FuncSymType : public SymbolType
+{
 public:
-    ArgList parameters;
+    ArgList params;
     Type ret_type;
+    const std::string class_name = "FuncSymType";
 
-    STypeFunctionSymbol(string &symbol_name, Type symbol_type, ArgList &arg_list);
-
+    FuncSymType(string &symbol_name, Type symbol_type, ArgList &arg_list);
 };
 
-typedef shared_ptr<STypeFunctionSymbol> STypeFunctionSymbolPtr;
+typedef shared_ptr<FuncSymType> FuncSymbolTypePtr;
 
-class STypeCaseList : public STypeBase {
+class CaseListType : public TerminalBase
+{
 public:
     case_label_list case_list;
     string default_label;
     branch_list next_list;
+    const std::string class_name = "CaseListType";
 
-    STypeCaseList(case_label_list case_list, string default_label, branch_list next_list);
+    CaseListType(case_label_list case_list, string default_label, branch_list next_list);
 };
 
-typedef shared_ptr<STypeCaseList> STypeCaseListPtr;
+typedef shared_ptr<CaseListType> CaseListTypePtr;
 
-class STypeCaseDecl : public STypeBase {
+class CaseDeclType : public TerminalBase
+{
 public:
     int case_num;
     string case_label;
     branch_list next_list;
+    const std::string class_name = "CaseDeclType";
 
-    STypeCaseDecl(int case_num, string case_label, branch_list next_list);
+    CaseDeclType(int case_num, string case_label, branch_list next_list);
 };
 
-typedef shared_ptr<STypeCaseDecl> STypeCaseDeclPtr;
+typedef shared_ptr<CaseDeclType> CaseDeclTypePtr;
 
 extern string TypeToString(Type type);
 
@@ -205,4 +238,4 @@ class Scope;
 
 typedef shared_ptr<Scope> ScopePtr;
 
-#endif //HWw3_TYPEDEFS_H
+#endif // HWw3_TYPEDEFS_H

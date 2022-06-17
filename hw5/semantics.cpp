@@ -1,105 +1,134 @@
 #include "semantics.h"
+#define LOWER 0
+#define UPPER 255
 
-SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table) {
-
+SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table)
+{
 }
 
-bool SemanticChecks::IsSymbolDefined(string &name) {
-    return table_ref.IsSymbolDefined(name);
+bool SemanticChecks::CheckSymDefined(string &n)
+{
+    return table_ref.IsSymbolDefined(n);
 }
 
-bool SemanticChecks::IsMainDefined() {
-    for (auto map_pair:table_ref.symbols_map) {
-        if (map_pair.second->general_type == FUNCTION_TYPE) {
-            auto dynamic_cast_function = dynamic_pointer_cast<STypeFunctionSymbol>(map_pair.second);
-            if (dynamic_cast_function->name == "main") {
-                if (dynamic_cast_function->parameters.empty() && dynamic_cast_function->ret_type == VOID_TYPE) {
-                    return true;
-                } else {
+bool SemanticChecks::CheckMainIsDefined()
+{
+    for (auto map_pair : table_ref.symbols_map)
+    {
+        if (FUNCTION_TYPE == map_pair.second->g_type)
+        {
+            auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
+            if ("main"==dyn_cast_func->name )
+            {
+                if ((!CheckGeneralType(dyn_cast_func->ret_type, VOID_TYPE)) || (!(dyn_cast_func->params.empty())))
                     return false;
-                }
+                else
+                    return true;
             }
         }
     }
     return false;
 }
 
-bool SemanticChecks::IsLegalAssignTypes(Type first, Type second) {
-    if (first == second) {
+bool SemanticChecks::CheckAssigned(Type f, Type s)
+{
+    if (CheckTypeType(s, f) || (CheckGeneralType(s, BYTE_TYPE) && CheckGeneralType(f, INT_TYPE)))
+    {
         return true;
     }
-    if (first == INT_TYPE && second == BYTE_TYPE) {
-        return true;
+    else
+    {
+        return false;
     }
-
-    return false;
 }
 
-bool SemanticChecks::IsLegalCallTypes(STypeFunctionSymbolPtr &func, STypeExpListPtr &exp_list) {
-    if (func->parameters.size() != exp_list->exp_list.size()) {
+bool SemanticChecks::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list)
+{
+    if (exp_list->exp_list.size() != func->params.size())
+    {
         return false;
     }
 
-    for (size_t i = 0; i < func->parameters.size(); ++i) {
-        if (!IsLegalAssignTypes(func->parameters[i].general_type, exp_list->exp_list[i]->general_type)) {
+    for (size_t i = 0; i < func->params.size(); ++i)
+    {
+        if (!CheckAssigned(func->params[i].g_type, exp_list->exp_list[i]->g_type))
+        {
             return false;
         }
     }
-
     return true;
 }
 
-bool SemanticChecks::IsLegalReturnType(Type type) {
-    auto required_return_type = table_ref.scope_stack.top()->ret_type;
-    return IsLegalAssignTypes(required_return_type, type);
+bool SemanticChecks::CheckReturn(Type t)
+{
+    bool check_type = CheckAssigned(table_ref.scope_stack.top()->return_type, t);
+    return check_type;
 }
 
-bool SemanticChecks::IsBoolType(Type type) {
-    return (type == BOOL_TYPE);
+bool SemanticChecks::CheckFunction(Type t)
+{
+    bool check_type = CheckGeneralType(t, FUNCTION_TYPE);
+    return check_type;
 }
 
-bool SemanticChecks::IsVoidType(Type type) {
-    return (type == VOID_TYPE);
+bool SemanticChecks::CheckVoid(Type t)
+{
+    bool check_type = CheckGeneralType(t, VOID_TYPE);
+    return check_type;
 }
 
-bool SemanticChecks::IsFunctionType(Type type) {
-    return (type == FUNCTION_TYPE);
+bool SemanticChecks::CheckBool(Type t)
+{
+    bool check_type = CheckGeneralType(t, BOOL_TYPE);
+    return check_type;
 }
 
-bool SemanticChecks::IsLegalBreak() {
-    return (table_ref.scope_stack.top()->inside_while || table_ref.scope_stack.top()->inside_switch);
+bool SemanticChecks::CheckGeneralType(Type t, GeneralType gt)
+{
+    return gt == t;
 }
 
-bool SemanticChecks::IsLegalContinue() {
-    return (table_ref.scope_stack.top()->inside_while);
+bool SemanticChecks::CheckTypeType(Type t1, Type t)
+{
+    return t1 == t;
 }
 
-bool SemanticChecks::IsByteOverflow(int &num) {
-    return (num >= 0 && num <= 255);
+bool SemanticChecks::CheckBreak()
+{
+    bool is_in_while(table_ref.scope_stack.top()->inside_while);
+    return is_in_while;
 }
 
-bool SemanticChecks::IsLegalRelopTypes(Type first, Type second) {
-    // all numeric types are ok
-    if (first == INT_TYPE || first == BYTE_TYPE) {
-        if (second == INT_TYPE || second == BYTE_TYPE) {
-            return true;
-        }
-    }
-    return false;
+bool SemanticChecks::CheckContinue()
+{
+    return CheckBreak();
 }
 
-Type SemanticChecks::CheckAndGetBinOpType(Type first, Type second) {
-    if (!IsLegalRelopTypes(first, second)) {
+bool SemanticChecks::CheckOFByte(int &num)
+{
+    return (num <= UPPER && num >= LOWER);
+}
+
+bool SemanticChecks::CheckRelop(Type f, Type s)
+{
+
+    return (CheckGeneralType(s, BYTE_TYPE) || CheckGeneralType(s, INT_TYPE)) && (CheckGeneralType(f, BYTE_TYPE) || CheckGeneralType(f, INT_TYPE));
+}
+
+Type SemanticChecks::CheckAndGetBinOpType(Type f, Type s)
+{
+    if (!CheckRelop(f, s))
+    {
         return ERROR_TYPE;
     }
-    if (first == INT_TYPE || second == INT_TYPE) {
-        return INT_TYPE;
+    if (!(CheckGeneralType(f, INT_TYPE) || CheckGeneralType(s, INT_TYPE)))
+    {
+        return BYTE_TYPE;
     }
-    return BYTE_TYPE;
+    return INT_TYPE;
 }
 
-bool SemanticChecks::IsLegalCast(Type first, Type second) {
-    return IsLegalAssignTypes(first, second);
+bool SemanticChecks::CheckCast(Type f, Type s)
+{
+    return CheckAssigned(f, s);
 }
-
-

@@ -5,112 +5,106 @@
 #include "bp.hpp"
 #include "semantics.h"
 
-const int MAX_VARIABLES_PER_FUNCTION = 50;
-const int VARIABLE_SIZE = 4;
-const int STACK_SIZE = MAX_VARIABLES_PER_FUNCTION * VARIABLE_SIZE;
 
-class CodeGen {
+const int STACK_SIZE = 300;
+
+class Generator {
 public:
-    int register_count;
-    CodeBuffer code_buffer;
-    SemanticChecks semantic_ref;
     string stack_register;
+    Validations validator_ref;
+    int num_of_regs;
+    Buff buff;
+    
+    
 
-    explicit CodeGen(SemanticChecks &semantic_ref);
+    explicit Generator(Validations &semantic_ref);
 
-    name_of_register GenRegister();
+    name_of_register GenerateReg();
 
-    name_of_register GenGlobalRegister();
+    name_of_register GenerateGlobalReg();
 
-    void EmitGlobalFunctions();
+    void addGlobalFuncs();
 
-    RegisterTypePtr EmitBinop(const BaseTypePtr &exp1, string binop, const BaseTypePtr &exp2);
+    RegisterTypePtr addBinop(const BaseTypePtr &exp1, string binop, const BaseTypePtr &exp2);
 
-    void EmitCheckDivZero(const BaseTypePtr &exp);
+    void addCheckDivZero(const BaseTypePtr &exp);
 
-    void EmitFuncHead(const FuncSymbolTypePtr &symbol);
+    void addFunctionHead(const FuncSymbolTypePtr &symbol);
 
-    void EmitFuncDecl(const BaseTypePtr &statements, const BaseTypePtr &next_label);
+    void addFuncDeclaration(const BaseTypePtr &statements, const BaseTypePtr &next_label);
 
-    StatementTypePtr EmitStatementType(string id);
+    StatementTypePtr addStatType(string id);
 
-    StatementTypePtr EmitStatementAssign(string id, const BaseTypePtr &exp);
+    StatementTypePtr addStatAssign(string id, const BaseTypePtr &exp);
 
-    static StatementTypePtr EmitStatementCall();
+    static StatementTypePtr addStatCall();
 
-    StatementTypePtr EmitStatementReturn();
+    StatementTypePtr addStatRet();
 
-    StatementTypePtr EmitStatementReturnExp(const BaseTypePtr &exp);
+    StatementTypePtr addStatRetExpression(const BaseTypePtr &exp);
 
     StatementTypePtr
-    EmitStatementIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+    addStatIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                     const BaseTypePtr &if_list_as_statement);
 
     StatementTypePtr
-    EmitStatementIfElse(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+    addStatIfAndElse(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                         BaseTypePtr if_list_as_statement,
                         const BaseTypePtr &else_label, const BaseTypePtr &else_statement);
 
     StatementTypePtr
-    EmitStatementWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &exp,
+    addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &exp,
                        const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
                        const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list);
 
-    StatementTypePtr EmitStatementBreak();
+    StatementTypePtr addStatBreak();
 
-    StatementTypePtr EmitStatementContinue();
+    StatementTypePtr addStatContinue();
 
-    StatementTypePtr
-    EmitStatementSwitch(BaseTypePtr exp, BaseTypePtr switch_list_as_statement, BaseTypePtr case_list,
-                        br_list_pointer break_list);
+    
+    
 
-    RegisterTypePtr EmitCall(const FuncSymbolTypePtr &func, const ExpListTypePtr &exp_list);
+    RegisterTypePtr addCall(const FuncSymbolTypePtr &func, const ExpListTypePtr &exp_list);
 
-    RegisterTypePtr EmitCall(const FuncSymbolTypePtr &func);
+    RegisterTypePtr addCall(const FuncSymbolTypePtr &func);
 
-    BoolExpTypePtr EmitTrue();
+    BoolExpTypePtr addTrue();
 
-    BoolExpTypePtr EmitFalse();
+    BoolExpTypePtr addFalse();
 
-    static BoolExpTypePtr EmitNot(const BaseTypePtr &bool_exp);
+    static BoolExpTypePtr addNot(const BaseTypePtr &bool_exp);
 
-    BoolExpTypePtr EmitAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2);
+    BoolExpTypePtr addAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2);
 
-    BoolExpTypePtr EmitOr(const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2);
+    BoolExpTypePtr addOr(const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2);
 
-    BoolExpTypePtr EmitRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2);
+    BoolExpTypePtr addRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2);
 
-    void EmitProgram();
+    void addProg();
 
-    string GetNonBoolExpString(const BaseTypePtr &exp);
+    string findNotBooleanExpressionStr(const BaseTypePtr &exp);
 
-    static string GetLLVMType(const Ty &type);
+    static string findTypeOfLLVM(const Ty &type);
 
-    void EmitStoreRegister(int offset, const name_of_register &reg_to_store);
+    void addStoreReg(int offset, const name_of_register &reg_to_store);
 
-    RegisterTypePtr EmitLoadRegister(int offset, Ty type);
+    RegisterTypePtr addLoadReg(int offset, Ty type);
 
-    StatementTypePtr EmitBranchNext();
+    StatementTypePtr addBranchNext();
 
-    RegisterTypePtr EmitString(const BaseTypePtr &stype_string);
+    RegisterTypePtr addString(const BaseTypePtr &stype_string);
 
-    BaseTypePtr EmitID(const SymbolTypePtr &symbol);
+    BaseTypePtr addIdentification(const SymbolTypePtr &symbol);
 
-    void EmitBoolExpToRegister(const BaseTypePtr &exp, const name_of_register &reg_result);
+    void addBooleanExpressionToRegister(const BaseTypePtr &exp, const name_of_register &reg_result);
 
-    BaseTypePtr RegisterToBoolExp(string &reg_source);
+    BaseTypePtr regToBooleanExpression(string &reg_source);
 
-    StatementTypePtr EmitBranchWhileHead();
+    StatementTypePtr addBWhileHead();
 
-    StatementTypePtr EmitParseBranchIfNext();
+    StatementTypePtr addPBIfNext();
 
-    StatementTypePtr EmitBranchSwitchHead();
-
-    StatementTypePtr EmitBranchCaseHead();
-
-    StatementTypePtr EmitBranchDefaultHead();
-
-    BaseTypePtr EmitCallExp(BaseTypePtr call_exp);
+    BaseTypePtr addCallExpression(BaseTypePtr call_exp);
 };
 
 

@@ -2,10 +2,10 @@
 #define HW3_SEMANTICS_H
 #include "symbol_table.h"
 
-class SemanticChecks {
+class Validations {
 public:
     SymbolTable &table_ref;
-    explicit SemanticChecks(SymbolTable &table);
+    explicit Validations(SymbolTable &table);
 
     
     Ty CheckAndGetBinOpType(Ty f, Ty s);

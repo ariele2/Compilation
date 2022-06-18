@@ -10,12 +10,12 @@ using namespace std;
 //for an unconditional branch (which contains only a single label) use FIRST.
 enum BranchLabelIndex {FIRST, SECOND};
 
-class CodeBuffer{
+class Buff{
 public:
-    CodeBuffer();
+    Buff();
     std::vector<std::string> buffer;
     std::vector<std::string> globalDefs;
-	static CodeBuffer &instance();
+	static Buff &instance();
 
 	// ******** Methods to handle the code section ******** //
 

@@ -2,16 +2,16 @@
 #define LOWER 0
 #define UPPER 255
 
-SemanticChecks::SemanticChecks(SymbolTable &table) : table_ref(table)
+Validations::Validations(SymbolTable &table) : table_ref(table)
 {
 }
 
-bool SemanticChecks::CheckSymDefined(string &n)
+bool Validations::CheckSymDefined(string &n)
 {
     return table_ref.IsSymbolDefined(n);
 }
 
-bool SemanticChecks::CheckMainIsDefined()
+bool Validations::CheckMainIsDefined()
 {
     for (auto map_pair : table_ref.symbols_map)
     {
@@ -30,7 +30,7 @@ bool SemanticChecks::CheckMainIsDefined()
     return false;
 }
 
-bool SemanticChecks::CheckAssigned(Ty f, Ty s)
+bool Validations::CheckAssigned(Ty f, Ty s)
 {
     if (CheckTypeType(s, f) || (CheckGeneralType(s, BYTE_TYPE) && CheckGeneralType(f, INT_TYPE)))
     {
@@ -42,7 +42,7 @@ bool SemanticChecks::CheckAssigned(Ty f, Ty s)
     }
 }
 
-bool SemanticChecks::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list)
+bool Validations::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list)
 {
     if (exp_list->exp_list.size() != func->params.size())
     {
@@ -59,63 +59,63 @@ bool SemanticChecks::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list
     return true;
 }
 
-bool SemanticChecks::CheckReturn(Ty t)
+bool Validations::CheckReturn(Ty t)
 {
     bool check_type = CheckAssigned(table_ref.scope_stack.top()->return_type, t);
     return check_type;
 }
 
-bool SemanticChecks::CheckFunction(Ty t)
+bool Validations::CheckFunction(Ty t)
 {
     bool check_type = CheckGeneralType(t, FUNCTION_TYPE);
     return check_type;
 }
 
-bool SemanticChecks::CheckVoid(Ty t)
+bool Validations::CheckVoid(Ty t)
 {
     bool check_type = CheckGeneralType(t, VOID_TYPE);
     return check_type;
 }
 
-bool SemanticChecks::CheckBool(Ty t)
+bool Validations::CheckBool(Ty t)
 {
     bool check_type = CheckGeneralType(t, BOOL_TYPE);
     return check_type;
 }
 
-bool SemanticChecks::CheckGeneralType(Ty t, GeneralType gt)
+bool Validations::CheckGeneralType(Ty t, GeneralType gt)
 {
     return gt == t;
 }
 
-bool SemanticChecks::CheckTypeType(Ty t1, Ty t)
+bool Validations::CheckTypeType(Ty t1, Ty t)
 {
     return t1 == t;
 }
 
-bool SemanticChecks::CheckBreak()
+bool Validations::CheckBreak()
 {
     bool is_in_while(table_ref.scope_stack.top()->inside_while);
     return is_in_while;
 }
 
-bool SemanticChecks::CheckContinue()
+bool Validations::CheckContinue()
 {
     return CheckBreak();
 }
 
-bool SemanticChecks::CheckOFByte(int &num)
+bool Validations::CheckOFByte(int &num)
 {
     return (num <= UPPER && num >= LOWER);
 }
 
-bool SemanticChecks::CheckRelop(Ty f, Ty s)
+bool Validations::CheckRelop(Ty f, Ty s)
 {
 
     return (CheckGeneralType(s, BYTE_TYPE) || CheckGeneralType(s, INT_TYPE)) && (CheckGeneralType(f, BYTE_TYPE) || CheckGeneralType(f, INT_TYPE));
 }
 
-Ty SemanticChecks::CheckAndGetBinOpType(Ty f, Ty s)
+Ty Validations::CheckAndGetBinOpType(Ty f, Ty s)
 {
     if (!CheckRelop(f, s))
     {
@@ -128,7 +128,7 @@ Ty SemanticChecks::CheckAndGetBinOpType(Ty f, Ty s)
     return INT_TYPE;
 }
 
-bool SemanticChecks::CheckCast(Ty f, Ty s)
+bool Validations::CheckCast(Ty f, Ty s)
 {
     return CheckAssigned(f, s);
 }

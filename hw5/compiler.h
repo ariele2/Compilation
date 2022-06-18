@@ -16,8 +16,8 @@ void yyerror(const char *);
 class Compiler {
 public:
     SymbolTable sym_tab;
-    SemanticChecks validations;
-    CodeGen code_genreation;
+    Validations validations;
+    Generator code_genreation;
     const std::string GEN_IF ="_if";
     const std::string GEN_ELSE ="_else";
     const std::string GEN_WHILE_BODY ="_while_body";

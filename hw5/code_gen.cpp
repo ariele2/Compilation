@@ -4,13 +4,13 @@ CodeGen::CodeGen(SemanticChecks &semantic_ref) : register_count(0), code_buffer(
     EmitGlobalFunctions();
 }
 
-register_name CodeGen::GenRegister() {
-    register_name ret;
+name_of_register CodeGen::GenRegister() {
+    name_of_register ret;
     return (ret + "%r" + to_string(register_count++));
 }
 
-register_name CodeGen::GenGlobalRegister() {
-    register_name ret;
+name_of_register CodeGen::GenGlobalRegister() {
+    name_of_register ret;
     return (ret + "@r" + to_string(register_count++));
 }
 
@@ -165,7 +165,7 @@ RegisterTypePtr CodeGen::EmitCall(const FuncSymbolTypePtr &func) {
     return reg_result;
 }
 
-string CodeGen::GetLLVMType(const Type &type) {
+string CodeGen::GetLLVMType(const Ty &type) {
     string llvm_type;
     switch (type) {
         case VOID_TYPE:
@@ -246,7 +246,7 @@ BoolExpTypePtr CodeGen::EmitRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, c
 
 StatementTypePtr CodeGen::EmitStatementType(string id) {
     auto symbol = semantic_ref.table_ref.GetDefinedSymbol(id);
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
 
     // create default value and store in stack
     // r = 0+0 (including bool)
@@ -260,7 +260,7 @@ StatementTypePtr CodeGen::EmitStatementType(string id) {
 
 StatementTypePtr CodeGen::EmitStatementAssign(string id, const BaseTypePtr &exp) {
     auto symbol = semantic_ref.table_ref.GetDefinedSymbol(id);
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
     auto reg_result = GenRegister();
 
     if (exp->generation_type == BOOL_TYPE) {
@@ -277,7 +277,7 @@ StatementTypePtr CodeGen::EmitStatementAssign(string id, const BaseTypePtr &exp)
     return statement;
 }
 
-void CodeGen::EmitBoolExpToRegister(const BaseTypePtr &exp, const register_name &reg_result) {
+void CodeGen::EmitBoolExpToRegister(const BaseTypePtr &exp, const name_of_register &reg_result) {
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
 
     // create phi junction
@@ -327,7 +327,7 @@ void CodeGen::EmitFuncHead(const FuncSymbolTypePtr &symbol) {
     code_buffer.emit(stack_register + " = alloca i32, i32 " + to_string(STACK_SIZE));
 }
 
-void CodeGen::EmitStoreRegister(int offset, const register_name &reg_to_store) {
+void CodeGen::EmitStoreRegister(int offset, const name_of_register &reg_to_store) {
     assert(!stack_register.empty());
     auto reg_pointer_to_stack = GenRegister();
 
@@ -341,7 +341,7 @@ void CodeGen::EmitStoreRegister(int offset, const register_name &reg_to_store) {
     }
 }
 
-RegisterTypePtr CodeGen::EmitLoadRegister(int offset, Type type) {
+RegisterTypePtr CodeGen::EmitLoadRegister(int offset, Ty type) {
     assert(!stack_register.empty());
 
     auto reg_result = GenRegister();
@@ -378,18 +378,18 @@ BaseTypePtr CodeGen::RegisterToBoolExp(string &reg_source) {
 }
 
 StatementTypePtr CodeGen::EmitStatementCall() {
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
     return statement;
 }
 
 StatementTypePtr CodeGen::EmitStatementReturn() {
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
     code_buffer.emit("ret void");
     return statement;
 }
 
 StatementTypePtr CodeGen::EmitStatementReturnExp(const BaseTypePtr &exp) {
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
     string reg_result;
 
     if (exp->generation_type == BOOL_TYPE) {
@@ -452,7 +452,7 @@ CodeGen::EmitStatementIfElse(const BaseTypePtr &exp, const BaseTypePtr &if_label
 StatementTypePtr
 CodeGen::EmitStatementWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &exp,
                             const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
-                            const BaseTypePtr &end_list_as_statement, const branch_list_ptr &break_list) {
+                            const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list) {
     auto dynamic_cast_start_list_as_statement = dynamic_pointer_cast<StatementType>(start_list_as_statement);
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
     auto dynamic_cast_while_statement = dynamic_pointer_cast<StatementType>(while_statement);
@@ -478,75 +478,18 @@ StatementTypePtr CodeGen::EmitStatementBreak() {
     // add address to `break_list`
     semantic_ref.table_ref.scope_stack.top()->break_list->push_back({code_buffer.emit("br label @  ; break"), FIRST});
 
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
     return statement;
 }
 
 StatementTypePtr CodeGen::EmitStatementContinue() {
     code_buffer.emit("br label %" + semantic_ref.table_ref.scope_stack.top()->while_continue_label);
-    auto statement = make_shared<StatementType>(branch_list());
+    auto statement = make_shared<StatementType>(br_list());
     return statement;
 }
 
-StatementTypePtr
-CodeGen::EmitStatementSwitch(BaseTypePtr exp, BaseTypePtr switch_list_as_statement, BaseTypePtr case_list,
-                             branch_list_ptr break_list) {
-    auto dynamic_cast_exp = GetNonBoolExpString(exp);
-    auto dynamic_cast_switch_list = dynamic_pointer_cast<StatementType>(switch_list_as_statement);
-    auto dynamic_cast_case_list = dynamic_pointer_cast<CaseListType>(case_list);
 
-
-    //  break_list -> next
-    auto statement = make_shared<StatementType>(*break_list);
-
-    // emit init label and backpatch switch head
-    auto init_label = code_buffer.genLabel("_switch_init");
-    code_buffer.bpatch(dynamic_cast_switch_list->next_list, init_label);
-
-    // caselist -> next
-    statement->next_list = CodeBuffer::merge(statement->next_list, dynamic_cast_case_list->next_list);
-
-    // emit comparisons
-    string last_label;
-    branch_list curr_branch_pair;
-    for (size_t i = 0; i < dynamic_cast_case_list->case_list.size(); ++i) {
-
-        if (i > 0) {
-            // backpatch
-            last_label = code_buffer.genLabel("_switch_comparison");
-            code_buffer.bpatch(curr_branch_pair, last_label);
-        }
-
-        // comparison
-        auto reg_icmp = GenRegister();
-        string icmp_string(reg_icmp + " = icmp eq i32 ");
-        icmp_string += dynamic_cast_exp + ", ";
-        icmp_string += to_string(dynamic_cast_case_list->case_list[i].first);
-        code_buffer.emit(icmp_string);
-
-        // branch - the last branch is not backpatched
-        auto branch_addr = code_buffer.emit("br i1 " + reg_icmp + ", label %" +
-                                            dynamic_cast_case_list->case_list[i].second + ", label @");
-        curr_branch_pair.push_back({branch_addr, SECOND});
-
-
-    }
-
-
-    // emit default branch if needed
-    if (!dynamic_cast_case_list->default_label.empty()) {
-        code_buffer.emit("br label %" + dynamic_cast_case_list->default_label);
-        code_buffer.bpatch(curr_branch_pair, dynamic_cast_case_list->default_label);
-    }else{
-        // backpatch last branch if no default
-        last_label = code_buffer.genLabel("_switch_comparison_end");
-        code_buffer.bpatch(curr_branch_pair, last_label);
-    }
-
-
-
-    return statement;
-}
+ 
 
 void CodeGen::EmitFuncDecl(const BaseTypePtr &statements, const BaseTypePtr &next_label) {
     // ret things
@@ -571,17 +514,17 @@ void CodeGen::EmitFuncDecl(const BaseTypePtr &statements, const BaseTypePtr &nex
 }
 
 BoolExpTypePtr CodeGen::EmitTrue() {
-    return make_shared<BoolExpType>(CodeBuffer::makelist({code_buffer.emit("br label @"), FIRST}), branch_list());
+    return make_shared<BoolExpType>(CodeBuffer::makelist({code_buffer.emit("br label @"), FIRST}), br_list());
 }
 
 BoolExpTypePtr CodeGen::EmitFalse() {
-    return make_shared<BoolExpType>(branch_list(), CodeBuffer::makelist({code_buffer.emit("br label @"), FIRST}));
+    return make_shared<BoolExpType>(br_list(), CodeBuffer::makelist({code_buffer.emit("br label @"), FIRST}));
 }
 
 BoolExpTypePtr CodeGen::EmitNot(const BaseTypePtr &bool_exp) {
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(bool_exp);
 
-    branch_list old_true_list(dynamic_cast_bool_exp->true_list);
+    br_list old_true_list(dynamic_cast_bool_exp->true_list);
     dynamic_cast_bool_exp->true_list = dynamic_cast_bool_exp->false_list;
     dynamic_cast_bool_exp->false_list = old_true_list;
 
@@ -648,70 +591,6 @@ BaseTypePtr CodeGen::EmitID(const SymbolTypePtr &symbol) {
     }
 
     return exp_reg;
-}
-
-CaseListTypePtr CodeGen::EmitCaseList(BaseTypePtr case_decl, BaseTypePtr next_label, BaseTypePtr case_list) {
-    auto dynamic_cast_case_decl = dynamic_pointer_cast<CaseDeclType>(case_decl);
-    auto dynamic_cast_next_label = dynamic_pointer_cast<StringType>(next_label);
-    auto dynamic_cast_case_list = dynamic_pointer_cast<CaseListType>(case_list);
-
-    // backpatch the statements in the last case declaration
-    code_buffer.bpatch(dynamic_cast_case_decl->next_list, dynamic_cast_next_label->t);
-
-    auto case_label_list = dynamic_cast_case_list->case_list;
-    case_label_list.emplace_back(dynamic_cast_case_decl->case_num, dynamic_cast_case_decl->case_label);
-
-    auto default_label = dynamic_cast_case_list->default_label;
-
-    auto next_list = dynamic_cast_case_list->next_list;
-
-    auto result_case_list = make_shared<CaseListType>(case_label_list, default_label, next_list);
-
-    return result_case_list;
-}
-
-CaseListTypePtr CodeGen::EmitCaseList(BaseTypePtr case_decl) {
-    auto dynamic_cast_case_decl = dynamic_pointer_cast<CaseDeclType>(case_decl);
-
-    auto case_list = case_label_list();
-    case_list.emplace_back(dynamic_cast_case_decl->case_num, dynamic_cast_case_decl->case_label);
-
-    auto result_case_list = make_shared<CaseListType>(case_list,
-                                                       "",
-                                                       dynamic_cast_case_decl->next_list);
-
-    return result_case_list;
-}
-
-CaseListTypePtr CodeGen::EmitCaseDefault(BaseTypePtr list_as_statement, BaseTypePtr default_label, BaseTypePtr statements) {
-    auto dynamic_cast_next_list = dynamic_pointer_cast<StatementType>(list_as_statement);
-    auto dynamic_cast_case_default_label = dynamic_pointer_cast<StringType>(default_label);
-    auto dynamic_cast_statements = dynamic_pointer_cast<StatementType>(statements);
-
-    auto result_case_list = make_shared<CaseListType>(case_label_list(),
-                                                       dynamic_cast_case_default_label->t,
-                                                       dynamic_cast_statements->next_list);
-
-    code_buffer.bpatch(dynamic_cast_next_list->next_list, dynamic_cast_case_default_label->t);
-
-    return result_case_list;
-}
-
-CaseDeclTypePtr
-CodeGen::EmitCaseDecl(BaseTypePtr num, BaseTypePtr list_as_statement, BaseTypePtr case_decl_label, BaseTypePtr statements) {
-    auto dynamic_cast_num = dynamic_pointer_cast<NumberType>(num);
-    auto dynamic_cast_case_decl_label = dynamic_pointer_cast<StringType>(case_decl_label);
-    auto dynamic_cast_statements = dynamic_pointer_cast<StatementType>(statements);
-    auto dynamic_cast_next_list = dynamic_pointer_cast<StatementType>(list_as_statement);
-
-    auto case_decl_result = make_shared<CaseDeclType>(dynamic_cast_num->token,
-                                                       dynamic_cast_case_decl_label->t,
-                                                       dynamic_cast_statements->next_list);
-
-    code_buffer.bpatch(dynamic_cast_next_list->next_list, dynamic_cast_case_decl_label->t);
-
-    return case_decl_result;
-
 }
 
 

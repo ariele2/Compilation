@@ -18,9 +18,9 @@ public:
 
     explicit CodeGen(SemanticChecks &semantic_ref);
 
-    register_name GenRegister();
+    name_of_register GenRegister();
 
-    register_name GenGlobalRegister();
+    name_of_register GenGlobalRegister();
 
     void EmitGlobalFunctions();
 
@@ -54,7 +54,7 @@ public:
     StatementTypePtr
     EmitStatementWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &exp,
                        const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
-                       const BaseTypePtr &end_list_as_statement, const branch_list_ptr &break_list);
+                       const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list);
 
     StatementTypePtr EmitStatementBreak();
 
@@ -62,7 +62,7 @@ public:
 
     StatementTypePtr
     EmitStatementSwitch(BaseTypePtr exp, BaseTypePtr switch_list_as_statement, BaseTypePtr case_list,
-                        branch_list_ptr break_list);
+                        br_list_pointer break_list);
 
     RegisterTypePtr EmitCall(const FuncSymbolTypePtr &func, const ExpListTypePtr &exp_list);
 
@@ -80,24 +80,15 @@ public:
 
     BoolExpTypePtr EmitRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2);
 
-    CaseDeclTypePtr
-    EmitCaseDecl(BaseTypePtr num, BaseTypePtr list_as_statement, BaseTypePtr case_decl_label, BaseTypePtr statements);
-
-    CaseListTypePtr EmitCaseDefault(BaseTypePtr list_as_statement, BaseTypePtr default_label, BaseTypePtr statements);
-
-    CaseListTypePtr EmitCaseList(BaseTypePtr case_decl);
-
-    CaseListTypePtr EmitCaseList(BaseTypePtr case_decl, BaseTypePtr next_label, BaseTypePtr case_list);
-
     void EmitProgram();
 
     string GetNonBoolExpString(const BaseTypePtr &exp);
 
-    static string GetLLVMType(const Type &type);
+    static string GetLLVMType(const Ty &type);
 
-    void EmitStoreRegister(int offset, const register_name &reg_to_store);
+    void EmitStoreRegister(int offset, const name_of_register &reg_to_store);
 
-    RegisterTypePtr EmitLoadRegister(int offset, Type type);
+    RegisterTypePtr EmitLoadRegister(int offset, Ty type);
 
     StatementTypePtr EmitBranchNext();
 
@@ -105,7 +96,7 @@ public:
 
     BaseTypePtr EmitID(const SymbolTypePtr &symbol);
 
-    void EmitBoolExpToRegister(const BaseTypePtr &exp, const register_name &reg_result);
+    void EmitBoolExpToRegister(const BaseTypePtr &exp, const name_of_register &reg_result);
 
     BaseTypePtr RegisterToBoolExp(string &reg_source);
 

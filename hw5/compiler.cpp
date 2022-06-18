@@ -697,7 +697,7 @@ void Compiler::pAddStatScope(int ln)
 void Compiler::pAddWhileScope(int ln, const BaseTypePtr &label_of_while_head)
 {
 
-    auto break_list = make_shared<branch_list>();
+    auto break_list = make_shared<br_list>();
 
     sym_tab.PushScope(WHILE_SCOPE);
     sym_tab.scope_stack.top()->inside_while = true;

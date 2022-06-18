@@ -27,10 +27,10 @@ void SymbolTable::PushDefaultFunctions() {
 
 void SymbolTable::PushScope(ScopeType scope_type) {
     // copy everything from top scope, unless global. the calling functions handle other stuff
-    Type ret_type;
+    Ty ret_type;
     bool inside_while, inside_switch;
     string while_continue_label;
-    branch_list_ptr break_list;
+    br_list_pointer break_list;
 
     if (scope_type == GLOBAL_SCOPE) {
         // labels and lists are empty, no need to init
@@ -50,7 +50,7 @@ void SymbolTable::PushScope(ScopeType scope_type) {
                                         while_continue_label, break_list));
 }
 
-void SymbolTable::PushFunctionScope(Type ret_type) {
+void SymbolTable::PushFunctionScope(Ty ret_type) {
     PushScope(FUNCTION_SCOPE);
     scope_stack.top()->return_type = ret_type;
 
@@ -136,8 +136,8 @@ SymbolTypePtr SymbolTable::GetDefinedSymbol(string &symbol_name) {
 
 
 // the labels are initialized empty
-Scope::Scope(ScopeType scope_type, int offset, Type ret_type, bool inside_while, bool inside_switch,
-             string while_continue_label, branch_list_ptr break_list) :
+Scope::Scope(ScopeType scope_type, int offset, Ty ret_type, bool inside_while, bool inside_switch,
+             string while_continue_label, br_list_pointer break_list) :
         scope_type(scope_type), offset(offset), return_type(ret_type),
         inside_while(inside_while), inside_switch(inside_switch),
         while_continue_label(move(while_continue_label)), break_list(move(break_list)) {

@@ -8,22 +8,22 @@ public:
     explicit SemanticChecks(SymbolTable &table);
 
     
-    Type CheckAndGetBinOpType(Type f, Type s);
-    bool CheckCast(Type f, Type s);
+    Ty CheckAndGetBinOpType(Ty f, Ty s);
+    bool CheckCast(Ty f, Ty s);
     bool CheckCall(FuncSymbolTypePtr &function, ExpListTypePtr &expression_list);
-    bool CheckReturn(Type t);
-    bool CheckBool(Type t);
+    bool CheckReturn(Ty t);
+    bool CheckBool(Ty t);
     bool CheckSymDefined(string &n);
-    bool CheckGeneralType(Type t, GeneralType gt);
-    bool CheckTypeType(Type t1, Type t);
+    bool CheckGeneralType(Ty t, GeneralType gt);
+    bool CheckTypeType(Ty t1, Ty t);
     bool CheckMainIsDefined();
     bool CheckOFByte(int &num);
-    bool CheckFunction(Type t);
+    bool CheckFunction(Ty t);
     bool CheckBreak();
-    bool CheckVoid(Type t);
-    bool CheckAssigned(Type f, Type s);
+    bool CheckVoid(Ty t);
+    bool CheckAssigned(Ty f, Ty s);
     bool CheckContinue();
-    bool CheckRelop(Type f, Type s);
+    bool CheckRelop(Ty f, Ty s);
     
     
 

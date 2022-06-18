@@ -4,7 +4,7 @@
 
 TerminalBase::TerminalBase() : generation_type(ERROR_TYPE) {}
 
-TerminalBase::TerminalBase(Type type) : generation_type(type) {}
+TerminalBase::TerminalBase(Ty type) : generation_type(type) {}
 
 StringType::StringType(string &token) : TerminalBase(STRING_TYPE), t(token) {}
 
@@ -12,11 +12,11 @@ NumberType::NumberType(string &token_string) : TerminalBase(INT_TYPE) {
     token = stoi(token_string);
 }
 
-CType::CType(Type type) : TerminalBase(type) {
+CType::CType(Ty type) : TerminalBase(type) {
 
 }
 
-string TypeToString(Type type) {
+string TypeToString(Ty type) {
 
     switch (type) {
         case VOID_TYPE:
@@ -42,7 +42,7 @@ void ArgListToStrings(ArgList &arg_list, vector<string> &string_vector) {
     }
 }
 
-SymbolType::SymbolType(string &name, int offset, Type type) : TerminalBase(type), name(name),
+SymbolType::SymbolType(string &name, int offset, Ty type) : TerminalBase(type), name(name),
                                                                 offset(offset) {
 
 }
@@ -56,7 +56,7 @@ ArgListType::ArgListType(ArgList &arg_list) : arguments_list(arg_list) {
 
 }
 
-FuncSymType::FuncSymType(string &symbol_name, Type symbol_type, ArgList &arg_list)
+FuncSymType::FuncSymType(string &symbol_name, Ty symbol_type, ArgList &arg_list)
         : SymbolType(symbol_name, 0, FUNCTION_TYPE), params(arg_list), ret_type(symbol_type) {
 
 }
@@ -69,26 +69,19 @@ TExpList::TExpList(ExpList &exp_list) : exp_list(exp_list) {
 
 }
 
-RegisterType::RegisterType(register_name reg_name, Type type) : TerminalBase(type), reg_name(move(reg_name)) {
+RegisterType::RegisterType(name_of_register reg_name, Ty type) : TerminalBase(type), reg_name(move(reg_name)) {
 
 }
 
-StatementType::StatementType(branch_list next_list) : TerminalBase(STATEMENT_TYPE), next_list(move(next_list)) {
+StatementType::StatementType(br_list next_list) : TerminalBase(STATEMENT_TYPE), next_list(move(next_list)) {
 
 }
 
-BoolExpType::BoolExpType(branch_list true_list, branch_list false_list) : TerminalBase(BOOL_TYPE),
+BoolExpType::BoolExpType(br_list true_list, br_list false_list) : TerminalBase(BOOL_TYPE),
                                                                             true_list(move(true_list)),
                                                                             false_list(move(false_list)) {
 
 }
 
-CaseListType::CaseListType(case_label_list case_list, string default_label, branch_list next_list) :
-        case_list(move(case_list)), default_label(move(default_label)), next_list(move(next_list)) {
 
-}
 
-CaseDeclType::CaseDeclType(int case_num, string case_label, branch_list next_list):
-        case_num(case_num), case_label(move(case_label)), next_list(move(next_list)) {
-
-}

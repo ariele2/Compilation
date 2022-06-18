@@ -19,27 +19,27 @@ public:
     ScopeType scope_type;
     int offset;
     vector<SymbolTypePtr> symbols;
-    Type return_type;
+    Ty return_type;
     bool inside_while;
     bool inside_switch;
     string while_continue_label;
-    branch_list_ptr break_list;
+    br_list_pointer break_list;
 
-    Scope(ScopeType scope_type, int offset, Type ret_type, bool inside_while, bool inside_switch,
-          string while_continue_label, branch_list_ptr break_list);
+    Scope(ScopeType scope_type, int offset, Ty ret_type, bool inside_while, bool inside_switch,
+          string while_continue_label, br_list_pointer break_list);
 };
 
 class SymbolTable {
 public:
     int current_offset;
     unordered_map<string, SymbolTypePtr> symbols_map;
-    stack<ScopePtr> scope_stack;
+    stack<ScopePointer> scope_stack;
 
     void PushDefaultFunctions();
 
     void PushScope(ScopeType scope_type);
 
-    void PushFunctionScope(Type ret_type);
+    void PushFunctionScope(Ty ret_type);
 
     void PopScope();
 

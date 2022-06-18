@@ -30,7 +30,7 @@ bool SemanticChecks::CheckMainIsDefined()
     return false;
 }
 
-bool SemanticChecks::CheckAssigned(Type f, Type s)
+bool SemanticChecks::CheckAssigned(Ty f, Ty s)
 {
     if (CheckTypeType(s, f) || (CheckGeneralType(s, BYTE_TYPE) && CheckGeneralType(f, INT_TYPE)))
     {
@@ -59,36 +59,36 @@ bool SemanticChecks::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list
     return true;
 }
 
-bool SemanticChecks::CheckReturn(Type t)
+bool SemanticChecks::CheckReturn(Ty t)
 {
     bool check_type = CheckAssigned(table_ref.scope_stack.top()->return_type, t);
     return check_type;
 }
 
-bool SemanticChecks::CheckFunction(Type t)
+bool SemanticChecks::CheckFunction(Ty t)
 {
     bool check_type = CheckGeneralType(t, FUNCTION_TYPE);
     return check_type;
 }
 
-bool SemanticChecks::CheckVoid(Type t)
+bool SemanticChecks::CheckVoid(Ty t)
 {
     bool check_type = CheckGeneralType(t, VOID_TYPE);
     return check_type;
 }
 
-bool SemanticChecks::CheckBool(Type t)
+bool SemanticChecks::CheckBool(Ty t)
 {
     bool check_type = CheckGeneralType(t, BOOL_TYPE);
     return check_type;
 }
 
-bool SemanticChecks::CheckGeneralType(Type t, GeneralType gt)
+bool SemanticChecks::CheckGeneralType(Ty t, GeneralType gt)
 {
     return gt == t;
 }
 
-bool SemanticChecks::CheckTypeType(Type t1, Type t)
+bool SemanticChecks::CheckTypeType(Ty t1, Ty t)
 {
     return t1 == t;
 }
@@ -109,13 +109,13 @@ bool SemanticChecks::CheckOFByte(int &num)
     return (num <= UPPER && num >= LOWER);
 }
 
-bool SemanticChecks::CheckRelop(Type f, Type s)
+bool SemanticChecks::CheckRelop(Ty f, Ty s)
 {
 
     return (CheckGeneralType(s, BYTE_TYPE) || CheckGeneralType(s, INT_TYPE)) && (CheckGeneralType(f, BYTE_TYPE) || CheckGeneralType(f, INT_TYPE));
 }
 
-Type SemanticChecks::CheckAndGetBinOpType(Type f, Type s)
+Ty SemanticChecks::CheckAndGetBinOpType(Ty f, Ty s)
 {
     if (!CheckRelop(f, s))
     {
@@ -128,7 +128,7 @@ Type SemanticChecks::CheckAndGetBinOpType(Type f, Type s)
     return INT_TYPE;
 }
 
-bool SemanticChecks::CheckCast(Type f, Type s)
+bool SemanticChecks::CheckCast(Ty f, Ty s)
 {
     return CheckAssigned(f, s);
 }

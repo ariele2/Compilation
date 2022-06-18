@@ -79,11 +79,11 @@ RegisterTypePtr CodeGen::EmitBinop(const BaseTypePtr &exp1, string binop, const 
 
     code_buffer.emit(binop_str);
 
-    if (semantic_ref.CheckAndGetBinOpType(exp1->g_type, exp2->g_type) == BYTE_TYPE) {
+    if (semantic_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type) == BYTE_TYPE) {
         // byte < 256
         auto reg_old_result = reg_result->reg_name;
         reg_result->reg_name = GenRegister();
-        reg_result->g_type = BYTE_TYPE;
+        reg_result->generation_type = BYTE_TYPE;
         code_buffer.emit(reg_result->reg_name + " = and i32 " + reg_old_result + ", 255");
     }
 
@@ -136,7 +136,7 @@ RegisterTypePtr CodeGen::EmitCall(const FuncSymbolTypePtr &func, const ExpListTy
         if (i > 0) {
             out_str += ", ";
         }
-        out_str += GetLLVMType(exp_list->exp_list[i]->g_type) + " ";
+        out_str += GetLLVMType(exp_list->exp_list[i]->generation_type) + " ";
 
         {
             out_str += GetNonBoolExpString(exp_list->exp_list[i]);
@@ -194,7 +194,7 @@ string CodeGen::GetNonBoolExpString(const BaseTypePtr &exp) {
     } else if (dynamic_cast_reg_exp) {
         return dynamic_cast_reg_exp->reg_name;
     } else if (dynamic_cast_sym_exp) {
-        return EmitLoadRegister(dynamic_cast_sym_exp->offset, dynamic_cast_sym_exp->g_type)->reg_name;
+        return EmitLoadRegister(dynamic_cast_sym_exp->offset, dynamic_cast_sym_exp->generation_type)->reg_name;
     } else {
         assert(false);
     }
@@ -216,7 +216,7 @@ BoolExpTypePtr CodeGen::EmitRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, c
     string icmp_string(reg_icmp + " = icmp ");
 
     auto dynamic_cast_relop = dynamic_pointer_cast<StringType>(relop);
-    auto relop_str = dynamic_cast_relop->token;
+    auto relop_str = dynamic_cast_relop->t;
 
     if (relop_str == "<") {
         icmp_string += "slt";
@@ -263,7 +263,7 @@ StatementTypePtr CodeGen::EmitStatementAssign(string id, const BaseTypePtr &exp)
     auto statement = make_shared<StatementType>(branch_list());
     auto reg_result = GenRegister();
 
-    if (exp->g_type == BOOL_TYPE) {
+    if (exp->generation_type == BOOL_TYPE) {
         EmitBoolExpToRegister(exp, reg_result);
 
     } else {
@@ -392,7 +392,7 @@ StatementTypePtr CodeGen::EmitStatementReturnExp(const BaseTypePtr &exp) {
     auto statement = make_shared<StatementType>(branch_list());
     string reg_result;
 
-    if (exp->g_type == BOOL_TYPE) {
+    if (exp->generation_type == BOOL_TYPE) {
         reg_result = GenRegister();
         EmitBoolExpToRegister(exp, reg_result);
 
@@ -400,7 +400,7 @@ StatementTypePtr CodeGen::EmitStatementReturnExp(const BaseTypePtr &exp) {
         reg_result = GetNonBoolExpString(exp);
     }
 
-    code_buffer.emit("ret " + GetLLVMType(exp->g_type) + " " + reg_result);
+    code_buffer.emit("ret " + GetLLVMType(exp->generation_type) + " " + reg_result);
     return statement;
 }
 
@@ -414,7 +414,7 @@ CodeGen::EmitStatementIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, co
 
 
     // bpatch true
-    code_buffer.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
+    code_buffer.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->t);
 
     // merge false and next
     auto statement = dynamic_cast_if_statement;
@@ -437,8 +437,8 @@ CodeGen::EmitStatementIfElse(const BaseTypePtr &exp, const BaseTypePtr &if_label
     auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
 
     // bpatch true and false
-    code_buffer.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
-    code_buffer.bpatch(dynamic_cast_bool_exp->false_list, dynamic_cast_else_label->token);
+    code_buffer.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->t);
+    code_buffer.bpatch(dynamic_cast_bool_exp->false_list, dynamic_cast_else_label->t);
 
     // merge if's next (includes if_list) and else's next
     auto statement = dynamic_cast_if_statement;
@@ -461,10 +461,10 @@ CodeGen::EmitStatementWhile(BaseTypePtr start_list_as_statement, const BaseTypeP
     auto dynamic_cast_end_list_as_statement = dynamic_pointer_cast<StatementType>(end_list_as_statement);
 
     // bpatch true->body->head, start->head
-    code_buffer.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_while_body_label->token);
-    code_buffer.bpatch(dynamic_cast_while_statement->next_list, dynamic_cast_while_head_label->token);
-    code_buffer.bpatch(dynamic_cast_end_list_as_statement->next_list, dynamic_cast_while_head_label->token);
-    code_buffer.bpatch(dynamic_cast_start_list_as_statement->next_list, dynamic_cast_while_head_label->token);
+    code_buffer.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_while_body_label->t);
+    code_buffer.bpatch(dynamic_cast_while_statement->next_list, dynamic_cast_while_head_label->t);
+    code_buffer.bpatch(dynamic_cast_end_list_as_statement->next_list, dynamic_cast_while_head_label->t);
+    code_buffer.bpatch(dynamic_cast_start_list_as_statement->next_list, dynamic_cast_while_head_label->t);
 
 
     // false & break go to next
@@ -567,7 +567,7 @@ void CodeGen::EmitFuncDecl(const BaseTypePtr &statements, const BaseTypePtr &nex
     auto dynamic_cast_statements = dynamic_pointer_cast<StatementType>(statements);
     auto dynamic_cast_next_label = dynamic_pointer_cast<StringType>(next_label);
 
-    code_buffer.bpatch(dynamic_cast_statements->next_list, dynamic_cast_next_label->token);
+    code_buffer.bpatch(dynamic_cast_statements->next_list, dynamic_cast_next_label->t);
 }
 
 BoolExpTypePtr CodeGen::EmitTrue() {
@@ -594,7 +594,7 @@ BoolExpTypePtr CodeGen::EmitAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr 
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
 
     // exp1: true -> exp2, false -> and_false
-    code_buffer.bpatch(dynamic_cast_bool_exp1->true_list, dynamic_cast_and_label->token);
+    code_buffer.bpatch(dynamic_cast_bool_exp1->true_list, dynamic_cast_and_label->t);
 
     // exp2: true -> and_true, false -> and_false
     return make_shared<BoolExpType>(dynamic_cast_bool_exp2->true_list,
@@ -608,7 +608,7 @@ BoolExpTypePtr CodeGen::EmitOr(const BaseTypePtr &bool_exp1, const BaseTypePtr &
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
 
     // exp1: true -> or_true, false -> exp2
-    code_buffer.bpatch(dynamic_cast_bool_exp1->false_list, dynamic_cast_or_label->token);
+    code_buffer.bpatch(dynamic_cast_bool_exp1->false_list, dynamic_cast_or_label->t);
 
     // exp2: true -> or_true, false -> or_false
     return make_shared<BoolExpType>(CodeBuffer::merge(dynamic_cast_bool_exp1->true_list,
@@ -621,11 +621,11 @@ RegisterTypePtr CodeGen::EmitString(const BaseTypePtr &stype_string) {
 
     auto reg_result = make_shared<RegisterType>(GenRegister(), STRING_TYPE);
     auto reg_global = GenGlobalRegister();
-    auto string_size_string = to_string(dynamic_cast_string->token.size() + 1);
+    auto string_size_string = to_string(dynamic_cast_string->t.size() + 1);
 
     code_buffer.emitGlobal(
             reg_global + " = constant [" + string_size_string +
-            " x i8] c\"" + dynamic_cast_string->token + "\\00\"");
+            " x i8] c\"" + dynamic_cast_string->t + "\\00\"");
 
     code_buffer.emit(reg_result->reg_name + " = getelementptr [" + string_size_string +
                      " x i8], [" + string_size_string + " x i8]* " + reg_global + ", i32 0, i32 0");
@@ -636,13 +636,13 @@ RegisterTypePtr CodeGen::EmitString(const BaseTypePtr &stype_string) {
 BaseTypePtr CodeGen::EmitID(const SymbolTypePtr &symbol) {
     auto dynamic_cast_symbol = dynamic_pointer_cast<SymbolType>(symbol);
 
-    if (dynamic_cast_symbol->g_type == FUNCTION_TYPE){
+    if (dynamic_cast_symbol->generation_type == FUNCTION_TYPE){
         // do not convert function id to register
         return dynamic_cast_symbol;
     }
 
-    auto exp_reg = EmitLoadRegister(dynamic_cast_symbol->offset, dynamic_cast_symbol->g_type);
-    if (exp_reg->g_type == BOOL_TYPE) {
+    auto exp_reg = EmitLoadRegister(dynamic_cast_symbol->offset, dynamic_cast_symbol->generation_type);
+    if (exp_reg->generation_type == BOOL_TYPE) {
         // exp should be a bool_exp when possible
         return RegisterToBoolExp(exp_reg->reg_name);
     }
@@ -656,7 +656,7 @@ CaseListTypePtr CodeGen::EmitCaseList(BaseTypePtr case_decl, BaseTypePtr next_la
     auto dynamic_cast_case_list = dynamic_pointer_cast<CaseListType>(case_list);
 
     // backpatch the statements in the last case declaration
-    code_buffer.bpatch(dynamic_cast_case_decl->next_list, dynamic_cast_next_label->token);
+    code_buffer.bpatch(dynamic_cast_case_decl->next_list, dynamic_cast_next_label->t);
 
     auto case_label_list = dynamic_cast_case_list->case_list;
     case_label_list.emplace_back(dynamic_cast_case_decl->case_num, dynamic_cast_case_decl->case_label);
@@ -689,10 +689,10 @@ CaseListTypePtr CodeGen::EmitCaseDefault(BaseTypePtr list_as_statement, BaseType
     auto dynamic_cast_statements = dynamic_pointer_cast<StatementType>(statements);
 
     auto result_case_list = make_shared<CaseListType>(case_label_list(),
-                                                       dynamic_cast_case_default_label->token,
+                                                       dynamic_cast_case_default_label->t,
                                                        dynamic_cast_statements->next_list);
 
-    code_buffer.bpatch(dynamic_cast_next_list->next_list, dynamic_cast_case_default_label->token);
+    code_buffer.bpatch(dynamic_cast_next_list->next_list, dynamic_cast_case_default_label->t);
 
     return result_case_list;
 }
@@ -705,10 +705,10 @@ CodeGen::EmitCaseDecl(BaseTypePtr num, BaseTypePtr list_as_statement, BaseTypePt
     auto dynamic_cast_next_list = dynamic_pointer_cast<StatementType>(list_as_statement);
 
     auto case_decl_result = make_shared<CaseDeclType>(dynamic_cast_num->token,
-                                                       dynamic_cast_case_decl_label->token,
+                                                       dynamic_cast_case_decl_label->t,
                                                        dynamic_cast_statements->next_list);
 
-    code_buffer.bpatch(dynamic_cast_next_list->next_list, dynamic_cast_case_decl_label->token);
+    code_buffer.bpatch(dynamic_cast_next_list->next_list, dynamic_cast_case_decl_label->t);
 
     return case_decl_result;
 
@@ -754,7 +754,7 @@ StatementTypePtr CodeGen::EmitBranchDefaultHead() {
 
 BaseTypePtr CodeGen::EmitCallExp(BaseTypePtr call_exp) {
     auto dynamic_cast_call_exp = dynamic_pointer_cast<RegisterType>(call_exp);
-    if (call_exp->g_type == BOOL_TYPE) {
+    if (call_exp->generation_type == BOOL_TYPE) {
         return RegisterToBoolExp(dynamic_cast_call_exp->reg_name);
     } else {
         return call_exp;

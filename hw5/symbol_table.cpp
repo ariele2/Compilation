@@ -64,7 +64,7 @@ void SymbolTable::PopScope() {
     // in global scope - functions only; in non-global scope - variables only
     if (scope_stack.top()->scope_type == GLOBAL_SCOPE) {
         for (const auto &func_symbol:scope_stack.top()->symbols) {
-            assert(func_symbol->g_type == FUNCTION_TYPE);
+            assert(func_symbol->generation_type == FUNCTION_TYPE);
             auto dynamic_cast_func = dynamic_pointer_cast<FuncSymType>(func_symbol);
             vector<string> string_types;
             ArgListToStrings(dynamic_cast_func->params, string_types);
@@ -77,8 +77,8 @@ void SymbolTable::PopScope() {
 
     } else {
         for (const auto &basic_symbol:scope_stack.top()->symbols) {
-            assert(basic_symbol->g_type != FUNCTION_TYPE);
-            string type = TypeToString(basic_symbol->g_type);
+            assert(basic_symbol->generation_type != FUNCTION_TYPE);
+            string type = TypeToString(basic_symbol->generation_type);
             if (PRINT_DEBUG) {
                 printID(basic_symbol->name, basic_symbol->offset, type);
             }

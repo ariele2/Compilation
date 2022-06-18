@@ -64,7 +64,7 @@ public:
     explicit TerminalBase(Type type);
     const std::string class_name = "TerminalBase";
     virtual ~TerminalBase() = default;
-    Type g_type;
+    Type generation_type;
     TerminalBase();
 };
 
@@ -96,7 +96,7 @@ class StringType : public TerminalBase
 public:
     explicit StringType(string &token);
     const std::string class_name = "StringType";
-    string token;
+    string t;
 };
 
 typedef shared_ptr<StringType> StringTypePtr;
@@ -171,7 +171,7 @@ class ArgListType : public TerminalBase
 public:
 explicit ArgListType(ArgList &arg_list);
     ArgListType();
-    ArgList arg_list;
+    ArgList arguments_list;
     const std::string class_name = "ArgListType";
 };
 

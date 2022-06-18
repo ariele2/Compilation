@@ -15,7 +15,7 @@ bool SemanticChecks::CheckMainIsDefined()
 {
     for (auto map_pair : table_ref.symbols_map)
     {
-        if (FUNCTION_TYPE == map_pair.second->g_type)
+        if (FUNCTION_TYPE == map_pair.second->generation_type)
         {
             auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
             if ("main"==dyn_cast_func->name )
@@ -51,7 +51,7 @@ bool SemanticChecks::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list
 
     for (size_t i = 0; i < func->params.size(); ++i)
     {
-        if (!CheckAssigned(func->params[i].g_type, exp_list->exp_list[i]->g_type))
+        if (!CheckAssigned(func->params[i].generation_type, exp_list->exp_list[i]->generation_type))
         {
             return false;
         }

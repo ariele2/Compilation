@@ -12,15 +12,20 @@ using namespace output;
 
 void yyerror(const char *);
 
-// note: maybe it's wiser to create a `Parser` class which is stored here and move the functions there.
-// it would require a lot of new functions though.
 
-// note: should've removed all the ln args and used the global instead.
 class Compiler {
 public:
-    SymbolTable symbol_table;
-    SemanticChecks semantic_checks;
-    CodeGen code_gen;
+    SymbolTable sym_tab;
+    SemanticChecks validations;
+    CodeGen code_genreation;
+    const std::string GEN_IF ="_if";
+    const std::string GEN_ELSE ="_else";
+    const std::string GEN_WHILE_BODY ="_while_body";
+    const std::string GEN_WHILE_HEAD ="_while_head";
+    const std::string GEN_AND ="_and";
+    const std::string GEN_OR ="_or";
+    const std::string GEN_NEXT ="_next";
+
 
     Compiler();
     void pProgram(int ln);
@@ -57,9 +62,7 @@ public:
                         const BaseTypePtr &end_list_as_statement);
     StatementTypePtr pStatBreak(int ln);
     StatementTypePtr pStatContinue(int ln);
-    // remove
-    StatementTypePtr
-    ParseStatementSwitch(int ln, BaseTypePtr exp, BaseTypePtr switch_list_as_statement, BaseTypePtr case_list);
+
     BaseTypePtr pCall(int ln, const BaseTypePtr &id, const BaseTypePtr &exp_list);
     BaseTypePtr pCall(int ln, const BaseTypePtr &id);
     static BaseTypePtr pExplist(int ln, const BaseTypePtr &exp);
@@ -87,46 +90,31 @@ public:
     StringTypePtr pGenerateAndL(int ln);
     StringTypePtr pGenerateOrL(int ln);
     StringTypePtr pGenerateNextL(int ln);
-    //remove from here
-    StringTypePtr pGenerateDefaultL(int ln);
-    StringTypePtr pGenerateCaseDeclL(int ln);
-    CaseListTypePtr pCaseList(int ln, BaseTypePtr case_decl, BaseTypePtr next_list, BaseTypePtr case_list);
-    CaseListTypePtr pCaseList(int ln, BaseTypePtr case_decl);
-    CaseListTypePtr
-    ParseCaseDefault(int ln, BaseTypePtr list_as_statement, BaseTypePtr default_label, BaseTypePtr statements);
-    CaseDeclTypePtr ParseCaseDecl(int ln, BaseTypePtr num, BaseTypePtr list_as_statement, BaseTypePtr case_decl_label,
-                                   BaseTypePtr statements);
-     // until here
+   
     void pAddStatScope(int ln);
     void pAddWhileScope(int ln, const BaseTypePtr &while_head_label);
-    //remove
-    void ParsePushSwitchScope(int ln, const BaseTypePtr &switch_head_label);
+    
     void pRemoveScope(int ln);
-    //remove
-    void ParseCheckSwitchExp(int ln, const BaseTypePtr &num_exp);
+    
     void pCheckBool(int ln, const BaseTypePtr &bool_exp);
     StatementTypePtr pBNext(int ln);
     StatementTypePtr pBWhileH(int ln);
     StatementTypePtr pBIfNext(int ln);
-    //remove from here
-    StatementTypePtr ParseBranchSwitchHead(int ln);
-    StatementTypePtr ParseBranchCaseHead(int ln);
-    StatementTypePtr ParseBranchDefaultHead(int ln);
-    // until here
+   
     BaseTypePtr pConvBool(int ln, BaseTypePtr exp);
     static Compiler &instance();
 
-    void handleErrorDoesNotMatch(int ln);
-    void handleErrorIsUndefined(int ln, string s);
-    void handleErrorInDefintion(int ln, string s);
-    void handleErrorUndefinedFunction(int ln, string s);
-    void handleErrorInLexical(int ln);
-    void handleErrorInSyntax(int ln);
-    void handleErrorBreak(int ln);
-    void handleErrorInContinue(int ln);
-    void handleErrorInMissingMain(int ln);
-    void handleErrorByteIsTooBig(int ln, string s);
-    void handleErrorPrototypeMismatch(int ln, const string &id, std::vector<string> &argTypes);
+    void handleErrorLex(int lineno);
+    void handleErrorSyn(int lineno);
+    void handleErrorUndef(int lineno, const string& id);
+    void handleErrorDef(int lineno, const string& id);
+    void handleErrorUndefFunc(int lineno, const string& id);
+    void handleErrorMismatch(int lineno);
+    void handleErrorPrototypeMismatch(int lineno, const string& id, vector<string>& argTypes);
+    void handleErrorUnexpectedBreak(int lineno);
+    void handleErrorUnexpectedContinue(int lineno);
+    void handleErrorMainMissing();
+    void handleErrorByteTooLarge(int lineno, const string& value);
 
 };
 

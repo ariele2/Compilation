@@ -2,11 +2,11 @@
 
 #include <utility>
 
-TerminalBase::TerminalBase() : g_type(ERROR_TYPE) {}
+TerminalBase::TerminalBase() : generation_type(ERROR_TYPE) {}
 
-TerminalBase::TerminalBase(Type type) : g_type(type) {}
+TerminalBase::TerminalBase(Type type) : generation_type(type) {}
 
-StringType::StringType(string &token) : TerminalBase(STRING_TYPE), token(token) {}
+StringType::StringType(string &token) : TerminalBase(STRING_TYPE), t(token) {}
 
 NumberType::NumberType(string &token_string) : TerminalBase(INT_TYPE) {
     token = stoi(token_string);
@@ -38,7 +38,7 @@ string TypeToString(Type type) {
 void ArgListToStrings(ArgList &arg_list, vector<string> &string_vector) {
     string_vector.clear();
     for (const auto &exp:arg_list) {
-        string_vector.push_back(TypeToString(exp.g_type));
+        string_vector.push_back(TypeToString(exp.generation_type));
     }
 }
 
@@ -48,11 +48,11 @@ SymbolType::SymbolType(string &name, int offset, Type type) : TerminalBase(type)
 }
 
 
-ArgListType::ArgListType() : arg_list() {
+ArgListType::ArgListType() : arguments_list() {
 
 }
 
-ArgListType::ArgListType(ArgList &arg_list) : arg_list(arg_list) {
+ArgListType::ArgListType(ArgList &arg_list) : arguments_list(arg_list) {
 
 }
 

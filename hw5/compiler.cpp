@@ -82,7 +82,7 @@ void Compiler::pFuncs(int ln)
 {
 }
 
-void Compiler::pFuncHead(int ln, const BaseTypePtr &type_returned, const BaseTypePtr &identification, const BaseTypePtr &list_of_formals)
+void Compiler::pFuncHead( const BaseTypePtr &type_returned, const BaseTypePtr &identification, const BaseTypePtr &list_of_formals, int ln)
 {
     auto identification_dyn_cast = dynamic_pointer_cast<StringType>(identification);
 
@@ -113,12 +113,12 @@ void Compiler::pFuncHead(int ln, const BaseTypePtr &type_returned, const BaseTyp
     }
 }
 // no
-void Compiler::pFuncDecl(int ln, const BaseTypePtr &stats, const BaseTypePtr &n_label)
+void Compiler::pFuncDecl( const BaseTypePtr &stats, const BaseTypePtr &n_label, int ln)
 {
     code_genreation.addFuncDeclaration(stats, n_label);
 }
 // no
-BaseTypePtr Compiler::pRetType(int ln, BaseTypePtr t)
+BaseTypePtr Compiler::pRetType( BaseTypePtr t, int ln)
 {
     return t;
 }
@@ -134,7 +134,7 @@ ArgListTypePtr Compiler::pFs(int ln)
     return make_shared<ArgListType>();
 }
 
-ArgListTypePtr Compiler::pFs(int ln, const BaseTypePtr &formals_list)
+ArgListTypePtr Compiler::pFs( const BaseTypePtr &formals_list, int ln)
 {
 
     auto pointer_to_formals_list = make_shared<ArgListType>();
@@ -147,7 +147,7 @@ ArgListTypePtr Compiler::pFs(int ln, const BaseTypePtr &formals_list)
     return pointer_to_formals_list;
 }
 
-ArgListTypePtr Compiler::pFsList(int ln, const BaseTypePtr &f)
+ArgListTypePtr Compiler::pFsList( const BaseTypePtr &f, int ln)
 {
 
     auto arg_list_pointer = make_shared<ArgListType>();
@@ -155,21 +155,21 @@ ArgListTypePtr Compiler::pFsList(int ln, const BaseTypePtr &f)
     return arg_list_pointer;
 }
 
-ArgListTypePtr Compiler::pFsList(int ln, const BaseTypePtr &f, const BaseTypePtr &formals_list)
+ArgListTypePtr Compiler::pFsList( const BaseTypePtr &f, const BaseTypePtr &formals_list, int ln)
 {
     auto dyn_cast_formals = dynamic_pointer_cast<ArgListType>(formals_list);
     dyn_cast_formals->arguments_list.push_back(*dynamic_pointer_cast<SymbolType>(f));
     return dyn_cast_formals;
 }
 
-SymbolTypePtr Compiler::pFDecl(int ln, const BaseTypePtr &t, const BaseTypePtr &identification)
+SymbolTypePtr Compiler::pFDecl( const BaseTypePtr &t, const BaseTypePtr &identification, int ln)
 {
     auto symbol_pointer = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->t, sym_tab.scope_stack.top()->offset,
                                                   dynamic_pointer_cast<CType>(t)->generation_type);
     return symbol_pointer;
 }
 
-StatementTypePtr Compiler::pStat(int ln, BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement)
+StatementTypePtr Compiler::pStat( BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement, int ln)
 {
     auto dynamic_cast_statement = dynamic_pointer_cast<StatementType>(statement);
 
@@ -179,9 +179,9 @@ StatementTypePtr Compiler::pStat(int ln, BaseTypePtr &statement, const BaseTypeP
     return dynamic_cast_statement;
 }
 
-StatementTypePtr Compiler::pStat(int ln, const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
+StatementTypePtr Compiler::pStat( const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
                                  const BaseTypePtr &next_label,
-                                 const BaseTypePtr &next_statement, const BaseTypePtr &my_next_list_as_statement)
+                                 const BaseTypePtr &next_statement, const BaseTypePtr &my_next_list_as_statement, int ln)
 {
 
     auto dynamic_cast_next_statement = dynamic_pointer_cast<StatementType>(next_statement);
@@ -195,12 +195,12 @@ StatementTypePtr Compiler::pStat(int ln, const BaseTypePtr &statements, const Ba
     return dynamic_cast_next_statement;
 }
 
-StatementTypePtr Compiler::pStatOfStats(int ln, BaseTypePtr &statements)
+StatementTypePtr Compiler::pStatOfStats( BaseTypePtr &statements, int ln)
 {
     return dynamic_pointer_cast<StatementType>(statements);
 }
 
-StatementTypePtr Compiler::pStatType(int ln, const BaseTypePtr &t, const BaseTypePtr &identification)
+StatementTypePtr Compiler::pStatType( const BaseTypePtr &t, const BaseTypePtr &identification, int ln)
 {
 
     if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->t))
@@ -217,7 +217,7 @@ StatementTypePtr Compiler::pStatType(int ln, const BaseTypePtr &t, const BaseTyp
 }
 
 StatementTypePtr
-Compiler::pStatTypeAssign(int ln, const BaseTypePtr &t, const BaseTypePtr &identification, const BaseTypePtr &expression)
+Compiler::pStatTypeAssign( const BaseTypePtr &t, const BaseTypePtr &identification, const BaseTypePtr &expression, int ln)
 {
 
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
@@ -245,7 +245,7 @@ Compiler::pStatTypeAssign(int ln, const BaseTypePtr &t, const BaseTypePtr &ident
     }
 }
 
-StatementTypePtr Compiler::pStatAssign(int ln, const BaseTypePtr &identification, const BaseTypePtr &expression)
+StatementTypePtr Compiler::pStatAssign( const BaseTypePtr &identification, const BaseTypePtr &expression, int ln)
 {
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
 
@@ -299,7 +299,7 @@ StatementTypePtr Compiler::pStatRet(int ln)
     }
 }
 
-StatementTypePtr Compiler::pStatRetExp(int ln, const BaseTypePtr &expression)
+StatementTypePtr Compiler::pStatRetExp( const BaseTypePtr &expression, int ln)
 {
     if (!validations.CheckFunction(expression->generation_type))
     {
@@ -319,24 +319,24 @@ StatementTypePtr Compiler::pStatRetExp(int ln, const BaseTypePtr &expression)
     }
 }
 
-StatementTypePtr Compiler::pStatIf(int ln, const BaseTypePtr &expression, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
-                                   const BaseTypePtr &if_list_as_statement)
+StatementTypePtr Compiler::pStatIf( const BaseTypePtr &expression, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+                                   const BaseTypePtr &if_list_as_statement, int ln)
 {
     return code_genreation.addStatIf(expression, if_label, if_statement, if_list_as_statement);
 }
 
-StatementTypePtr Compiler::pStatIfElse(int ln, const BaseTypePtr &expression, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+StatementTypePtr Compiler::pStatIfElse( const BaseTypePtr &expression, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                                        BaseTypePtr if_list_as_statement, const BaseTypePtr &else_label,
-                                       const BaseTypePtr &else_statement)
+                                       const BaseTypePtr &else_statement, int ln)
 {
     return code_genreation.addStatIfAndElse(expression, if_label, if_statement, move(if_list_as_statement), else_label,
                                         else_statement);
 }
 // chnage here
-StatementTypePtr Compiler::pStatWhile(int ln, BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label,
+StatementTypePtr Compiler::pStatWhile( BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label,
                                       const BaseTypePtr &expression,
                                       const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
-                                      const BaseTypePtr &end_list_as_statement)
+                                      const BaseTypePtr &end_list_as_statement, int ln)
 {
 
     assert(sym_tab.scope_stack.top()->scope_type == WHILE_SCOPE);
@@ -375,7 +375,7 @@ StatementTypePtr Compiler::pStatContinue(int ln)
     }
 }
 
-BaseTypePtr Compiler::pCall(int ln, const BaseTypePtr &identification, const BaseTypePtr &exp_list)
+BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, const BaseTypePtr &exp_list, int ln)
 {
 
     if (validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->t))
@@ -412,7 +412,7 @@ BaseTypePtr Compiler::pCall(int ln, const BaseTypePtr &identification, const Bas
     }
 }
 
-BaseTypePtr Compiler::pCall(int ln, const BaseTypePtr &identification)
+BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, int ln)
 {
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
 
@@ -449,7 +449,7 @@ BaseTypePtr Compiler::pCall(int ln, const BaseTypePtr &identification)
 }
 
 
-BaseTypePtr Compiler::pExplist(int ln, const BaseTypePtr &expression)
+BaseTypePtr Compiler::pExplist( const BaseTypePtr &expression, int ln)
 {
     ExpListTypePtr exp_list_pointer = make_shared<TExpList>();
 
@@ -457,7 +457,7 @@ BaseTypePtr Compiler::pExplist(int ln, const BaseTypePtr &expression)
     return exp_list_pointer;
 }
 
-BaseTypePtr Compiler::pExplist(int ln, const BaseTypePtr &expression, const BaseTypePtr &exp_list)
+BaseTypePtr Compiler::pExplist( const BaseTypePtr &expression, const BaseTypePtr &exp_list, int ln)
 {
     ExpListTypePtr dynamic_cast_exp_list = dynamic_pointer_cast<TExpList>(exp_list);
 
@@ -484,12 +484,12 @@ CTypePtr Compiler::pBool(int ln)
     return val;
 }
 
-BaseTypePtr Compiler::pParen(int ln, BaseTypePtr expression)
+BaseTypePtr Compiler::pParen( BaseTypePtr expression, int ln)
 {
     return expression;
 }
 
-RegisterTypePtr Compiler::pBinop(int ln, const BaseTypePtr &first_expression, BaseTypePtr &binop, const BaseTypePtr &second_expression)
+RegisterTypePtr Compiler::pBinop( const BaseTypePtr &first_expression, BaseTypePtr &binop, const BaseTypePtr &second_expression, int ln)
 {
     if (!validations.CheckFunction(first_expression->generation_type))
     {
@@ -515,7 +515,7 @@ RegisterTypePtr Compiler::pBinop(int ln, const BaseTypePtr &first_expression, Ba
     }
 }
 
-BaseTypePtr Compiler::pID(int ln, const BaseTypePtr &identification)
+BaseTypePtr Compiler::pID( const BaseTypePtr &identification, int ln)
 {
 
     if (sym_tab.IsSymbolDefined(dynamic_pointer_cast<StringType>(identification)->t))
@@ -529,18 +529,18 @@ BaseTypePtr Compiler::pID(int ln, const BaseTypePtr &identification)
     }
 }
 // change
-BaseTypePtr Compiler::pCallExp(int ln, BaseTypePtr call_exp)
+BaseTypePtr Compiler::pCallExp( BaseTypePtr call_exp, int ln)
 {
     return code_genreation.addCallExpression(move(call_exp));
 }
 
-NumberTypePtr Compiler::pNum(int ln, const BaseTypePtr &num)
+NumberTypePtr Compiler::pNum( const BaseTypePtr &num, int ln)
 {
 
     return dynamic_pointer_cast<NumberType>(num);
 }
 
-BaseTypePtr Compiler::pNumB(int ln, BaseTypePtr num)
+BaseTypePtr Compiler::pNumB( BaseTypePtr num, int ln)
 {
 
     if (validations.CheckOFByte(dynamic_pointer_cast<NumberType>(num)->token))
@@ -555,7 +555,7 @@ BaseTypePtr Compiler::pNumB(int ln, BaseTypePtr num)
 }
 
 // change here
-RegisterTypePtr Compiler::pString(int ln, const BaseTypePtr &stype_string)
+RegisterTypePtr Compiler::pString( const BaseTypePtr &stype_string, int ln)
 {
 
     return code_genreation.addString(stype_string);
@@ -571,7 +571,7 @@ BoolExpTypePtr Compiler::pFalse(int ln)
     return code_genreation.addFalse();
 }
 
-BoolExpTypePtr Compiler::pNot(int ln, const BaseTypePtr &boolean_expression)
+BoolExpTypePtr Compiler::pNot(const BaseTypePtr &boolean_expression, int ln)
 {
 
     if (!validations.CheckFunction(boolean_expression->generation_type))
@@ -593,7 +593,7 @@ BoolExpTypePtr Compiler::pNot(int ln, const BaseTypePtr &boolean_expression)
 }
 
 BoolExpTypePtr
-Compiler::pAnd(int ln, const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_and, const BaseTypePtr &second_boolean_exppression)
+Compiler::pAnd( const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_and, const BaseTypePtr &second_boolean_exppression, int ln)
 {
     if (!validations.CheckFunction(first_boolean_exppression->generation_type))
     {
@@ -627,7 +627,7 @@ Compiler::pAnd(int ln, const BaseTypePtr &first_boolean_exppression, const BaseT
 }
 
 BoolExpTypePtr
-Compiler::pOr(int ln, const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_or, const BaseTypePtr &second_boolean_exppression)
+Compiler::pOr( const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_or, const BaseTypePtr &second_boolean_exppression, int ln)
 {
     if (!validations.CheckFunction(first_boolean_exppression->generation_type))
     {
@@ -663,7 +663,7 @@ Compiler::pOr(int ln, const BaseTypePtr &first_boolean_exppression, const BaseTy
     }
 }
 
-BoolExpTypePtr Compiler::pRelOp(int ln, const BaseTypePtr &first_expression, BaseTypePtr &relop, const BaseTypePtr &second_expression)
+BoolExpTypePtr Compiler::pRelOp( const BaseTypePtr &first_expression, BaseTypePtr &relop, const BaseTypePtr &second_expression, int ln)
 {
     if (!validations.CheckFunction(first_expression->generation_type))
     {
@@ -694,7 +694,7 @@ void Compiler::pAddStatScope(int ln)
     sym_tab.PushScope(STATEMENT_SCOPE);
 }
 
-void Compiler::pAddWhileScope(int ln, const BaseTypePtr &label_of_while_head)
+void Compiler::pAddWhileScope( const BaseTypePtr &label_of_while_head, int ln)
 {
 
     auto break_list = make_shared<br_list>();
@@ -711,7 +711,7 @@ void Compiler::pRemoveScope(int ln)
     sym_tab.PopScope();
 }
 
-void Compiler::pCheckBool(int ln, const BaseTypePtr &boolean_expression)
+void Compiler::pCheckBool( const BaseTypePtr &boolean_expression, int ln)
 {
     if (validations.CheckFunction(boolean_expression->generation_type))
     {
@@ -786,7 +786,7 @@ StatementTypePtr Compiler::pBIfNext(int ln)
     return code_genreation.addPBIfNext();
 }
 
-BaseTypePtr Compiler::pConvBool(int ln, BaseTypePtr expression)
+BaseTypePtr Compiler::pConvBool( BaseTypePtr expression, int ln)
 {
     if (expression->generation_type == BOOL_TYPE)
     {

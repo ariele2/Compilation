@@ -30,59 +30,59 @@ public:
     Compiler();
     void pProgram(int ln);
     void pFuncs(int ln);
-    void pFuncDecl(int ln, const BaseTypePtr &statements, const BaseTypePtr &next_label);
-    void pFuncHead(int ln, const BaseTypePtr &ret_type, const BaseTypePtr &id, const BaseTypePtr &formals);
-    static BaseTypePtr pRetType(int ln, BaseTypePtr type);
+    void pFuncDecl(              const BaseTypePtr &statements, const BaseTypePtr &next_label, int ln);
+    void pFuncHead(              const BaseTypePtr &ret_type, const BaseTypePtr &id, const BaseTypePtr &formals, int ln);
+    static BaseTypePtr pRetType(              BaseTypePtr type, int ln);
     static CTypePtr pRetType(int ln);
     static ArgListTypePtr pFs(int ln);
-    static ArgListTypePtr pFs(int ln, const BaseTypePtr &formals);
-    static ArgListTypePtr pFsList(int ln, const BaseTypePtr &formal);
-    static ArgListTypePtr pFsList(int ln, const BaseTypePtr &formal, const BaseTypePtr &formals_list);
-    SymbolTypePtr pFDecl(int ln, const BaseTypePtr &type, const BaseTypePtr &id);
-    static StatementTypePtr pStat(int ln, BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement);
-    StatementTypePtr pStat(int ln, const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
+    static ArgListTypePtr pFs(              const BaseTypePtr &formals, int ln);
+    static ArgListTypePtr pFsList(              const BaseTypePtr &formal, int ln);
+    static ArgListTypePtr pFsList(              const BaseTypePtr &formal, const BaseTypePtr &formals_list, int ln);
+    SymbolTypePtr pFDecl(              const BaseTypePtr &type, const BaseTypePtr &id, int ln);
+    static StatementTypePtr pStat(              BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement, int ln);
+    StatementTypePtr pStat(              const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
                     const BaseTypePtr &next_label,
-                    const BaseTypePtr &next_statement, const BaseTypePtr &my_next_list_as_statement);
-    static StatementTypePtr pStatOfStats(int ln, BaseTypePtr &statements);
-    StatementTypePtr pStatType(int ln, const BaseTypePtr &type, const BaseTypePtr &id);
-    StatementTypePtr pStatTypeAssign(int ln, const BaseTypePtr &type, const BaseTypePtr &id, const BaseTypePtr &exp);
-    StatementTypePtr pStatAssign(int ln, const BaseTypePtr &id, const BaseTypePtr &exp);
+                    const BaseTypePtr &next_statement, const BaseTypePtr &my_next_list_as_statement, int ln);
+    static StatementTypePtr pStatOfStats(              BaseTypePtr &statements, int ln);
+    StatementTypePtr pStatType(              const BaseTypePtr &type, const BaseTypePtr &id, int ln);
+    StatementTypePtr pStatTypeAssign(              const BaseTypePtr &type, const BaseTypePtr &id, const BaseTypePtr &exp, int ln);
+    StatementTypePtr pStatAssign(              const BaseTypePtr &id, const BaseTypePtr &exp, int ln);
     static StatementTypePtr pStatCall(int ln);
     StatementTypePtr pStatRet(int ln);
-    StatementTypePtr pStatRetExp(int ln, const BaseTypePtr &exp);
-    StatementTypePtr pStatIf(int ln, const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
-                     const BaseTypePtr &if_list_as_statement);
-    StatementTypePtr pStatIfElse(int ln, const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+    StatementTypePtr pStatRetExp(              const BaseTypePtr &exp, int ln);
+    StatementTypePtr pStatIf(              const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+                     const BaseTypePtr &if_list_as_statement, int ln);
+    StatementTypePtr pStatIfElse(              const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                          BaseTypePtr if_list_as_statement, const BaseTypePtr &else_label,
-                         const BaseTypePtr &else_statement);
+                         const BaseTypePtr &else_statement, int ln);
     StatementTypePtr
-    pStatWhile(int ln, BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label,
+    pStatWhile(              BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label,
                         const BaseTypePtr &exp,
                         const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
-                        const BaseTypePtr &end_list_as_statement);
+                        const BaseTypePtr &end_list_as_statement, int ln);
     StatementTypePtr pStatBreak(int ln);
     StatementTypePtr pStatContinue(int ln);
 
-    BaseTypePtr pCall(int ln, const BaseTypePtr &id, const BaseTypePtr &exp_list);
-    BaseTypePtr pCall(int ln, const BaseTypePtr &id);
-    static BaseTypePtr pExplist(int ln, const BaseTypePtr &exp);
-    static BaseTypePtr pExplist(int ln, const BaseTypePtr &exp, const BaseTypePtr &exp_list);
+    BaseTypePtr pCall(              const BaseTypePtr &id, const BaseTypePtr &exp_list, int ln);
+    BaseTypePtr pCall(              const BaseTypePtr &id, int ln);
+    static BaseTypePtr pExplist(              const BaseTypePtr &exp, int ln);
+    static BaseTypePtr pExplist(              const BaseTypePtr &exp, const BaseTypePtr &exp_list, int ln);
     static CTypePtr pInt(int ln);
     static CTypePtr pByte(int ln);
     static CTypePtr pBool(int ln);
-    static BaseTypePtr pParen(int ln, BaseTypePtr exp);
-    RegisterTypePtr pBinop(int ln, const BaseTypePtr &exp1, BaseTypePtr &binop, const BaseTypePtr &exp2);
-    BaseTypePtr pID(int ln, const BaseTypePtr &id);
-    BaseTypePtr pCallExp(int ln, BaseTypePtr call_exp);
-    static NumberTypePtr pNum(int ln, const BaseTypePtr &num);
-    BaseTypePtr pNumB(int ln, BaseTypePtr num);
-    RegisterTypePtr pString(int ln, const BaseTypePtr &stype_string);
+    static BaseTypePtr pParen(              BaseTypePtr exp, int ln);
+    RegisterTypePtr pBinop(              const BaseTypePtr &exp1, BaseTypePtr &binop, const BaseTypePtr &exp2, int ln);
+    BaseTypePtr pID(              const BaseTypePtr &id, int ln);
+    BaseTypePtr pCallExp(              BaseTypePtr call_exp, int ln);
+    static NumberTypePtr pNum(              const BaseTypePtr &num, int ln);
+    BaseTypePtr pNumB(              BaseTypePtr num, int ln);
+    RegisterTypePtr pString(              const BaseTypePtr &stype_string, int ln);
     BoolExpTypePtr pTrue(int ln);
     BoolExpTypePtr pFalse(int ln);
-    BoolExpTypePtr pNot(int ln, const BaseTypePtr &bool_exp);
-    BoolExpTypePtr pAnd(int ln, const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2);
-    BoolExpTypePtr pOr(int ln, const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2);
-    BoolExpTypePtr pRelOp(int ln, const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2);
+    BoolExpTypePtr pNot(              const BaseTypePtr &bool_exp, int ln);
+    BoolExpTypePtr pAnd(              const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2, int ln);
+    BoolExpTypePtr pOr(              const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2, int ln);
+    BoolExpTypePtr pRelOp(              const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2, int ln);
     StringTypePtr pGenerateIfL(int ln);
     StringTypePtr pGenerateElseL(int ln);
     StringTypePtr pGenerateWhileHeadL(int ln);
@@ -92,16 +92,16 @@ public:
     StringTypePtr pGenerateNextL(int ln);
    
     void pAddStatScope(int ln);
-    void pAddWhileScope(int ln, const BaseTypePtr &while_head_label);
+    void pAddWhileScope(              const BaseTypePtr &while_head_label, int ln);
     
     void pRemoveScope(int ln);
     
-    void pCheckBool(int ln, const BaseTypePtr &bool_exp);
+    void pCheckBool(              const BaseTypePtr &bool_exp, int ln);
     StatementTypePtr pBNext(int ln);
     StatementTypePtr pBWhileH(int ln);
     StatementTypePtr pBIfNext(int ln);
    
-    BaseTypePtr pConvBool(int ln, BaseTypePtr exp);
+    BaseTypePtr pConvBool(              BaseTypePtr exp, int ln);
     static Compiler &instance();
 
     void handleErrorLex(int lineno);

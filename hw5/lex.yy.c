@@ -751,7 +751,7 @@ YY_DECL
 		}
 
 	{
-#line 20 "scanner.lex"
+#line 15 "scanner.lex"
 
 
 #line 758 "lex.yy.c"
@@ -823,179 +823,179 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 22 "scanner.lex"
+#line 17 "scanner.lex"
 return LexToken(VOID, yytext);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 23 "scanner.lex"
+#line 18 "scanner.lex"
 return LexToken(INT, yytext);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 24 "scanner.lex"
+#line 19 "scanner.lex"
 return LexToken(BYTE, yytext);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 25 "scanner.lex"
+#line 20 "scanner.lex"
 return LexToken(B, yytext);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 26 "scanner.lex"
+#line 21 "scanner.lex"
 return LexToken(BOOL, yytext);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 27 "scanner.lex"
+#line 22 "scanner.lex"
 return LexToken(AND, yytext);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 28 "scanner.lex"
+#line 23 "scanner.lex"
 return LexToken(OR, yytext);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 29 "scanner.lex"
+#line 24 "scanner.lex"
 return LexToken(NOT, yytext);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 30 "scanner.lex"
+#line 25 "scanner.lex"
 return LexToken(AUTO, yytext);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 31 "scanner.lex"
+#line 26 "scanner.lex"
 return LexToken(TRUE, yytext);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 32 "scanner.lex"
+#line 27 "scanner.lex"
 return LexToken(FALSE, yytext);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 33 "scanner.lex"
+#line 28 "scanner.lex"
 return LexToken(RETURN, yytext);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 34 "scanner.lex"
+#line 29 "scanner.lex"
 return LexToken(IF, yytext);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 35 "scanner.lex"
+#line 30 "scanner.lex"
 return LexToken(ELSE, yytext);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 36 "scanner.lex"
+#line 31 "scanner.lex"
 return LexToken(WHILE, yytext);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 37 "scanner.lex"
+#line 32 "scanner.lex"
 return LexToken(BREAK, yytext);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 38 "scanner.lex"
+#line 33 "scanner.lex"
 return LexToken(CONTINUE, yytext);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 39 "scanner.lex"
+#line 34 "scanner.lex"
 return LexToken(COLON, yytext);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 40 "scanner.lex"
+#line 35 "scanner.lex"
 return LexToken(SC, yytext);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 41 "scanner.lex"
+#line 36 "scanner.lex"
 return LexToken(COMMA, yytext);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 42 "scanner.lex"
+#line 37 "scanner.lex"
 return LexToken(LPAREN, yytext);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 43 "scanner.lex"
+#line 38 "scanner.lex"
 return LexToken(RPAREN, yytext);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 44 "scanner.lex"
+#line 39 "scanner.lex"
 return LexToken(LBRACE, yytext);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 45 "scanner.lex"
+#line 40 "scanner.lex"
 return LexToken(RBRACE, yytext);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 46 "scanner.lex"
+#line 41 "scanner.lex"
 return LexToken(EQUAL_UNEQUAL, yytext);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 47 "scanner.lex"
+#line 42 "scanner.lex"
 return LexToken(INEQUALITY, yytext);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 49 "scanner.lex"
+#line 44 "scanner.lex"
 return LexToken(MULT_DIV, yytext);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 50 "scanner.lex"
+#line 45 "scanner.lex"
 return LexToken(PLUS_MINUS, yytext);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 52 "scanner.lex"
+#line 47 "scanner.lex"
 return LexToken(ASSIGN, yytext);
 	YY_BREAK
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 54 "scanner.lex"
+#line 49 "scanner.lex"
 ; 
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 55 "scanner.lex"
+#line 50 "scanner.lex"
 return LexToken(ID, yytext);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 56 "scanner.lex"
+#line 51 "scanner.lex"
 return LexToken(NUM, yytext);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 57 "scanner.lex"
+#line 52 "scanner.lex"
 return LexToken(STRING, yytext);
 	YY_BREAK
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 58 "scanner.lex"
+#line 53 "scanner.lex"
 ;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 59 "scanner.lex"
+#line 54 "scanner.lex"
 {
                                 output::errorLex(yylineno); 
                                 exit(0); 
@@ -1003,7 +1003,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 63 "scanner.lex"
+#line 58 "scanner.lex"
 ECHO;
 	YY_BREAK
 #line 1010 "lex.yy.c"
@@ -1982,5 +1982,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 63 "scanner.lex"
+#line 58 "scanner.lex"
 

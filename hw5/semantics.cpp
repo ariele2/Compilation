@@ -13,17 +13,31 @@ bool Validations::CheckSymDefined(string &n)
 
 bool Validations::CheckMainIsDefined()
 {
-    for (auto map_pair : table_ref.symbols_map)
-    {
-        if (FUNCTION_TYPE == map_pair.second->generation_type)
-        {
+    // for (auto map_pair : table_ref.symbols_map)
+    // {
+    //     if (FUNCTION_TYPE == map_pair.second->generation_type)
+    //     {
+    //         auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
+    //         if ("main"==dyn_cast_func->name )
+    //         {
+    //             if (!(CheckGeneralType(dyn_cast_func->ret_type, VOID_TYPE)) || (!(dyn_cast_func->params.empty())))
+    //                 return false;
+    //             else
+    //                 return true;
+    //         }
+    //     }
+    // }
+    // return false;
+
+    for (auto map_pair:table_ref.symbols_map) {
+        if (map_pair.second->generation_type == FUNCTION_TYPE) {
             auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
-            if ("main"==dyn_cast_func->name )
-            {
-                if (!(CheckGeneralType(dyn_cast_func->ret_type, VOID_TYPE)) || (!(dyn_cast_func->params.empty())))
-                    return false;
-                else
+            if (dyn_cast_func->name == "main") {
+                if (dyn_cast_func->params.empty() && dyn_cast_func->ret_type == VOID_TYPE) {
                     return true;
+                } else {
+                    return false;
+                }
             }
         }
     }

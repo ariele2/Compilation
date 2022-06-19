@@ -98,7 +98,7 @@ class StringType : public TerminalBase
 public:
     explicit StringType(string &token);
     const std::string class_name = "StringType";
-    string t;
+    string token;
 };
 
 typedef shared_ptr<StringType> StringTypePtr;

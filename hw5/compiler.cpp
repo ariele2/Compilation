@@ -88,9 +88,9 @@ void Compiler::pFuncHead( const BaseTypePtr &type_returned, const BaseTypePtr &i
 {
     auto identification_dyn_cast = dynamic_pointer_cast<StringType>(identification);
 
-    if (!sym_tab.IsSymbolDefined(identification_dyn_cast->t))
+    if (!sym_tab.IsSymbolDefined(identification_dyn_cast->token))
     {
-        auto func_sym = make_shared<FuncSymType>(identification_dyn_cast->t, dynamic_pointer_cast<CType>(type_returned)->generation_type,
+        auto func_sym = make_shared<FuncSymType>(identification_dyn_cast->token, dynamic_pointer_cast<CType>(type_returned)->generation_type,
                                                         dynamic_pointer_cast<ArgListType>(list_of_formals)->arguments_list);
         sym_tab.AddFunction(func_sym);
         sym_tab.PushFunctionScope(dynamic_pointer_cast<CType>(type_returned)->generation_type);
@@ -111,7 +111,7 @@ void Compiler::pFuncHead( const BaseTypePtr &type_returned, const BaseTypePtr &i
     }
     else
     {
-        handleErrorDef(ln, identification_dyn_cast->t);
+        handleErrorDef(ln, identification_dyn_cast->token);
     }
 }
 // no
@@ -166,7 +166,7 @@ ArgListTypePtr Compiler::pFsList( const BaseTypePtr &f, const BaseTypePtr &forma
 
 SymbolTypePtr Compiler::pFDecl( const BaseTypePtr &t, const BaseTypePtr &identification, int ln)
 {
-    auto symbol_pointer = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->t, sym_tab.scope_stack.top()->offset,
+    auto symbol_pointer = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->token, sym_tab.scope_stack.top()->offset,
                                                   dynamic_pointer_cast<CType>(t)->generation_type);
     return symbol_pointer;
 }
@@ -188,8 +188,8 @@ StatementTypePtr Compiler::pStat( const BaseTypePtr &statements, const BaseTypeP
 
     auto dynamic_cast_next_statement = dynamic_pointer_cast<StatementType>(next_statement);
 
-    code_genreation.buff.bpatch(dynamic_pointer_cast<StatementType>(statements)->next_list, dynamic_pointer_cast<StringType>(next_label)->t);
-    code_genreation.buff.bpatch(dynamic_pointer_cast<StatementType>(old_next_list_as_statement)->next_list, dynamic_pointer_cast<StringType>(next_label)->t);
+    code_genreation.buff.bpatch(dynamic_pointer_cast<StatementType>(statements)->next_list, dynamic_pointer_cast<StringType>(next_label)->token);
+    code_genreation.buff.bpatch(dynamic_pointer_cast<StatementType>(old_next_list_as_statement)->next_list, dynamic_pointer_cast<StringType>(next_label)->token);
 
     dynamic_cast_next_statement->next_list = Buff::merge(dynamic_cast_next_statement->next_list,
                                                                dynamic_pointer_cast<StatementType>(my_next_list_as_statement)->next_list);
@@ -205,16 +205,16 @@ StatementTypePtr Compiler::pStatOfStats( BaseTypePtr &statements, int ln)
 StatementTypePtr Compiler::pStatType( const BaseTypePtr &t, const BaseTypePtr &identification, int ln)
 {
 
-    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->t))
+    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
-        const auto sym = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->t, 0, dynamic_pointer_cast<CType>(t)->generation_type);
+        const auto sym = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->token, 0, dynamic_pointer_cast<CType>(t)->generation_type);
         sym_tab.AddVariable(sym);
 
-        return code_genreation.addStatType(dynamic_pointer_cast<StringType>(identification)->t);
+        return code_genreation.addStatType(dynamic_pointer_cast<StringType>(identification)->token);
     }
     else
     {
-        handleErrorDef(ln, dynamic_pointer_cast<StringType>(identification)->t);
+        handleErrorDef(ln, dynamic_pointer_cast<StringType>(identification)->token);
     }
 }
 
@@ -234,16 +234,16 @@ Compiler::pStatTypeAssign( const BaseTypePtr &t, const BaseTypePtr &identificati
     {
         handleErrorMismatch(ln);
     }
-    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->t))
+    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
-        const auto sym = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->t, 0, dynamic_pointer_cast<CType>(t)->generation_type);
+        const auto sym = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->token, 0, dynamic_pointer_cast<CType>(t)->generation_type);
         sym_tab.AddVariable(sym);
 
-        return code_genreation.addStatAssign(dynamic_pointer_cast<StringType>(identification)->t, expression);
+        return code_genreation.addStatAssign(dynamic_pointer_cast<StringType>(identification)->token, expression);
     }
     else
     {
-        handleErrorDef(ln, dynamic_pointer_cast<StringType>(identification)->t);
+        handleErrorDef(ln, dynamic_pointer_cast<StringType>(identification)->token);
     }
 }
 
@@ -251,13 +251,13 @@ StatementTypePtr Compiler::pStatAssign( const BaseTypePtr &identification, const
 {
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
 
-    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->t))
+    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
-        handleErrorUndef(ln, dynamic_pointer_cast<StringType>(identification)->t);
+        handleErrorUndef(ln, dynamic_pointer_cast<StringType>(identification)->token);
         exit(0);
     }
 
-    auto sym_retured_id = sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->t);
+    auto sym_retured_id = sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->token);
 
     if (validations.CheckFunction(expression->generation_type))
     {
@@ -276,7 +276,7 @@ StatementTypePtr Compiler::pStatAssign( const BaseTypePtr &identification, const
     if (validations.CheckAssigned(sym_retured_id->generation_type, expression->generation_type))
     {
 
-        return code_genreation.addStatAssign(dynamic_pointer_cast<StringType>(identification)->t, expression);
+        return code_genreation.addStatAssign(dynamic_pointer_cast<StringType>(identification)->token, expression);
     }
     else
     {
@@ -380,9 +380,9 @@ StatementTypePtr Compiler::pStatContinue(int ln)
 BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, const BaseTypePtr &exp_list, int ln)
 {
 
-    if (validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->t))
+    if (validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
-        auto sym_retured_id = sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->t);
+        auto sym_retured_id = sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->token);
 
         if (validations.CheckFunction(sym_retured_id->generation_type))
         {
@@ -400,17 +400,17 @@ BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, const BaseTypePt
                 {
                     expected_args.push_back(TypeToString(sym.generation_type));
                 }
-                handleErrorPrototypeMismatch(ln, dynamic_pointer_cast<StringType>(identification)->t, expected_args);
+                handleErrorPrototypeMismatch(ln, dynamic_pointer_cast<StringType>(identification)->token, expected_args);
             }
         }
         else
         {
-            handleErrorUndefFunc(ln, dynamic_pointer_cast<StringType>(identification)->t);
+            handleErrorUndefFunc(ln, dynamic_pointer_cast<StringType>(identification)->token);
         }
     }
     else
     {
-        handleErrorUndefFunc(ln, dynamic_pointer_cast<StringType>(identification)->t);
+        handleErrorUndefFunc(ln, dynamic_pointer_cast<StringType>(identification)->token);
     }
 }
 
@@ -418,35 +418,35 @@ BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, int ln)
 {
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
 
-    if (validations.CheckSymDefined(dynamic_cast_id->t))
+    if (validations.CheckSymDefined(dynamic_cast_id->token))
     {
-        auto sym_retured_id = sym_tab.GetDefinedSymbol(dynamic_cast_id->t);
+        auto sym_retured_id = sym_tab.GetDefinedSymbol(dynamic_cast_id->token);
 
-        if (!validations.CheckFunction(sym_tab.GetDefinedSymbol(dynamic_cast_id->t)->generation_type))
+        if (!validations.CheckFunction(sym_tab.GetDefinedSymbol(dynamic_cast_id->token)->generation_type))
         {
-            handleErrorUndefFunc(ln, dynamic_cast_id->t);
+            handleErrorUndefFunc(ln, dynamic_cast_id->token);
             exit(0);
         }
         std::shared_ptr<TExpList> empty_exp_list = make_shared<TExpList>();
-        std::shared_ptr<FuncSymType> dynamic_cast_func = dynamic_pointer_cast<FuncSymType>(sym_tab.GetDefinedSymbol(dynamic_cast_id->t));
+        std::shared_ptr<FuncSymType> dynamic_cast_func = dynamic_pointer_cast<FuncSymType>(sym_tab.GetDefinedSymbol(dynamic_cast_id->token));
 
         if (validations.CheckCall(dynamic_cast_func, empty_exp_list))
         {
-            return code_genreation.addCall(dynamic_pointer_cast<FuncSymType>(sym_tab.GetDefinedSymbol(dynamic_cast_id->t)));
+            return code_genreation.addCall(dynamic_pointer_cast<FuncSymType>(sym_tab.GetDefinedSymbol(dynamic_cast_id->token)));
         }
         else
         {
             vector<string> expected_args;
-            for (const auto &sym : dynamic_pointer_cast<FuncSymType>(sym_tab.GetDefinedSymbol(dynamic_cast_id->t))->params)
+            for (const auto &sym : dynamic_pointer_cast<FuncSymType>(sym_tab.GetDefinedSymbol(dynamic_cast_id->token))->params)
             {
                 expected_args.push_back(TypeToString(sym.generation_type));
             }
-            handleErrorPrototypeMismatch(ln, dynamic_cast_id->t, expected_args);
+            handleErrorPrototypeMismatch(ln, dynamic_cast_id->token, expected_args);
         }
     }
     else
     {
-        handleErrorUndefFunc(ln, dynamic_cast_id->t);
+        handleErrorUndefFunc(ln, dynamic_cast_id->token);
     }
 }
 
@@ -502,7 +502,7 @@ RegisterTypePtr Compiler::pBinop( const BaseTypePtr &first_expression, BaseTypeP
                 handleErrorMismatch(ln);
             }
 
-            return code_genreation.addBinop(first_expression, dynamic_pointer_cast<StringType>(binop)->t, second_expression);
+            return code_genreation.addBinop(first_expression, dynamic_pointer_cast<StringType>(binop)->token, second_expression);
         }
         else
         {
@@ -520,14 +520,14 @@ RegisterTypePtr Compiler::pBinop( const BaseTypePtr &first_expression, BaseTypeP
 BaseTypePtr Compiler::pID( const BaseTypePtr &identification, int ln)
 {
 
-    if (sym_tab.IsSymbolDefined(dynamic_pointer_cast<StringType>(identification)->t))
+    if (sym_tab.IsSymbolDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
 
-        return code_genreation.addIdentification(sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->t));
+        return code_genreation.addIdentification(sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->token));
     }
     else
     {
-        handleErrorUndef(ln, dynamic_pointer_cast<StringType>(identification)->t);
+        handleErrorUndef(ln, dynamic_pointer_cast<StringType>(identification)->token);
     }
 }
 // change
@@ -705,7 +705,7 @@ void Compiler::pAddWhileScope( const BaseTypePtr &label_of_while_head, int ln)
     sym_tab.scope_stack.top()->inside_while = true;
     sym_tab.scope_stack.top()->break_list = break_list;
 
-    sym_tab.scope_stack.top()->while_continue_label = dynamic_pointer_cast<StringType>(label_of_while_head)->t;
+    sym_tab.scope_stack.top()->while_continue_label = dynamic_pointer_cast<StringType>(label_of_while_head)->token;
 }
 
 void Compiler::pRemoveScope(int ln)

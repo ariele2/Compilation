@@ -6,7 +6,7 @@ TerminalBase::TerminalBase() : generation_type(ERROR_TYPE) {}
 
 TerminalBase::TerminalBase(Ty type) : generation_type(type) {}
 
-StringType::StringType(string &token) : TerminalBase(STRING_TYPE), t(token) {}
+StringType::StringType(string &token) : TerminalBase(STRING_TYPE), token(token) {}
 
 NumberType::NumberType(string &token_string) : TerminalBase(INT_TYPE) {
     token = stoi(token_string);

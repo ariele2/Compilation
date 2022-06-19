@@ -247,7 +247,7 @@ BoolExpTypePtr Generator::addRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, 
     string icmp_string(reg_icmp + " = icmp ");
 
     auto dynamic_cast_relop = dynamic_pointer_cast<StringType>(relop);
-    auto relop_str = dynamic_cast_relop->t;
+    auto relop_str = dynamic_cast_relop->token;
 
     if (relop_str == "<")
     {
@@ -478,7 +478,7 @@ Generator::addStatIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const 
     auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
 
     // bpatch true
-    buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->t);
+    buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
 
     // merge false and next
     auto statement = dynamic_cast_if_statement;
@@ -502,8 +502,8 @@ Generator::addStatIfAndElse(const BaseTypePtr &exp, const BaseTypePtr &if_label,
     auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
 
     // bpatch true and false
-    buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->t);
-    buff.bpatch(dynamic_cast_bool_exp->false_list, dynamic_cast_else_label->t);
+    buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
+    buff.bpatch(dynamic_cast_bool_exp->false_list, dynamic_cast_else_label->token);
 
     // merge if's next (includes if_list) and else's next
     auto statement = dynamic_cast_if_statement;
@@ -527,10 +527,10 @@ Generator::addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &
     auto dynamic_cast_end_list_as_statement = dynamic_pointer_cast<StatementType>(end_list_as_statement);
 
     
-    buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_while_body_label->t);
-    buff.bpatch(dynamic_cast_while_statement->next_list, dynamic_cast_while_head_label->t);
-    buff.bpatch(dynamic_cast_end_list_as_statement->next_list, dynamic_cast_while_head_label->t);
-    buff.bpatch(dynamic_cast_start_list_as_statement->next_list, dynamic_cast_while_head_label->t);
+    buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_while_body_label->token);
+    buff.bpatch(dynamic_cast_while_statement->next_list, dynamic_cast_while_head_label->token);
+    buff.bpatch(dynamic_cast_end_list_as_statement->next_list, dynamic_cast_while_head_label->token);
+    buff.bpatch(dynamic_cast_start_list_as_statement->next_list, dynamic_cast_while_head_label->token);
 
    
     auto statement = make_shared<StatementType>(Buff::merge(dynamic_cast_bool_exp->false_list,
@@ -577,7 +577,7 @@ void Generator::addFuncDeclaration(const BaseTypePtr &statements, const BaseType
     auto dynamic_cast_statements = dynamic_pointer_cast<StatementType>(statements);
     auto dynamic_cast_next_label = dynamic_pointer_cast<StringType>(next_label);
 
-    buff.bpatch(dynamic_cast_statements->next_list, dynamic_cast_next_label->t);
+    buff.bpatch(dynamic_cast_statements->next_list, dynamic_cast_next_label->token);
 }
 
 BoolExpTypePtr Generator::addTrue()
@@ -608,7 +608,7 @@ BoolExpTypePtr Generator::addAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
 
     
-    buff.bpatch(dynamic_cast_bool_exp1->true_list, dynamic_cast_and_label->t);
+    buff.bpatch(dynamic_cast_bool_exp1->true_list, dynamic_cast_and_label->token);
 
     
     return make_shared<BoolExpType>(dynamic_cast_bool_exp2->true_list,
@@ -623,7 +623,7 @@ BoolExpTypePtr Generator::addOr(const BaseTypePtr &bool_exp1, const BaseTypePtr 
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
 
     
-    buff.bpatch(dynamic_cast_bool_exp1->false_list, dynamic_cast_or_label->t);
+    buff.bpatch(dynamic_cast_bool_exp1->false_list, dynamic_cast_or_label->token);
 
     
     return make_shared<BoolExpType>(Buff::merge(dynamic_cast_bool_exp1->true_list,
@@ -637,11 +637,11 @@ RegisterTypePtr Generator::addString(const BaseTypePtr &stype_string)
 
     auto reg_result = make_shared<RegisterType>(GenerateReg(), STRING_TYPE);
     auto reg_global = GenerateGlobalReg();
-    auto string_size_string = to_string(dynamic_cast_string->t.size() + 1);
+    auto string_size_string = to_string(dynamic_cast_string->token.size() + 1);
 
     buff.emitGlobal(
         reg_global + " = constant [" + string_size_string +
-        " x i8] c\"" + dynamic_cast_string->t + "\\00\"");
+        " x i8] c\"" + dynamic_cast_string->token + "\\00\"");
 
     buff.emit(reg_result->reg_name + " = getelementptr [" + string_size_string +
               " x i8], [" + string_size_string + " x i8]* " + reg_global + ", i32 0, i32 0");

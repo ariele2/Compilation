@@ -62,24 +62,32 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
 
     string binop_str = reg_result->reg_name + " = ";
 
-    if ('+' == binop[0])
-    {
-        binop_str = binop_str + "add ";
-    }
-    else if ('/' == binop[0])
-    {
-        binop_str = binop_str + "sdiv ";
-    }
-    else if ('*' == binop[0])
-    {
-        binop_str = binop_str + "mul ";
-    }
-    else if ('-' == binop[0])
-    {
-        binop_str = binop_str + "sub ";
+    switch (binop[0]) {
+        case '+':
+            binop_str += "add ";
+            break;
+        case '-':
+            binop_str += "sub ";
+            break;
+        case '*':
+            binop_str += "mul ";
+            break;
+        case '/':
+            binop_str += "sdiv ";
+            break;
     }
 
-    buff.emit(binop_str + "i32 " + dynamic_cast_exp1 + ", " + dynamic_cast_exp2);
+
+    // all types are i32
+    binop_str += "i32 ";
+
+    binop_str += dynamic_cast_exp1;
+
+    binop_str += ", ";
+
+    binop_str += dynamic_cast_exp2;
+
+    buff.emit(binop_str);
 
     if (BYTE_TYPE == validator_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type))
     {
@@ -102,26 +110,14 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
     auto is_zero = GenerateReg();
     auto err_str = GenerateReg();
 
-    if (!dynamic_cast_reg_exp)
-    {
-        auto str_to_emit = is_zero;
-        str_to_emit += " = icmp eq i32 ";
-        str_to_emit += to_string(dynamic_cast_num_exp->token);
-        str_to_emit += ", 0";
-        buff.emit(str_to_emit);
+      if (dynamic_cast_reg_exp) {
+        buff.emit(is_zero + " = icmp eq i32 " + dynamic_cast_reg_exp->reg_name + ", 0");
+    } else {
+        buff.emit(is_zero + " = icmp eq i32 " + to_string(dynamic_cast_num_exp->token) + ", 0");
     }
-    else
-    {
-        auto str_to_emit = is_zero;
-        str_to_emit += " = icmp eq i32 ";
-        str_to_emit += dynamic_cast_reg_exp->reg_name;
-        str_to_emit += ", 0";
-        buff.emit(str_to_emit);
-    }
-    std::string str_to_emit = "br i1 ";
-    str_to_emit += is_zero;
-    str_to_emit += ", label @, label @";
-    auto bp_zero_and_non = buff.emit(str_to_emit);
+
+    
+    auto bp_zero_and_non = buff.emit("br i1 " + is_zero + ", label @, label @");
     auto label_err_zero = buff.genLabel("_err_zero");
     vector<pair<int, BranchLabelIndex>> bp_zero_vec;
     bp_zero_vec.emplace_back(bp_zero_and_non, FIRST);
@@ -130,7 +126,7 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
     buff.emit(err_str + " = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0");
     buff.emit("call void (i8*) @print(i8* " + err_str + ")");
     buff.emit("call void (i32) @exit(i32 0)");
-    buff.emit("unreachable"); // this prevents no branch before label error
+    buff.emit("unreachable");  // this prevents no branch before label error
 
     auto label_non_zero = buff.genLabel("_non_zero");
     vector<pair<int, BranchLabelIndex>> bp_non_vec;

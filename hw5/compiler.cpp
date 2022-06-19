@@ -127,21 +127,20 @@ BaseTypePtr Compiler::pRetType( BaseTypePtr t, int ln)
 
 void Compiler::parseAutoTypeAssignment(BaseTypePtr type, BaseTypePtr id, BaseTypePtr exp, int ln)
 {
-    // std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
-    // std::cout << "[DEBUG] type: " << type->general_type << std::endl;
-    // std::cout << "[DEBUG] exp: " << exp->general_type << std::endl;
+    std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
+    std::cout << "[DEBUG] type: " << type->generation_type << std::endl;
+    std::cout << "[DEBUG] exp: " << exp->generation_type << std::endl;
     bool check_semantics;
     auto dynamic_cast_id = std::dynamic_pointer_cast<StringType>(id);
     if (exp->generation_type != INT_TYPE && exp->generation_type != BYTE_TYPE && exp->generation_type != BOOL_TYPE)
     {
         handleErrorMismatch(ln);
-        
     }
     type->generation_type = exp->generation_type;
     BaseTypePtr dynamic_cast_type = std::dynamic_pointer_cast<CType>(type);
-    // std::cout << dynamic_cast_type << std::endl;
-    // std::cout << "[DEBUG] id token : " << dynamic_cast_id->token <<std::endl;
-    // std::cout << "[DEBUG] found auto type!" <<std::endl;
+    std::cout << dynamic_cast_type << std::endl;
+    std::cout << "[DEBUG] id token : " << dynamic_cast_id->token <<std::endl;
+    std::cout << "[DEBUG] found auto type!" <<std::endl;
     // std::cout << "[DEBUG] Casting to: " << exp->general_type <<std::endl;
     // std::cout << "[DEBUG] dynamic_cast_type: " << dynamic_cast_type->general_type <<std::endl;
     // std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dynamic_cast_id->general_type <<std::endl;

@@ -634,7 +634,7 @@ BoolExpTypePtr Generator::addOr(const BaseTypePtr &bool_exp1, const BaseTypePtr 
 RegisterTypePtr Generator::addString(const BaseTypePtr &stype_string)
 {
     auto dynamic_cast_string = dynamic_pointer_cast<StringType>(stype_string);
-
+    dynamic_cast_string->token = dynamic_cast_string->token.substr(1,dynamic_cast_string->token.size());
     auto reg_result = make_shared<RegisterType>(GenerateReg(), STRING_TYPE);
     auto reg_global = GenerateGlobalReg();
     auto string_size_string = to_string(dynamic_cast_string->token.size() + 1);

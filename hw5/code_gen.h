@@ -6,7 +6,9 @@
 #include "semantics.h"
 
 
-const int STACK_SIZE = 300;
+const int MAX_VARIABLES_PER_FUNCTION = 50;
+const int VARIABLE_SIZE = 4;
+const int STACK_SIZE = MAX_VARIABLES_PER_FUNCTION * VARIABLE_SIZE;
 
 class Generator {
 public:

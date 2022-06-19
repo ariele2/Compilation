@@ -38,6 +38,7 @@ public:
     static ArgListTypePtr pFs(              const BaseTypePtr &formals, int ln);
     static ArgListTypePtr pFsList(              const BaseTypePtr &formal, int ln);
     static ArgListTypePtr pFsList(              const BaseTypePtr &formal, const BaseTypePtr &formals_list, int ln);
+    void parseAutoTypeAssignment(BaseTypePtr type, BaseTypePtr id, BaseTypePtr exp, int ln);
     SymbolTypePtr pFDecl(              const BaseTypePtr &type, const BaseTypePtr &id, int ln);
     static StatementTypePtr pStat(              BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement, int ln);
     StatementTypePtr pStat(              const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
@@ -83,6 +84,7 @@ public:
     BoolExpTypePtr pAnd(              const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2, int ln);
     BoolExpTypePtr pOr(              const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2, int ln);
     BoolExpTypePtr pRelOp(              const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2, int ln);
+    BaseTypePtr pAuto(int ln);
     StringTypePtr pGenerateIfL(int ln);
     StringTypePtr pGenerateElseL(int ln);
     StringTypePtr pGenerateWhileHeadL(int ln);

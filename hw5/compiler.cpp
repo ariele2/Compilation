@@ -559,7 +559,6 @@ BaseTypePtr Compiler::pNumB( BaseTypePtr num, int ln)
 // change here
 RegisterTypePtr Compiler::pString( const BaseTypePtr &stype_string, int ln)
 {
-
     return code_genreation.addString(stype_string);
 }
 // also

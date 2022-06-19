@@ -20,7 +20,7 @@ bool Validations::CheckMainIsDefined()
             auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
             if ("main"==dyn_cast_func->name )
             {
-                if ((!CheckGeneralType(dyn_cast_func->ret_type, VOID_TYPE)) || (!(dyn_cast_func->params.empty())))
+                if (!(CheckGeneralType(dyn_cast_func->ret_type, VOID_TYPE)) || (!(dyn_cast_func->params.empty())))
                     return false;
                 else
                     return true;

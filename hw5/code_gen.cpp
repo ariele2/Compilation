@@ -1,6 +1,5 @@
 #include "code_gen.h"
-#define TEXTR "%r"
-#define TEXTR2 "@r"
+
 Generator::Generator(Validations &semantic_ref) : num_of_regs(0), buff(), validator_ref(semantic_ref)
 {
     addGlobalFuncs();
@@ -10,14 +9,14 @@ name_of_register Generator::GenerateReg()
 {
 
     name_of_register ret;
-    return (ret + TEXTR + to_string(num_of_regs++));
+    return (ret + "%r" + to_string(num_of_regs++));
 }
 
 name_of_register Generator::GenerateGlobalReg()
 {
 
     name_of_register ret;
-    return (ret + TEXTR2 + to_string(num_of_regs++));
+    return (ret + "@r" + to_string(num_of_regs++));
 }
 
 void Generator::addGlobalFuncs()

@@ -75,7 +75,9 @@ void Compiler::pProgram(int ln)
         sym_tab.PopScope();
         code_genreation.addProg();
     }
-    handleErrorMainMissing();
+    else {
+        handleErrorMainMissing();
+    }
 }
 
 void Compiler::pFuncs(int ln)

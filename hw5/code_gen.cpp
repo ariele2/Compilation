@@ -25,8 +25,10 @@ void Generator::addGlobalFuncs()
 
     buff.emitGlobal("declare i32 @printf(i8*, ...)");
 
+    // exit
     buff.emitGlobal("declare void @exit(i32)");
 
+    // print
     buff.emitGlobal(R"(@.str_specifier = constant [4 x i8] c"%s\0A\00")");
     buff.emitGlobal("define void @print(i8*) {");
     buff.emitGlobal("    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0");
@@ -34,6 +36,7 @@ void Generator::addGlobalFuncs()
     buff.emitGlobal("    ret void");
     buff.emitGlobal("}");
 
+    // printi
     buff.emitGlobal(R"(@.int_specifier = constant [4 x i8] c"%d\0A\00")");
     buff.emitGlobal("define void @printi(i32) {");
     buff.emitGlobal("    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0");
@@ -41,6 +44,7 @@ void Generator::addGlobalFuncs()
     buff.emitGlobal("    ret void");
     buff.emitGlobal("}");
 
+    // zero
     buff.emitGlobal(R"(@err_zero = constant [23 x i8] c"Error division by zero\00")");
 }
 
@@ -88,7 +92,7 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
 
     return reg_result;
 }
-//until here in the midlle
+
 void Generator::addCheckDivZero(const BaseTypePtr &exp)
 {
 

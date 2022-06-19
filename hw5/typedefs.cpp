@@ -16,6 +16,8 @@ CType::CType(Ty type) : TerminalBase(type) {
 
 }
 
+AutoType::AutoType(std::string& token) : TerminalBase(AUTO_TYPE), token(token) {}
+
 string TypeToString(Ty type) {
 
     switch (type) {

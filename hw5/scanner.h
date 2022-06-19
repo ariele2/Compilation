@@ -24,11 +24,11 @@ int LexToken(int bison_enum, string token)
         result.reset(new NumberType(token));
     }
     break;
-    // case AUTO:
-    // {
-    //     result.reset(new AutoType(token));
-    // }
-    // break;
+    case AUTO:
+    {
+        result.reset(new AutoType(token));
+    }
+    break;
     case STRING:
     {
         result.reset(new StringType(token));

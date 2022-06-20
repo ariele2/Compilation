@@ -349,11 +349,13 @@ void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &
 {
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
     auto true_label = buff.genLabel("_convert_true");
+    auto bp_true = buff.emit("br label @");
     auto false_label = buff.genLabel("_convert_false");
+    auto bp_false = buff.emit("br label @");
     auto convert_label = buff.genLabel("_convert_final");
 
-    auto convert_true_list = Buff::makelist(branch_pair(buff.emit("br label @"), FIRST));
-    auto convert_false_list = Buff::makelist(branch_pair(buff.emit("br label @"), FIRST));
+    auto convert_true_list = Buff::makelist(branch_pair(bp_true, FIRST));
+    auto convert_false_list = Buff::makelist(branch_pair(bp_false, FIRST));
 
     buff.bpatch(dynamic_cast_bool_exp->true_list, true_label);
     buff.bpatch(dynamic_cast_bool_exp->false_list, false_label);

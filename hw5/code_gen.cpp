@@ -404,7 +404,7 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
 
    
     for (size_t count = 0; count < symbol->params.size(); ++count) {
-    {
+    
         if (count == 0)
         {
             emit_string = emit_string + symbol->name;

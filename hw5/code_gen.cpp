@@ -402,8 +402,8 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
         emit_string = emit_string + s_void;
     }
 
-    size_t count = 0;
-    while (count < symbol->params.size())
+   
+    for (size_t count = 0; count < symbol->params.size(); ++count) {
     {
         if (count == 0)
         {
@@ -413,13 +413,13 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
         if (!(count > 0))
         {
             emit_string += "i32";
-            ++count;
+           
         }
         else
         {
             emit_string += ", ";
             emit_string += "i32";
-            ++count;
+            
         }
     }
 

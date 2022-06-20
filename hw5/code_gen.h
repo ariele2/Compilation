@@ -5,12 +5,12 @@
 #include "bp.hpp"
 #include "semantics.h"
 
-
 const int MAX_VARIABLES_PER_FUNCTION = 50;
 const int VARIABLE_SIZE = 4;
 const int STACK_SIZE = MAX_VARIABLES_PER_FUNCTION * VARIABLE_SIZE;
 
-class Generator {
+class Generator
+{
 public:
     string stack_register;
     Validations validator_ref;
@@ -22,7 +22,8 @@ public:
     void emitPrint();
     void emitPrinti();
     void emitErrorDivByZero();
-    
+    size_t emitBpTrue();
+    size_t emitBpFalse();
 
     explicit Generator(Validations &semantic_ref);
 
@@ -52,24 +53,21 @@ public:
 
     StatementTypePtr
     addStatIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
-                    const BaseTypePtr &if_list_as_statement);
+              const BaseTypePtr &if_list_as_statement);
 
     StatementTypePtr
     addStatIfAndElse(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
-                        BaseTypePtr if_list_as_statement,
-                        const BaseTypePtr &else_label, const BaseTypePtr &else_statement);
+                     BaseTypePtr if_list_as_statement,
+                     const BaseTypePtr &else_label, const BaseTypePtr &else_statement);
 
     StatementTypePtr
     addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &exp,
-                       const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
-                       const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list);
+                 const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
+                 const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list);
 
     StatementTypePtr addStatBreak();
 
     StatementTypePtr addStatContinue();
-
-    
-    
 
     RegisterTypePtr addCall(const FuncSymbolTypePtr &func, const ExpListTypePtr &exp_list);
 
@@ -114,5 +112,4 @@ public:
     BaseTypePtr addCallExpression(BaseTypePtr call_exp);
 };
 
-
-#endif //HW5_CODE_GEN_H
+#endif // HW5_CODE_GEN_H

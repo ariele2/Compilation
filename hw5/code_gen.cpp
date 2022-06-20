@@ -1,11 +1,11 @@
 #include "code_gen.h"
 
 
-//  #define TRUE_LABEL "_convert_true"
-//  #define BP_TRUE "br label @"
-//  #define  FALSE_LABEL  "_convert_false"
-//  #define BP_FALSE bp_false = buff.emit("br label @"
-//  #define CONVERT_LABEL "_convert_final"
+ #define TRUE_LABEL "_convert_true"
+ #define BP_TRUE "br label @"
+ #define  FALSE_LABEL "_convert_false"
+ #define BP_FALSE "br label @"
+ #define CONVERT_LABEL "_convert_final"
 
 Generator::Generator(Validations &semantic_ref) : num_of_regs(0), buff(), validator_ref(semantic_ref)
 {
@@ -364,9 +364,14 @@ StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
 
 void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result)
 {
+    //  #define TRUE_LABEL "_convert_true"
+//  #define BP_TRUE "br label @"
+//  #define  FALSE_LABEL "_convert_false"
+//  #define BP_FALSE "br label @"
+//  #define CONVERT_LABEL "_convert_final"
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
-    auto true_label = buff.genLabel("_convert_true");
-    auto bp_true = buff.emit("br label @");
+    auto true_label = buff.genLabel(TRUE_LABEL);
+    auto bp_true = buff.emit(BP_TRUE);
     auto false_label = buff.genLabel("_convert_false");
     auto bp_false = buff.emit("br label @");
     auto convert_label = buff.genLabel("_convert_final");

@@ -1529,7 +1529,7 @@ yyreduce:
 
   case 19:
 #line 94 "parser.ypp"
-    {Compiler::instance().pAutoTypeAssignment( yyvsp[-5], yyvsp[-3], yyvsp[-1], yylineno);}
+    {yyval = Compiler::instance().pAutoTypeAssignment(yyvsp[-5], yyvsp[-3], yyvsp[-1], yylineno);}
 #line 1534 "parser.tab.cpp"
     break;
 

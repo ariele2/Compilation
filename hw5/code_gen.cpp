@@ -61,21 +61,21 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
 
     string binop_str = reg_result->reg_name + " = ";
 
-    switch (binop[0]) {
-        case '+':
-            binop_str += "add ";
-            break;
-        case '-':
-            binop_str += "sub ";
-            break;
-        case '*':
-            binop_str += "mul ";
-            break;
-        case '/':
-            binop_str += "sdiv ";
-            break;
+    switch (binop[0])
+    {
+    case '+':
+        binop_str += "add ";
+        break;
+    case '-':
+        binop_str += "sub ";
+        break;
+    case '*':
+        binop_str += "mul ";
+        break;
+    case '/':
+        binop_str += "sdiv ";
+        break;
     }
-
 
     // all types are i32
     binop_str += "i32 ";
@@ -109,13 +109,15 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
     auto is_zero = GenerateReg();
     auto err_str = GenerateReg();
 
-      if (dynamic_cast_reg_exp) {
+    if (dynamic_cast_reg_exp)
+    {
         buff.emit(is_zero + " = icmp eq i32 " + dynamic_cast_reg_exp->reg_name + ", 0");
-    } else {
+    }
+    else
+    {
         buff.emit(is_zero + " = icmp eq i32 " + to_string(dynamic_cast_num_exp->token) + ", 0");
     }
 
-    
     auto bp_zero_and_non = buff.emit("br i1 " + is_zero + ", label @, label @");
     auto label_err_zero = buff.genLabel("_err_zero");
     vector<pair<int, BranchLabelIndex>> bp_zero_vec;
@@ -125,7 +127,7 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
     buff.emit(err_str + " = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0");
     buff.emit("call void (i8*) @print(i8* " + err_str + ")");
     buff.emit("call void (i32) @exit(i32 0)");
-    buff.emit("unreachable");  // this prevents no branch before label error
+    buff.emit("unreachable"); // this prevents no branch before label error
 
     auto label_non_zero = buff.genLabel("_non_zero");
     vector<pair<int, BranchLabelIndex>> bp_non_vec;
@@ -305,6 +307,7 @@ StatementTypePtr Generator::addStatType(string id)
 StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
 {
     auto symbol = validator_ref.table_ref.GetDefinedSymbol(id);
+
     auto statement = make_shared<StatementType>(br_list());
     auto reg_result = GenerateReg();
 
@@ -525,13 +528,11 @@ Generator::addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &
     auto dynamic_cast_while_body_label = dynamic_pointer_cast<StringType>(while_body_label);
     auto dynamic_cast_end_list_as_statement = dynamic_pointer_cast<StatementType>(end_list_as_statement);
 
-    
     buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_while_body_label->token);
     buff.bpatch(dynamic_cast_while_statement->next_list, dynamic_cast_while_head_label->token);
     buff.bpatch(dynamic_cast_end_list_as_statement->next_list, dynamic_cast_while_head_label->token);
     buff.bpatch(dynamic_cast_start_list_as_statement->next_list, dynamic_cast_while_head_label->token);
 
-   
     auto statement = make_shared<StatementType>(Buff::merge(dynamic_cast_bool_exp->false_list,
                                                             *break_list));
 
@@ -540,7 +541,7 @@ Generator::addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &
 
 StatementTypePtr Generator::addStatBreak()
 {
-  
+
     validator_ref.table_ref.scope_stack.top()->break_list->push_back({buff.emit("br label @  ; break"), FIRST});
 
     auto statement = make_shared<StatementType>(br_list());
@@ -556,7 +557,7 @@ StatementTypePtr Generator::addStatContinue()
 
 void Generator::addFuncDeclaration(const BaseTypePtr &statements, const BaseTypePtr &next_label)
 {
-  
+
     auto curr_func_ret_type = validator_ref.table_ref.scope_stack.top()->return_type;
     if (curr_func_ret_type == VOID_TYPE)
     {
@@ -567,12 +568,10 @@ void Generator::addFuncDeclaration(const BaseTypePtr &statements, const BaseType
         buff.emit("ret i32 0");
     }
 
-   
     buff.emit("}");
     stack_register.clear();
     validator_ref.table_ref.PopScope();
 
-   
     auto dynamic_cast_statements = dynamic_pointer_cast<StatementType>(statements);
     auto dynamic_cast_next_label = dynamic_pointer_cast<StringType>(next_label);
 
@@ -606,10 +605,8 @@ BoolExpTypePtr Generator::addAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr
     auto dynamic_cast_and_label = dynamic_pointer_cast<StringType>(and_label);
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
 
-    
     buff.bpatch(dynamic_cast_bool_exp1->true_list, dynamic_cast_and_label->token);
 
-    
     return make_shared<BoolExpType>(dynamic_cast_bool_exp2->true_list,
                                     Buff::merge(dynamic_cast_bool_exp1->false_list,
                                                 dynamic_cast_bool_exp2->false_list));
@@ -621,10 +618,8 @@ BoolExpTypePtr Generator::addOr(const BaseTypePtr &bool_exp1, const BaseTypePtr 
     auto dynamic_cast_or_label = dynamic_pointer_cast<StringType>(or_label);
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
 
-    
     buff.bpatch(dynamic_cast_bool_exp1->false_list, dynamic_cast_or_label->token);
 
-    
     return make_shared<BoolExpType>(Buff::merge(dynamic_cast_bool_exp1->true_list,
                                                 dynamic_cast_bool_exp2->true_list),
                                     dynamic_cast_bool_exp2->false_list);
@@ -633,7 +628,7 @@ BoolExpTypePtr Generator::addOr(const BaseTypePtr &bool_exp1, const BaseTypePtr 
 RegisterTypePtr Generator::addString(const BaseTypePtr &stype_string)
 {
     auto dynamic_cast_string = dynamic_pointer_cast<StringType>(stype_string);
-    dynamic_cast_string->token = dynamic_cast_string->token.substr(1,dynamic_cast_string->token.size()-2);
+    dynamic_cast_string->token = dynamic_cast_string->token.substr(1, dynamic_cast_string->token.size() - 2);
     auto reg_result = make_shared<RegisterType>(GenerateReg(), STRING_TYPE);
     auto reg_global = GenerateGlobalReg();
     auto string_size_string = to_string(dynamic_cast_string->token.size() + 1);
@@ -654,14 +649,14 @@ BaseTypePtr Generator::addIdentification(const SymbolTypePtr &symbol)
 
     if (dynamic_cast_symbol->generation_type == FUNCTION_TYPE)
     {
-        
+
         return dynamic_cast_symbol;
     }
 
     auto exp_reg = addLoadReg(dynamic_cast_symbol->offset, dynamic_cast_symbol->generation_type);
     if (exp_reg->generation_type == BOOL_TYPE)
     {
-        
+
         return regToBooleanExpression(exp_reg->reg_name);
     }
 
@@ -670,7 +665,7 @@ BaseTypePtr Generator::addIdentification(const SymbolTypePtr &symbol)
 
 StatementTypePtr Generator::addBranchNext()
 {
-    
+
     auto fake_statement = make_shared<StatementType>(
         Buff::makelist({buff.emit("br label @  ; end of statement"), FIRST}));
     return fake_statement;

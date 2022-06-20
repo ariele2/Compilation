@@ -91,7 +91,7 @@ Statement: Type ID SC
 Statement: Type ID ASSIGN Exp SC
     {$$ = Compiler::instance().pStatTypeAssign(   $1, $2, $4, yylineno);}
 Statement: Pre_Auto AUTO ID ASSIGN Exp SC
-    {Compiler::instance().pAutoTypeAssignment( $1, $3, $5, yylineno);}
+    {$$ = Compiler::instance().pAutoTypeAssignment($1, $3, $5, yylineno);}
 Statement: ID ASSIGN Exp SC
     {$$ = Compiler::instance().pStatAssign(   $1, $3, yylineno);}
 Statement: Call SC

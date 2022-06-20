@@ -279,9 +279,6 @@ StatementTypePtr Compiler::pAutoTypeAssignment(BaseTypePtr &t, BaseTypePtr &iden
     else {
         handleErrorDef(ln, dynamic_pointer_cast<StringType>(identification)->token);
     }
-    const auto symbol = make_shared<SymbolType>(dyn_cast_id->token, 0, dyn_cast_type->generation_type);
-    // std::cout << "[DEBUG] Adding Variable... " << std::endl;
-    sym_tab.AddVariable(symbol);
 }
 
 StatementTypePtr Compiler::pStatAssign( const BaseTypePtr &identification, const BaseTypePtr &expression, int ln)

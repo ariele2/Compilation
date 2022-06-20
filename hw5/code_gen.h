@@ -23,6 +23,10 @@ public:
     void emitPrinti();
     void emitErrorDivByZero();
     
+    size_t Generator::emitBpTrue();
+
+    size_t Generator::emitBpFalse();
+
 
     explicit Generator(Validations &semantic_ref);
 

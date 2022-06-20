@@ -16,7 +16,12 @@ public:
     Validations validator_ref;
     int num_of_regs;
     Buff buff;
-    
+
+    void emitPrintf();
+    void emitExit();
+    void emitPrint();
+    void emitPrinti();
+    void emitErrorDivByZero();
     
 
     explicit Generator(Validations &semantic_ref);
@@ -84,7 +89,7 @@ public:
 
     void addProg();
 
-    string findNotBooleanExpressionStr(const BaseTypePtr &exp);
+    string findNoBoolExpStr(const BaseTypePtr &exp);
 
     static string findTypeOfLLVM(const Ty &type);
 
@@ -98,7 +103,7 @@ public:
 
     BaseTypePtr addIdentification(const SymbolTypePtr &symbol);
 
-    void addBooleanExpressionToRegister(const BaseTypePtr &exp, const name_of_register &reg_result);
+    void addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result);
 
     BaseTypePtr regToBooleanExpression(string &reg_source);
 

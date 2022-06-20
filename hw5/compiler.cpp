@@ -840,7 +840,7 @@ BaseTypePtr Compiler::pConvBool( BaseTypePtr expression, int ln)
         }
         else
         {
-            code_genreation.addBooleanExpressionToRegister(expression, register_reserved_bool);
+            code_genreation.addBoolExpToReg(expression, register_reserved_bool);
         }
 
         return result_register_pointer;

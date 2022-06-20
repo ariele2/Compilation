@@ -18,39 +18,53 @@ name_of_register Generator::GenerateGlobalReg()
     name_of_register ret;
     return (ret + "@r" + to_string(num_of_regs++));
 }
-
-void Generator::addGlobalFuncs()
+void Generator::emitPrintf()
 {
-
     buff.emitGlobal("declare i32 @printf(i8*, ...)");
-
-    // exit
+}
+void Generator::emitExit()
+{
     buff.emitGlobal("declare void @exit(i32)");
-
-    // print
+}
+void Generator::emitPrint()
+{
     buff.emitGlobal(R"(@.str_specifier = constant [4 x i8] c"%s\0A\00")");
     buff.emitGlobal("define void @print(i8*) {");
     buff.emitGlobal("    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0");
     buff.emitGlobal("    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)");
     buff.emitGlobal("    ret void");
     buff.emitGlobal("}");
+}
 
-    // printi
+void Generator::emitPrinti()
+{
     buff.emitGlobal(R"(@.int_specifier = constant [4 x i8] c"%d\0A\00")");
     buff.emitGlobal("define void @printi(i32) {");
     buff.emitGlobal("    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0");
     buff.emitGlobal("    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)");
     buff.emitGlobal("    ret void");
     buff.emitGlobal("}");
-
-    // zero
+}
+void Generator::emitErrorDivByZero()
+{
     buff.emitGlobal(R"(@err_zero = constant [23 x i8] c"Error division by zero\00")");
+}
+
+
+
+void Generator::addGlobalFuncs()
+{
+    Generator::emitPrintf();
+    Generator::emitExit();
+    Generator::emitPrint();
+    Generator::emitPrinti();
+    Generator::emitErrorDivByZero();
 }
 
 RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const BaseTypePtr &exp2)
 {
-    auto dynamic_cast_exp1 = findNotBooleanExpressionStr(exp1);
-    auto dynamic_cast_exp2 = findNotBooleanExpressionStr(exp2);
+    auto dynamic_cast_exp1 = findNoBoolExpStr(exp1);
+    auto dynamic_cast_exp2 = findNoBoolExpStr(exp2);
 
     auto reg_result = make_shared<RegisterType>(GenerateReg(), INT_TYPE);
 
@@ -59,45 +73,43 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
         addCheckDivZero(exp2);
     }
 
-    string binop_str = reg_result->reg_name + " = ";
+    string binop_str = reg_result->reg_name;
+    binop_str += " = ";
 
-    switch (binop[0])
+    if ('+' == binop[0])
     {
-    case '+':
-        binop_str += "add ";
-        break;
-    case '-':
-        binop_str += "sub ";
-        break;
-    case '*':
-        binop_str += "mul ";
-        break;
-    case '/':
-        binop_str += "sdiv ";
-        break;
+        binop_str = binop_str + "add ";
+    }
+    else if ('/' == binop[0])
+    {
+        binop_str = binop_str + "sdiv ";
+    }
+    else if ('*' == binop[0])
+    {
+        binop_str = binop_str + "mul ";
+    }
+    else if ('-' == binop[0])
+    {
+        binop_str = binop_str + "sub ";
     }
 
-    // all types are i32
-    binop_str += "i32 ";
+    buff.emit(binop_str + "i32 " + dynamic_cast_exp1 + ", " + dynamic_cast_exp2);
 
-    binop_str += dynamic_cast_exp1;
-
-    binop_str += ", ";
-
-    binop_str += dynamic_cast_exp2;
-
-    buff.emit(binop_str);
-
-    if (BYTE_TYPE == validator_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type))
+    if (!( validator_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type) == BYTE_TYPE ))
     {
-
+        return reg_result;
+    }
+    else
+    {
         auto reg_old_result = reg_result->reg_name;
         reg_result->reg_name = GenerateReg();
         reg_result->generation_type = BYTE_TYPE;
-        buff.emit(reg_result->reg_name + " = and i32 " + reg_old_result + ", 255");
+         string to_emit = reg_result->reg_name;
+         to_emit+= " = and i32 ";
+         to_emit += reg_old_result;
+         to_emit += ", 255";
+        buff.emit(to_emit);
     }
-
-    return reg_result;
 }
 
 void Generator::addCheckDivZero(const BaseTypePtr &exp)
@@ -109,25 +121,37 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
     auto is_zero = GenerateReg();
     auto err_str = GenerateReg();
 
-    if (dynamic_cast_reg_exp)
+    if (!dynamic_cast_reg_exp)
     {
-        buff.emit(is_zero + " = icmp eq i32 " + dynamic_cast_reg_exp->reg_name + ", 0");
+        auto str_to_emit = is_zero;
+        str_to_emit += " = icmp eq i32 ";
+        str_to_emit += to_string(dynamic_cast_num_exp->token);
+        str_to_emit += ", 0";
+        buff.emit(str_to_emit);
     }
     else
     {
-        buff.emit(is_zero + " = icmp eq i32 " + to_string(dynamic_cast_num_exp->token) + ", 0");
+        auto str_to_emit = is_zero;
+        str_to_emit += " = icmp eq i32 ";
+        str_to_emit += dynamic_cast_reg_exp->reg_name;
+        str_to_emit += ", 0";
+        buff.emit(str_to_emit);
     }
+    std::string str_to_emit = "br i1 ";
+    str_to_emit += is_zero;
+    str_to_emit += ", label @, label @";
 
-    auto bp_zero_and_non = buff.emit("br i1 " + is_zero + ", label @, label @");
+    auto bp_zero_and_non = buff.emit(str_to_emit);
     auto label_err_zero = buff.genLabel("_err_zero");
     vector<pair<int, BranchLabelIndex>> bp_zero_vec;
     bp_zero_vec.emplace_back(bp_zero_and_non, FIRST);
     buff.bpatch(bp_zero_vec, label_err_zero);
+    
 
     buff.emit(err_str + " = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0");
     buff.emit("call void (i8*) @print(i8* " + err_str + ")");
     buff.emit("call void (i32) @exit(i32 0)");
-    buff.emit("unreachable"); // this prevents no branch before label error
+    buff.emit("unreachable");
 
     auto label_non_zero = buff.genLabel("_non_zero");
     vector<pair<int, BranchLabelIndex>> bp_non_vec;
@@ -157,7 +181,7 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func, const ExpListT
         }
         out_str += findTypeOfLLVM(exp_list->exp_list[i]->generation_type) + " ";
         {
-            out_str += findNotBooleanExpressionStr(exp_list->exp_list[i]);
+            out_str += findNoBoolExpStr(exp_list->exp_list[i]);
         }
     }
     out_str += ")";
@@ -188,40 +212,40 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func)
 string Generator::findTypeOfLLVM(const Ty &type)
 {
     string llvm_type;
-    switch (type)
+    if (type == VOID_TYPE)
     {
-    case VOID_TYPE:
         llvm_type = "void";
-        break;
-    case STRING_TYPE:
+    }
+    else if (type == STRING_TYPE)
+    {
         llvm_type = "i8*";
-        break;
-    default:
+    }
+    else
+    {
         llvm_type = "i32";
-        break;
     }
     return llvm_type;
 }
 
-string Generator::findNotBooleanExpressionStr(const BaseTypePtr &exp)
+string Generator::findNoBoolExpStr(const BaseTypePtr &exp)
 {
-    // supports bools that are in register representation
-    auto dynamic_cast_num_exp = dynamic_pointer_cast<NumberType>(exp);
-    auto dynamic_cast_reg_exp = dynamic_pointer_cast<RegisterType>(exp);
-    auto dynamic_cast_str_exp = dynamic_pointer_cast<StringType>(exp);
-    auto dynamic_cast_sym_exp = dynamic_pointer_cast<SymbolType>(exp);
 
-    if (dynamic_cast_num_exp)
+    auto dyn_cast_num_exp = dynamic_pointer_cast<NumberType>(exp);
+    auto dyn_cast_reg_exp = dynamic_pointer_cast<RegisterType>(exp);
+    auto dyn_cast_str_exp = dynamic_pointer_cast<StringType>(exp);
+    auto dyn_cast_sym_exp = dynamic_pointer_cast<SymbolType>(exp);
+
+    if (dyn_cast_num_exp)
     {
-        return to_string(dynamic_cast_num_exp->token);
+        return to_string(dyn_cast_num_exp->token);
     }
-    else if (dynamic_cast_reg_exp)
+    else if (dyn_cast_sym_exp)
     {
-        return dynamic_cast_reg_exp->reg_name;
+        return addLoadReg(dyn_cast_sym_exp->offset, dyn_cast_sym_exp->generation_type)->reg_name;
     }
-    else if (dynamic_cast_sym_exp)
+    else if (dyn_cast_reg_exp)
     {
-        return addLoadReg(dynamic_cast_sym_exp->offset, dynamic_cast_sym_exp->generation_type)->reg_name;
+        return dyn_cast_reg_exp->reg_name;
     }
     else
     {
@@ -241,8 +265,8 @@ void Generator::addProg()
 
 BoolExpTypePtr Generator::addRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, const BaseTypePtr &exp2)
 {
-    auto exp1_value = findNotBooleanExpressionStr(exp1);
-    auto exp2_value = findNotBooleanExpressionStr(exp2);
+    auto exp1_value = findNoBoolExpStr(exp1);
+    auto exp2_value = findNoBoolExpStr(exp2);
 
     auto reg_icmp = GenerateReg();
     string icmp_string(reg_icmp + " = icmp ");
@@ -254,25 +278,25 @@ BoolExpTypePtr Generator::addRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, 
     {
         icmp_string += "slt";
     }
-    else if (relop_str == ">")
-    {
-        icmp_string += "sgt";
-    }
     else if (relop_str == "<=")
     {
         icmp_string += "sle";
+    }
+    else if (relop_str == ">")
+    {
+        icmp_string += "sgt";
     }
     else if (relop_str == ">=")
     {
         icmp_string += "sge";
     }
-    else if (relop_str == "==")
-    {
-        icmp_string += "eq";
-    }
     else if (relop_str == "!=")
     {
         icmp_string += "ne";
+    }
+    else if (relop_str == "==")
+    {
+        icmp_string += "eq";
     }
     else
     {
@@ -294,12 +318,10 @@ StatementTypePtr Generator::addStatType(string id)
     auto symbol = validator_ref.table_ref.GetDefinedSymbol(id);
     auto statement = make_shared<StatementType>(br_list());
 
-    // create default value and store in stack
-    // r = 0+0 (including bool)
-    auto reg_default_value = GenerateReg();
-    buff.emit(reg_default_value + " = add i32 0, 0");
+    auto reg_val = GenerateReg();
+    buff.emit(reg_val + " = add i32 0, 0");
 
-    addStoreReg(symbol->offset, reg_default_value);
+    addStoreReg(symbol->offset, reg_val);
 
     return statement;
 }
@@ -307,39 +329,31 @@ StatementTypePtr Generator::addStatType(string id)
 StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
 {
     auto symbol = validator_ref.table_ref.GetDefinedSymbol(id);
-
     auto statement = make_shared<StatementType>(br_list());
     auto reg_result = GenerateReg();
 
     if (exp->generation_type == BOOL_TYPE)
     {
-        addBooleanExpressionToRegister(exp, reg_result);
+        addBoolExpToReg(exp, reg_result);
     }
     else
     {
-        auto exp_str = findNotBooleanExpressionStr(exp);
+        auto exp_str = findNoBoolExpStr(exp);
         buff.emit(reg_result + " = add i32 " + exp_str + ", 0");
     }
-
-    // store and return
     addStoreReg(symbol->offset, reg_result);
-
     return statement;
 }
 
-void Generator::addBooleanExpressionToRegister(const BaseTypePtr &exp, const name_of_register &reg_result)
+void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result)
 {
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
-
-    // create phi junction
     auto true_label = buff.genLabel("_convert_true");
-    auto bp_true = buff.emit("br label @");
     auto false_label = buff.genLabel("_convert_false");
-    auto bp_false = buff.emit("br label @");
     auto convert_label = buff.genLabel("_convert_final");
 
-    auto convert_true_list = Buff::makelist(branch_pair(bp_true, FIRST));
-    auto convert_false_list = Buff::makelist(branch_pair(bp_false, FIRST));
+    auto convert_true_list = Buff::makelist(branch_pair(buff.emit("br label @"), FIRST));
+    auto convert_false_list = Buff::makelist(branch_pair(buff.emit("br label @"), FIRST));
 
     buff.bpatch(dynamic_cast_bool_exp->true_list, true_label);
     buff.bpatch(dynamic_cast_bool_exp->false_list, false_label);
@@ -351,7 +365,7 @@ void Generator::addBooleanExpressionToRegister(const BaseTypePtr &exp, const nam
 
 void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
 {
-    // emit definition
+
     string emit_string("define ");
 
     if (symbol->ret_type == VOID_TYPE)
@@ -363,8 +377,7 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
         emit_string += "i32 @";
     }
 
-    emit_string += symbol->name;
-    emit_string += "(";
+    emit_string += symbol->name + "(";
 
     for (size_t i = 0; i < symbol->params.size(); ++i)
     {
@@ -379,7 +392,6 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
 
     buff.emit(emit_string);
 
-    // allocate stack
     stack_register = GenerateReg();
     buff.emit(stack_register + " = alloca i32, i32 " + to_string(STACK_SIZE));
 }
@@ -391,11 +403,10 @@ void Generator::addStoreReg(int offset, const name_of_register &reg_to_store)
 
     if (offset >= 0)
     {
-        // get address on stack
+
         buff.emit(reg_pointer_to_stack + " = getelementptr i32, i32* " + stack_register +
                   ", i32 " + to_string(offset));
 
-        // store in stack
         buff.emit("store i32 " + reg_to_store + ", i32* " + reg_pointer_to_stack);
     }
 }
@@ -459,11 +470,11 @@ StatementTypePtr Generator::addStatRetExpression(const BaseTypePtr &exp)
     if (exp->generation_type == BOOL_TYPE)
     {
         reg_result = GenerateReg();
-        addBooleanExpressionToRegister(exp, reg_result);
+        addBoolExpToReg(exp, reg_result);
     }
     else
     {
-        reg_result = findNotBooleanExpressionStr(exp);
+        reg_result = findNoBoolExpStr(exp);
     }
 
     buff.emit("ret " + findTypeOfLLVM(exp->generation_type) + " " + reg_result);

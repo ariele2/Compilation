@@ -391,7 +391,7 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
 
     string emit_string("define ");
     string s_void = "void @";
-    string s_i32 = "void @";
+    string s_i32 = "i32 @";
 
     if (symbol->ret_type != VOID_TYPE)
     {

@@ -360,24 +360,17 @@ StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
     return statement;
 }
 
-size_t Generator::emitBpTrue()
-{
-    return buff.emit(BP_TRUE);
-}
-size_t Generator::emitBpFalse()
-{
-    return buff.emit(BP_FALSE);
-}
+
 
 void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result)
 {
 
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
     auto true_label = buff.genLabel(TRUE_LABEL);
-    auto bp_true = emitBpTrue();
+    auto bp_true =  buff.emit(BP_TRUE);
     string to_emit = reg_result;
     auto false_label = buff.genLabel(FALSE_LABEL);
-    auto bp_false = emitBpFalse();
+    auto bp_false =  buff.emit(BP_FALSE);
     auto convert_label = buff.genLabel(CONVERT_LABEL);
     auto convert_false_list = Buff::makelist(branch_pair(bp_false, FIRST));
     auto convert_true_list = Buff::makelist(branch_pair(bp_true, FIRST));

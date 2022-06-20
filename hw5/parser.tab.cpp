@@ -612,15 +612,15 @@ static const yytype_int8 yydefact[] =
 {
        3,    35,     8,    33,    34,     0,     2,     3,     0,     0,
        7,     1,     4,    46,     0,     0,     0,     0,     0,     0,
-       0,    63,    63,     0,     0,     0,     0,     9,    45,    21,
+       0,    63,    63,     0,     0,     0,     0,     9,    45,    22,
       39,    41,    43,    44,     0,     0,    40,     0,     0,    27,
-      28,    64,     0,     0,     0,    62,    14,    20,     0,     0,
-      46,     0,    10,    11,     0,    42,    47,     0,    22,    61,
+      28,    64,     0,     0,     0,    62,    14,    21,     0,     0,
+      46,     0,    10,    11,     0,    42,    47,     0,    23,    61,
       60,     0,     0,     0,     0,    55,    58,     0,    30,     0,
       66,     5,    46,    17,     0,     0,    63,     6,     0,    13,
-      36,     0,     0,    50,    51,    37,    38,     0,     0,    19,
+      36,     0,     0,    50,    51,    37,    38,     0,     0,    20,
       29,    31,    63,     0,     0,    54,    12,    49,    48,    52,
-      55,     0,    15,    18,     0,    16,    56,     0,    32,    23,
+      55,     0,    15,    18,     0,    16,    56,     0,    32,    19,
       46,    53,    54,    59,    65,    46,    24,    64,    52,    26,
       57,    46,    54,    25
 };
@@ -725,8 +725,8 @@ static const yytype_int8 yyr1[] =
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     0,     2,     5,     5,     1,     1,     0,
-       1,     1,     3,     2,     2,     5,     5,     3,     5,     4,
-       2,     2,     3,     6,    10,    15,    11,     2,     2,     4,
+       1,     1,     3,     2,     2,     5,     5,     3,     5,     6,
+       4,     2,     2,     3,    10,    15,    11,     2,     2,     4,
        3,     2,     4,     1,     1,     1,     3,     3,     3,     1,
        1,     1,     2,     1,     1,     1,     0,     2,     4,     4,
        3,     3,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -1529,31 +1529,31 @@ yyreduce:
 
   case 19:
 #line 94 "parser.ypp"
-    {yyval = Compiler::instance().pStatAssign(   yyvsp[-3], yyvsp[-1], yylineno);}
+    {Compiler::instance().pAutoTypeAssignment( yyvsp[-5], yyvsp[-3], yyvsp[-1], yylineno);}
 #line 1534 "parser.tab.cpp"
     break;
 
   case 20:
 #line 96 "parser.ypp"
-    {yyval = Compiler::instance().pStatCall(yylineno);}
+    {yyval = Compiler::instance().pStatAssign(   yyvsp[-3], yyvsp[-1], yylineno);}
 #line 1540 "parser.tab.cpp"
     break;
 
   case 21:
 #line 98 "parser.ypp"
-    {yyval = Compiler::instance().pStatRet(yylineno);}
+    {yyval = Compiler::instance().pStatCall(yylineno);}
 #line 1546 "parser.tab.cpp"
     break;
 
   case 22:
 #line 100 "parser.ypp"
-    {yyval = Compiler::instance().pStatRetExp(   yyvsp[-1], yylineno);}
+    {yyval = Compiler::instance().pStatRet(yylineno);}
 #line 1552 "parser.tab.cpp"
     break;
 
   case 23:
 #line 102 "parser.ypp"
-    {Compiler::instance().parseAutoTypeAssignment( yyvsp[-5], yyvsp[-3], yyvsp[-1], yylineno);}
+    {yyval = Compiler::instance().pStatRetExp(   yyvsp[-1], yylineno);}
 #line 1558 "parser.tab.cpp"
     break;
 

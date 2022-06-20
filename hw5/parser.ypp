@@ -90,6 +90,8 @@ Statement: Type ID SC
     {$$ = Compiler::instance().pStatType(   $1, $2, yylineno);}
 Statement: Type ID ASSIGN Exp SC
     {$$ = Compiler::instance().pStatTypeAssign(   $1, $2, $4, yylineno);}
+Statement: Pre_Auto AUTO ID ASSIGN Exp SC
+    {Compiler::instance().pAutoTypeAssignment( $1, $3, $5, yylineno);}
 Statement: ID ASSIGN Exp SC
     {$$ = Compiler::instance().pStatAssign(   $1, $3, yylineno);}
 Statement: Call SC
@@ -98,8 +100,6 @@ Statement: RETURN SC
     {$$ = Compiler::instance().pStatRet(yylineno);}
 Statement: RETURN Exp SC
     {$$ = Compiler::instance().pStatRetExp(   $2, yylineno);}
-Statement: Pre_Auto AUTO ID ASSIGN Exp SC
-    {Compiler::instance().parseAutoTypeAssignment( $1, $3, $5, yylineno);}
 Statement: IF LPAREN Exp CheckBool RPAREN PushStatementScope GenerateIfLabel Statement PopScope BIfNext
     {$$ = Compiler::instance().pStatIf(   $3, $7, $8, $10, yylineno);}
 Statement: IF LPAREN Exp CheckBool RPAREN PushStatementScope GenerateIfLabel Statement PopScope BIfNext ELSE PushStatementScope GenerateElseLabel Statement PopScope

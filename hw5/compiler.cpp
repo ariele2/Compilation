@@ -125,44 +125,6 @@ BaseTypePtr Compiler::pRetType( BaseTypePtr t, int ln)
     return t;
 }
 
-void Compiler::parseAutoTypeAssignment(BaseTypePtr type, BaseTypePtr id, BaseTypePtr exp, int ln)
-{
-    std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
-    std::cout << "[DEBUG] type: " << type->generation_type << std::endl;
-    std::cout << "[DEBUG] exp: " << exp->generation_type << std::endl;
-    bool check_semantics;
-    auto dynamic_cast_id = std::dynamic_pointer_cast<StringType>(id);
-    if (exp->generation_type != INT_TYPE && exp->generation_type != BYTE_TYPE && exp->generation_type != BOOL_TYPE)
-    {
-        handleErrorMismatch(ln);
-    }
-    type->generation_type = exp->generation_type;
-    BaseTypePtr dynamic_cast_type = std::dynamic_pointer_cast<CType>(type);
-    std::cout << dynamic_cast_type << std::endl;
-    std::cout << "[DEBUG] id token : " << dynamic_cast_id->token <<std::endl;
-    std::cout << "[DEBUG] found auto type!" <<std::endl;
-    // std::cout << "[DEBUG] Casting to: " << exp->general_type <<std::endl;
-    // std::cout << "[DEBUG] dynamic_cast_type: " << dynamic_cast_type->general_type <<std::endl;
-    // std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dynamic_cast_id->general_type <<std::endl;
-    check_semantics = validations.CheckFunction(exp->generation_type);
-    if (check_semantics)
-    {
-        // std::cout << "[DEBUG] inside IsFunctionType " << std::endl;
-        auto cast_function = std::dynamic_pointer_cast<FuncSymType>(exp);
-        handleErrorUndef(ln, cast_function->name);
-    }
-    // std::cout << "[DEBUG] 2 " << std::endl;
-    check_semantics = validations.CheckSymDefined(dynamic_cast_id->token);
-    if (check_semantics)
-    {
-        // std::cout << "[DEBUG] inside checkSymbolDefined " << std::endl;
-        handleErrorDef(ln, dynamic_cast_id->token);
-    }
-    const auto symbol = make_shared<SymbolType>(dynamic_cast_id->token, 0, dynamic_cast_type->generation_type);
-    // std::cout << "[DEBUG] Adding Variable... " << std::endl;
-    sym_tab.AddVariable(symbol);
-}
-
 CTypePtr Compiler::pRetType(int ln)
 {
     return make_shared<CType>(VOID_TYPE);
@@ -285,6 +247,43 @@ Compiler::pStatTypeAssign( const BaseTypePtr &t, const BaseTypePtr &identificati
     }
 }
 
+StatementTypePtr Compiler::pAutoTypeAssignment(BaseTypePtr &t, BaseTypePtr &identification, BaseTypePtr &exp, int ln)
+{
+    std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
+    std::cout << "[DEBUG] type: " << t->generation_type << std::endl;
+    std::cout << "[DEBUG] exp: " << exp->generation_type << std::endl;
+    auto dyn_cast_id = std::dynamic_pointer_cast<StringType>(identification);
+    if (validations.CheckFunction(exp->generation_type))
+    {
+        auto cast_function = std::dynamic_pointer_cast<FuncSymType>(exp);
+        handleErrorUndef(ln, cast_function->name);
+    }
+    if (exp->generation_type != INT_TYPE && exp->generation_type != BYTE_TYPE && exp->generation_type != BOOL_TYPE)
+    {
+        handleErrorMismatch(ln);
+    }
+    t->generation_type = exp->generation_type;
+    BaseTypePtr dyn_cast_type = std::dynamic_pointer_cast<CType>(t);
+    std::cout << dyn_cast_type << std::endl;
+    std::cout << "[DEBUG] id token : " << dyn_cast_id->token <<std::endl;
+    std::cout << "[DEBUG] found auto type!" <<std::endl;
+    std::cout << "[DEBUG] Casting to: " << exp->generation_type <<std::endl;
+    std::cout << "[DEBUG] dynamic_cast_type: " << dyn_cast_type->generation_type <<std::endl;
+    std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dyn_cast_id->generation_type <<std::endl;
+    if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
+    {
+        const auto sym = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->token, 0, dynamic_pointer_cast<CType>(t)->generation_type);
+        sym_tab.AddVariable(sym);
+        return code_genreation.addStatAssign(dynamic_pointer_cast<StringType>(identification)->token, exp);
+    }
+    else {
+        handleErrorDef(ln, dynamic_pointer_cast<StringType>(identification)->token);
+    }
+    const auto symbol = make_shared<SymbolType>(dyn_cast_id->token, 0, dyn_cast_type->generation_type);
+    // std::cout << "[DEBUG] Adding Variable... " << std::endl;
+    sym_tab.AddVariable(symbol);
+}
+
 StatementTypePtr Compiler::pStatAssign( const BaseTypePtr &identification, const BaseTypePtr &expression, int ln)
 {
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
@@ -313,7 +312,6 @@ StatementTypePtr Compiler::pStatAssign( const BaseTypePtr &identification, const
 
     if (validations.CheckAssigned(sym_retured_id->generation_type, expression->generation_type))
     {
-
         return code_genreation.addStatAssign(dynamic_pointer_cast<StringType>(identification)->token, expression);
     }
     else

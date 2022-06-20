@@ -154,7 +154,6 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func, const ExpListT
             out_str += ", ";
         }
         out_str += findTypeOfLLVM(exp_list->exp_list[i]->generation_type) + " ";
-
         {
             out_str += findNotBooleanExpressionStr(exp_list->exp_list[i]);
         }

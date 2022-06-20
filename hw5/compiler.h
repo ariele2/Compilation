@@ -38,7 +38,6 @@ public:
     static ArgListTypePtr pFs(              const BaseTypePtr &formals, int ln);
     static ArgListTypePtr pFsList(              const BaseTypePtr &formal, int ln);
     static ArgListTypePtr pFsList(              const BaseTypePtr &formal, const BaseTypePtr &formals_list, int ln);
-    void parseAutoTypeAssignment(BaseTypePtr type, BaseTypePtr id, BaseTypePtr exp, int ln);
     SymbolTypePtr pFDecl(              const BaseTypePtr &type, const BaseTypePtr &id, int ln);
     static StatementTypePtr pStat(              BaseTypePtr &statement, const BaseTypePtr &next_list_as_statement, int ln);
     StatementTypePtr pStat(              const BaseTypePtr &statements, const BaseTypePtr &old_next_list_as_statement,
@@ -47,6 +46,7 @@ public:
     static StatementTypePtr pStatOfStats(              BaseTypePtr &statements, int ln);
     StatementTypePtr pStatType(              const BaseTypePtr &type, const BaseTypePtr &id, int ln);
     StatementTypePtr pStatTypeAssign(              const BaseTypePtr &type, const BaseTypePtr &id, const BaseTypePtr &exp, int ln);
+    StatementTypePtr pAutoTypeAssignment(BaseTypePtr &type, BaseTypePtr &id, BaseTypePtr &exp, int ln);
     StatementTypePtr pStatAssign(              const BaseTypePtr &id, const BaseTypePtr &exp, int ln);
     static StatementTypePtr pStatCall(int ln);
     StatementTypePtr pStatRet(int ln);

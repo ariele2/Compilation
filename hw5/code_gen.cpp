@@ -1,5 +1,12 @@
 #include "code_gen.h"
 
+
+//  #define TRUE_LABEL "_convert_true"
+//  #define BP_TRUE "br label @"
+//  #define  FALSE_LABEL  "_convert_false"
+//  #define BP_FALSE bp_false = buff.emit("br label @"
+//  #define CONVERT_LABEL "_convert_final"
+
 Generator::Generator(Validations &semantic_ref) : num_of_regs(0), buff(), validator_ref(semantic_ref)
 {
     addGlobalFuncs();
@@ -50,8 +57,6 @@ void Generator::emitErrorDivByZero()
     buff.emitGlobal(R"(@err_zero = constant [23 x i8] c"Error division by zero\00")");
 }
 
-
-
 void Generator::addGlobalFuncs()
 {
     Generator::emitPrintf();
@@ -95,7 +100,7 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
 
     buff.emit(binop_str + "i32 " + dynamic_cast_exp1 + ", " + dynamic_cast_exp2);
 
-    if (!( validator_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type) == BYTE_TYPE ))
+    if (!(validator_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type) == BYTE_TYPE))
     {
         return reg_result;
     }
@@ -104,10 +109,10 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
         auto reg_old_result = reg_result->reg_name;
         reg_result->reg_name = GenerateReg();
         reg_result->generation_type = BYTE_TYPE;
-         string to_emit = reg_result->reg_name;
-         to_emit+= " = and i32 ";
-         to_emit += reg_old_result;
-         to_emit += ", 255";
+        string to_emit = reg_result->reg_name;
+        to_emit += " = and i32 ";
+        to_emit += reg_old_result;
+        to_emit += ", 255";
         buff.emit(to_emit);
     }
 }
@@ -146,7 +151,6 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
     vector<pair<int, BranchLabelIndex>> bp_zero_vec;
     bp_zero_vec.emplace_back(bp_zero_and_non, FIRST);
     buff.bpatch(bp_zero_vec, label_err_zero);
-    
 
     buff.emit(err_str + " = getelementptr [23 x i8], [23 x i8]* @err_zero, i32 0, i32 0");
     buff.emit("call void (i8*) @print(i8* " + err_str + ")");
@@ -171,42 +175,54 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func, const ExpListT
 
     out_str += "call ";
     string llvm_type = findTypeOfLLVM(func->ret_type);
-    out_str += llvm_type + " @" + func->name + "(";
-
-    for (size_t i = 0; i < exp_list->exp_list.size(); ++i)
+    out_str = out_str + llvm_type;
+    out_str = out_str + " @";
+    out_str = out_str + func->name + "(";
+    size_t count = 0;
+    while (count < exp_list->exp_list.size())
     {
-        if (i > 0)
+        if (count > 0)
         {
-            out_str += ", ";
+            out_str = out_str + ", ";
         }
-        out_str += findTypeOfLLVM(exp_list->exp_list[i]->generation_type) + " ";
+        out_str = out_str + findTypeOfLLVM(exp_list->exp_list[count]->generation_type) + " ";
         {
-            out_str += findNoBoolExpStr(exp_list->exp_list[i]);
+            out_str = out_str + findNoBoolExpStr(exp_list->exp_list[count]);
         }
+        ++count;
     }
-    out_str += ")";
-
-    buff.emit(out_str);
+    buff.emit(out_str + ")");
     return reg_result;
 }
 
 RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func)
 {
     auto reg_result = make_shared<RegisterType>(GenerateReg(), func->ret_type);
-    string out_str;
+    string out_str ;
 
-    if (func->ret_type != VOID_TYPE)
+    if (func->ret_type == VOID_TYPE)
     {
-        out_str += reg_result->reg_name + " = ";
+        out_str =out_str + "call ";
+        string llvm_type = findTypeOfLLVM(func->ret_type);
+        out_str =out_str+ llvm_type;
+        out_str =out_str + " @";
+        out_str =out_str + func->name ;
+        out_str =out_str+ "()";
+        buff.emit(out_str);
+        return reg_result;
     }
+    else
+    {
+        out_str = out_str + reg_result->reg_name + " = "+ "call ";
 
-    out_str += "call ";
-    string llvm_type = findTypeOfLLVM(func->ret_type);
-
-    out_str += llvm_type + " @" + func->name + "()";
-
-    buff.emit(out_str);
-    return reg_result;
+        string llvm_type = findTypeOfLLVM(func->ret_type);
+        out_str =out_str+ llvm_type;
+        out_str =out_str + " @";
+        out_str =out_str + func->name;
+        out_str =out_str + "()";
+        buff.emit(out_str);
+        return reg_result;
+    }
 }
 
 string Generator::findTypeOfLLVM(const Ty &type)
@@ -255,10 +271,6 @@ string Generator::findNoBoolExpStr(const BaseTypePtr &exp)
 
 void Generator::addProg()
 {
-    if (PRINT_DEBUG)
-    {
-        cout << "code starts here:\n";
-    }
     buff.printGlobalBuffer();
     buff.printCodeBuffer();
 }
@@ -332,14 +344,19 @@ StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
     auto statement = make_shared<StatementType>(br_list());
     auto reg_result = GenerateReg();
 
-    if (exp->generation_type == BOOL_TYPE)
+    if (exp->generation_type != BOOL_TYPE)
     {
-        addBoolExpToReg(exp, reg_result);
+        auto exp_str = findNoBoolExpStr(exp);
+        string out = reg_result;
+        out+= " = add i32 ";
+        out+=exp_str;
+        out+=", 0";
+        buff.emit(out);
     }
     else
     {
-        auto exp_str = findNoBoolExpStr(exp);
-        buff.emit(reg_result + " = add i32 " + exp_str + ", 0");
+        addBoolExpToReg(exp, reg_result);
+        
     }
     addStoreReg(symbol->offset, reg_result);
     return statement;
@@ -405,7 +422,6 @@ void Generator::addStoreReg(int offset, const name_of_register &reg_to_store)
 
     if (offset >= 0)
     {
-
         buff.emit(reg_pointer_to_stack + " = getelementptr i32, i32* " + stack_register +
                   ", i32 " + to_string(offset));
 
@@ -416,23 +432,23 @@ void Generator::addStoreReg(int offset, const name_of_register &reg_to_store)
 RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
 {
     assert(!stack_register.empty());
-
     auto reg_result = GenerateReg();
 
-    if (offset >= 0)
-    {
-        // non-negative offset - calculate real address and load
-        auto reg_stack_offset = GenerateReg();
-
-        buff.emit(reg_stack_offset + " = getelementptr i32, i32* " +
-                  stack_register + ", i32 " + to_string(offset));
-        buff.emit(reg_result + " = load i32, i32* " + reg_stack_offset);
-    }
-    else
+    if (offset < 0)
     {
         // negative offset - get func register and assign
         auto reg_argument = "%" + to_string(-offset - 1);
         buff.emit(reg_result + " = add i32 0, " + reg_argument);
+    }
+    else
+    {
+        auto reg_stack_offset = GenerateReg();
+        string out = reg_stack_offset + " = getelementptr i32, i32* ";
+        out += stack_register;
+        out += ", i32 " + to_string(offset);
+        buff.emit(out);
+        out = reg_result + " = load i32, i32* " + reg_stack_offset;
+        buff.emit(out);
     }
 
     return make_shared<RegisterType>(reg_result, type);

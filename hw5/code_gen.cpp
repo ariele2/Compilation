@@ -436,13 +436,7 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
     buff.emit(emit_string);
 
     stack_register = GenerateReg();
-    string to_emit = stack_register;
-    to_emit = to_emit + " = ";
-    to_emit = to_emit + "alloca";
-    to_emit = to_emit + " i32, ";
-    to_emit = to_emit + "i32 ";
-    to_emit = to_emit + to_string(STACK_SIZE);
-    buff.emit(to_emit);
+    buff.emit(stack_register + " = alloca i32, i32 " + to_string(STACK_SIZE));
 }
 
 void Generator::addStoreReg(int offset, const name_of_register &reg_to_store)
@@ -450,21 +444,12 @@ void Generator::addStoreReg(int offset, const name_of_register &reg_to_store)
     assert(!stack_register.empty());
     auto reg_pointer_to_stack = GenerateReg();
 
-    if (!(offset < 0))
+    if (offset >= 0)
     {
-        string to_emit = reg_pointer_to_stack;
-        string to_emit2 = "store";
-        to_emit = to_emit + " = getelementptr";
-        to_emit = to_emit + " i32, i32* ";
-        to_emit = to_emit + stack_register;
-        to_emit = to_emit + ", i32 ";
-        to_emit = to_emit + to_string(offset);
-        to_emit2 = to_emit2 + " i32 ";
-        to_emit2 = to_emit2 + reg_to_store;
-        to_emit2 = to_emit2 + ", i32* ";
-        to_emit2 = to_emit2 + reg_pointer_to_stack;
-        buff.emit(to_emit);
-        buff.emit(to_emit2);
+        buff.emit(reg_pointer_to_stack + " = getelementptr i32, i32* " + stack_register +
+                  ", i32 " + to_string(offset));
+
+        buff.emit("store i32 " + reg_to_store + ", i32* " + reg_pointer_to_stack);
     }
 }
 
@@ -472,35 +457,31 @@ RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
 {
     assert(!stack_register.empty());
     auto reg_result = GenerateReg();
-    string out;
 
-    if (!(offset < 0))
+    if (offset < 0)
     {
-        auto reg_stack_offset = GenerateReg();
-        out = reg_stack_offset + " = getelementptr i32, i32* ";
-        out += stack_register;
-        out += ", i32 " + to_string(offset);
-        string out2 = reg_result + " = load i32, i32* " + reg_stack_offset;
-        buff.emit(out);
-        buff.emit(out2);
-        return make_shared<RegisterType>(reg_result, type);
+        // negative offset - get func register and assign
+        auto reg_argument = "%" + to_string(-offset - 1);
+        buff.emit(reg_result + " = add i32 0, " + reg_argument);
     }
     else
     {
-        auto reg_argument = "%" + to_string(-offset - 1);
-        string out = reg_result;
-        out = out + " = add i32 0, ";
-        out = out + reg_argument;
+        auto reg_stack_offset = GenerateReg();
+        string out = reg_stack_offset + " = getelementptr i32, i32* ";
+        out += stack_register;
+        out += ", i32 " + to_string(offset);
         buff.emit(out);
-        return make_shared<RegisterType>(reg_result, type);
+        out = reg_result + " = load i32, i32* " + reg_stack_offset;
+        buff.emit(out);
     }
+
+    return make_shared<RegisterType>(reg_result, type);
 }
 
 BaseTypePtr Generator::regToBooleanExpression(string &reg_source)
 {
     auto reg_bitcast = GenerateReg();
-    // string to_emit1 = ;
-    // string to_emit2=2
+
     buff.emit(
         reg_bitcast + " = trunc i32 " + reg_source + " to i1");
 

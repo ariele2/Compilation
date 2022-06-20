@@ -249,9 +249,9 @@ Compiler::pStatTypeAssign( const BaseTypePtr &t, const BaseTypePtr &identificati
 
 StatementTypePtr Compiler::pAutoTypeAssignment(BaseTypePtr &t, BaseTypePtr &identification, BaseTypePtr &exp, int ln)
 {
-    std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
-    std::cout << "[DEBUG] type: " << t->generation_type << std::endl;
-    std::cout << "[DEBUG] exp: " << exp->generation_type << std::endl;
+    // std::cout << "[DEBUG] start parseAutoTypeAssignment" << std::endl;
+    // std::cout << "[DEBUG] type: " << t->generation_type << std::endl;
+    // std::cout << "[DEBUG] exp: " << exp->generation_type << std::endl;
     auto dyn_cast_id = std::dynamic_pointer_cast<StringType>(identification);
     if (validations.CheckFunction(exp->generation_type))
     {
@@ -265,11 +265,11 @@ StatementTypePtr Compiler::pAutoTypeAssignment(BaseTypePtr &t, BaseTypePtr &iden
     t->generation_type = exp->generation_type;
     BaseTypePtr dyn_cast_type = std::dynamic_pointer_cast<CType>(t);
     std::cout << dyn_cast_type << std::endl;
-    std::cout << "[DEBUG] id token : " << dyn_cast_id->token <<std::endl;
-    std::cout << "[DEBUG] found auto type!" <<std::endl;
-    std::cout << "[DEBUG] Casting to: " << exp->generation_type <<std::endl;
-    std::cout << "[DEBUG] dynamic_cast_type: " << dyn_cast_type->generation_type <<std::endl;
-    std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dyn_cast_id->generation_type <<std::endl;
+    // std::cout << "[DEBUG] id token : " << dyn_cast_id->token <<std::endl;
+    // std::cout << "[DEBUG] found auto type!" <<std::endl;
+    // std::cout << "[DEBUG] Casting to: " << exp->generation_type <<std::endl;
+    // std::cout << "[DEBUG] dynamic_cast_type: " << dyn_cast_type->generation_type <<std::endl;
+    // std::cout << "[DEBUG] dynamic_cast_id->general_type: " << dyn_cast_id->generation_type <<std::endl;
     if (!validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
         const auto sym = make_shared<SymbolType>(dynamic_pointer_cast<StringType>(identification)->token, 0, dynamic_pointer_cast<CType>(t)->generation_type);

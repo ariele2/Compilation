@@ -264,7 +264,7 @@ StatementTypePtr Compiler::pAutoTypeAssignment(BaseTypePtr &t, BaseTypePtr &iden
     }
     t->generation_type = exp->generation_type;
     BaseTypePtr dyn_cast_type = std::dynamic_pointer_cast<CType>(t);
-    std::cout << dyn_cast_type << std::endl;
+    // std::cout << dyn_cast_type << std::endl;
     // std::cout << "[DEBUG] id token : " << dyn_cast_id->token <<std::endl;
     // std::cout << "[DEBUG] found auto type!" <<std::endl;
     // std::cout << "[DEBUG] Casting to: " << exp->generation_type <<std::endl;

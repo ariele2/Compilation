@@ -410,7 +410,7 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
             emit_string = emit_string + symbol->name;
             emit_string = emit_string + "(";
         }
-        if (!(count > 0))
+        if (!(count <= 0))
         {
             emit_string += "i32";
            

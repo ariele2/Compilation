@@ -14,15 +14,15 @@ Generator::Generator(Validations &semantic_ref) : num_of_regs(0), buff(), valida
 name_of_register Generator::GenerateReg()
 {
 
-    name_of_register returned_value;
-    return (returned_value + "%r" + to_string(num_of_regs++));
+    name_of_register ret;
+    return (ret + "%r" + to_string(num_of_regs++));
 }
 
 name_of_register Generator::GenerateGlobalReg()
 {
 
-    name_of_register returned_value;
-    return (returned_value + "@r" + to_string(num_of_regs++));
+    name_of_register ret;
+    return (ret + "@r" + to_string(num_of_regs++));
 }
 void Generator::emitPrintf()
 {
@@ -38,7 +38,7 @@ void Generator::emitPrint()
     buff.emitGlobal("define void @print(i8*) {");
     buff.emitGlobal("    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0");
     buff.emitGlobal("    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)");
-    buff.emitGlobal("    returned_value void");
+    buff.emitGlobal("    ret void");
     buff.emitGlobal("}");
 }
 
@@ -48,7 +48,7 @@ void Generator::emitPrinti()
     buff.emitGlobal("define void @printi(i32) {");
     buff.emitGlobal("    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0");
     buff.emitGlobal("    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)");
-    buff.emitGlobal("    returned_value void");
+    buff.emitGlobal("    ret void");
     buff.emitGlobal("}");
 }
 void Generator::emitErrorDivByZero()
@@ -67,17 +67,17 @@ void Generator::addGlobalFuncs()
 
 RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const BaseTypePtr &exp2)
 {
-    auto dynamic_cast_first_expression = findNoBoolExpStr(exp1);
-    auto dynamic_cast_second_expression = findNoBoolExpStr(exp2);
+    auto dynamic_cast_exp1 = findNoBoolExpStr(exp1);
+    auto dynamic_cast_exp2 = findNoBoolExpStr(exp2);
 
-    auto register_result = make_shared<RegisterType>(GenerateReg(), INT_TYPE);
+    auto reg_result = make_shared<RegisterType>(GenerateReg(), INT_TYPE);
 
     if (binop == "/")
     {
         addCheckDivZero(exp2);
     }
 
-    string binop_str = register_result->reg_name;
+    string binop_str = reg_result->reg_name;
     binop_str += " = ";
 
     if ('+' == binop[0])
@@ -97,18 +97,18 @@ RegisterTypePtr Generator::addBinop(const BaseTypePtr &exp1, string binop, const
         binop_str = binop_str + "sub ";
     }
 
-    buff.emit(binop_str + "i32 " + dynamic_cast_first_expression + ", " + dynamic_cast_second_expression);
+    buff.emit(binop_str + "i32 " + dynamic_cast_exp1 + ", " + dynamic_cast_exp2);
 
     if (!(validator_ref.CheckAndGetBinOpType(exp1->generation_type, exp2->generation_type) == BYTE_TYPE))
     {
-        return register_result;
+        return reg_result;
     }
     else
     {
-        auto reg_old_result = register_result->reg_name;
-        register_result->reg_name = GenerateReg();
-        register_result->generation_type = BYTE_TYPE;
-        string to_emit = register_result->reg_name;
+        auto reg_old_result = reg_result->reg_name;
+        reg_result->reg_name = GenerateReg();
+        reg_result->generation_type = BYTE_TYPE;
+        string to_emit = reg_result->reg_name;
         to_emit += " = and i32 ";
         to_emit += reg_old_result;
         to_emit += ", 255";
@@ -164,12 +164,12 @@ void Generator::addCheckDivZero(const BaseTypePtr &exp)
 
 RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func, const ExpListTypePtr &exp_list)
 {
-    auto register_result = make_shared<RegisterType>(GenerateReg(), func->ret_type);
+    auto reg_result = make_shared<RegisterType>(GenerateReg(), func->ret_type);
     string output_string_to_emit;
 
     if (func->ret_type != VOID_TYPE)
     {
-        output_string_to_emit += register_result->reg_name + " = ";
+        output_string_to_emit += reg_result->reg_name + " = ";
     }
 
     output_string_to_emit += "call ";
@@ -191,12 +191,12 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func, const ExpListT
         ++count;
     }
     buff.emit(output_string_to_emit + ")");
-    return register_result;
+    return reg_result;
 }
 
 RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func)
 {
-    auto register_result = make_shared<RegisterType>(GenerateReg(), func->ret_type);
+    auto reg_result = make_shared<RegisterType>(GenerateReg(), func->ret_type);
     string output_string_to_emit;
 
     if (func->ret_type == VOID_TYPE)
@@ -208,11 +208,11 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func)
         output_string_to_emit = output_string_to_emit + func->name;
         output_string_to_emit = output_string_to_emit + "()";
         buff.emit(output_string_to_emit);
-        return register_result;
+        return reg_result;
     }
     else
     {
-        output_string_to_emit = output_string_to_emit + register_result->reg_name + " = " + "call ";
+        output_string_to_emit = output_string_to_emit + reg_result->reg_name + " = " + "call ";
 
         string llvm_type = findTypeOfLLVM(func->ret_type);
         output_string_to_emit = output_string_to_emit + llvm_type;
@@ -220,7 +220,7 @@ RegisterTypePtr Generator::addCall(const FuncSymbolTypePtr &func)
         output_string_to_emit = output_string_to_emit + func->name;
         output_string_to_emit = output_string_to_emit + "()";
         buff.emit(output_string_to_emit);
-        return register_result;
+        return reg_result;
     }
 }
 
@@ -349,12 +349,12 @@ StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
 {
     auto symbol = validator_ref.table_ref.GetDefinedSymbol(id);
     auto statement = make_shared<StatementType>(br_list());
-    auto register_result = GenerateReg();
+    auto reg_result = GenerateReg();
 
     if (exp->generation_type != BOOL_TYPE)
     {
         auto exp_str = findNoBoolExpStr(exp);
-        string string_to_emit = register_result;
+        string string_to_emit = reg_result;
         string_to_emit += " = add i32 ";
         string_to_emit += exp_str;
         string_to_emit += ", 0";
@@ -362,13 +362,13 @@ StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
     }
     else
     {
-        addBoolExpToReg(exp, register_result);
+        addBoolExpToReg(exp, reg_result);
     }
-    addStoreReg(symbol->offset, register_result);
+    addStoreReg(symbol->offset, reg_result);
     return statement;
 }
 
-void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &register_result)
+void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result)
 {
 
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
@@ -386,7 +386,7 @@ void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &
     buff.bpatch(convert_true_list, convert_label);
     buff.bpatch(convert_false_list, convert_label);
 
-    buff.emit(register_result + " = phi i32 [1, %" + true_label + "], [0, %" + false_label + "]");
+    buff.emit(reg_result + " = phi i32 [1, %" + true_label + "], [0, %" + false_label + "]");
 }
 
 void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
@@ -452,12 +452,12 @@ void Generator::addStoreReg(int offset, const name_of_register &reg_to_store)
 RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
 {
     assert(!stack_register.empty());
-    auto register_result = GenerateReg();
+    auto reg_result = GenerateReg();
     string to_emit;
     if (offset < 0)
     {
         auto reg_argument = "%" + to_string(-offset - 1);
-        to_emit = register_result;
+        to_emit = reg_result;
         to_emit = to_emit + " = add";
         to_emit = to_emit + " i32 0, ";
         to_emit = to_emit + reg_argument;
@@ -471,13 +471,13 @@ RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
         string_to_emit += stack_register;
         string_to_emit += ", i32 " + to_string(offset);
         buff.emit(string_to_emit);
-        string_to_emit = register_result;
+        string_to_emit = reg_result;
         string_to_emit = string_to_emit + " = load i32, i32* ";
         string_to_emit = string_to_emit + reg_stack_offset;
         buff.emit(string_to_emit);
     }
 
-    return make_shared<RegisterType>(register_result, type);
+    return make_shared<RegisterType>(reg_result, type);
 }
 
 BaseTypePtr Generator::regToBooleanExpression(string &reg_source)
@@ -509,28 +509,28 @@ StatementTypePtr Generator::addStatCall()
 StatementTypePtr Generator::addStatRet()
 {
     std::shared_ptr<StatementType> statement = make_shared<StatementType>(br_list());
-    buff.emit("returned_value void");
+    buff.emit("ret void");
     return statement;
 }
 
 StatementTypePtr Generator::addStatRetExpression(const BaseTypePtr &exp)
 {
     auto statement = make_shared<StatementType>(br_list());
-    string register_result;
+    string reg_result;
 
     if (exp->generation_type != BOOL_TYPE)
     {
-        register_result = findNoBoolExpStr(exp);
+        reg_result = findNoBoolExpStr(exp);
     }
     else
     {
-        register_result = GenerateReg();
-        addBoolExpToReg(exp, register_result);
+        reg_result = GenerateReg();
+        addBoolExpToReg(exp, reg_result);
     }
-    string to_emit = "returned_value ";
+    string to_emit = "ret ";
     to_emit += findTypeOfLLVM(exp->generation_type);
     to_emit += " ";
-    to_emit += register_result;
+    to_emit += reg_result;
     buff.emit(to_emit);
     return statement;
 }
@@ -623,11 +623,11 @@ void Generator::addFuncDeclaration(const BaseTypePtr &statements, const BaseType
     auto curr_func_ret_type = validator_ref.table_ref.scope_stack.top()->return_type;
     if (curr_func_ret_type != VOID_TYPE)
     {
-        buff.emit("returned_value i32 0");
+        buff.emit("ret i32 0");
     }
     else
     {
-        buff.emit("returned_value void");
+        buff.emit("ret void");
     }
 
     buff.emit("}");
@@ -695,7 +695,7 @@ RegisterTypePtr Generator::addString(const BaseTypePtr &stype_string)
 {
     auto dynamic_cast_string = dynamic_pointer_cast<StringType>(stype_string);
     dynamic_cast_string->token = dynamic_cast_string->token.substr(1, dynamic_cast_string->token.size() - 2);
-    auto register_result = make_shared<RegisterType>(GenerateReg(), STRING_TYPE);
+    auto reg_result = make_shared<RegisterType>(GenerateReg(), STRING_TYPE);
     auto reg_global = GenerateGlobalReg();
     auto string_size_string = to_string(dynamic_cast_string->token.size() + 1);
 
@@ -704,13 +704,13 @@ RegisterTypePtr Generator::addString(const BaseTypePtr &stype_string)
     to_emit += dynamic_cast_string->token + "\\00\"";
     buff.emitGlobal(to_emit);
 
-    to_emit = register_result->reg_name + " = getelementptr [";
+    to_emit = reg_result->reg_name + " = getelementptr [";
     to_emit += string_size_string + " x i8], [";
     to_emit += string_size_string + " x i8]* ";
     to_emit += reg_global + ", i32 0, i32 0";
     buff.emit(to_emit);
 
-    return register_result;
+    return reg_result;
 }
 
 BaseTypePtr Generator::addIdentification(const SymbolTypePtr &symbol)

@@ -453,12 +453,16 @@ RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
 {
     assert(!stack_register.empty());
     auto reg_result = GenerateReg();
-
+    string to_emit;
     if (offset < 0)
     {
-       
         auto reg_argument = "%" + to_string(-offset - 1);
-        buff.emit(reg_result + " = add i32 0, " + reg_argument);
+        to_emit = reg_result;
+        to_emit = to_emit + " = add";
+        to_emit = to_emit + " i32 0, ";
+        to_emit = to_emit + reg_argument;
+
+        buff.emit(to_emit);
     }
     else
     {
@@ -467,7 +471,9 @@ RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
         out += stack_register;
         out += ", i32 " + to_string(offset);
         buff.emit(out);
-        out = reg_result + " = load i32, i32* " + reg_stack_offset;
+        out = reg_result;
+        out = out + " = load i32, i32* ";
+        out = out + reg_stack_offset;
         buff.emit(out);
     }
 
@@ -477,11 +483,18 @@ RegisterTypePtr Generator::addLoadReg(int offset, Ty type)
 BaseTypePtr Generator::regToBooleanExpression(string &reg_source)
 {
     auto reg_bitcast = GenerateReg();
-
-    buff.emit(
-        reg_bitcast + " = trunc i32 " + reg_source + " to i1");
-
-    auto branch_addr = buff.emit("br i1 " + reg_bitcast + ", label @, label @");
+    string to_emit1 = reg_bitcast;
+    string to_emit2;
+    to_emit1 += " = trunc i32 ";
+    to_emit1 += reg_source;
+    to_emit1 += " to i1";
+    
+    to_emit2 = "br i1 ";
+    to_emit2 = to_emit2 + reg_bitcast;
+    to_emit2 = to_emit2 + ", label @, label @";
+    
+    buff.emit(to_emit1);
+    auto branch_addr = buff.emit(to_emit2);
 
     return make_shared<BoolExpType>(Buff::makelist({branch_addr, FIRST}),
                                     Buff::makelist({branch_addr, SECOND}));
@@ -489,13 +502,13 @@ BaseTypePtr Generator::regToBooleanExpression(string &reg_source)
 
 StatementTypePtr Generator::addStatCall()
 {
-    auto statement = make_shared<StatementType>(br_list());
-    return statement;
+   
+    return make_shared<StatementType>(br_list());
 }
 
 StatementTypePtr Generator::addStatRet()
 {
-    auto statement = make_shared<StatementType>(br_list());
+    std::shared_ptr<StatementType> statement = make_shared<StatementType>(br_list());
     buff.emit("ret void");
     return statement;
 }
@@ -505,17 +518,21 @@ StatementTypePtr Generator::addStatRetExpression(const BaseTypePtr &exp)
     auto statement = make_shared<StatementType>(br_list());
     string reg_result;
 
-    if (exp->generation_type == BOOL_TYPE)
+    if (exp->generation_type != BOOL_TYPE)
     {
-        reg_result = GenerateReg();
-        addBoolExpToReg(exp, reg_result);
+       reg_result = findNoBoolExpStr(exp);
     }
     else
     {
-        reg_result = findNoBoolExpStr(exp);
+         reg_result = GenerateReg();
+        addBoolExpToReg(exp, reg_result);
+        
     }
-
-    buff.emit("ret " + findTypeOfLLVM(exp->generation_type) + " " + reg_result);
+    string to_emit = "ret ";
+    to_emit+=findTypeOfLLVM(exp->generation_type);
+    to_emit +=" ";
+    to_emit += reg_result;
+    buff.emit(to_emit);
     return statement;
 }
 
@@ -528,7 +545,7 @@ Generator::addStatIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const 
     auto dynamic_cast_if_label = dynamic_pointer_cast<StringType>(if_label);
     auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
 
-    // bpatch true
+    
     buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
 
     // merge false and next
@@ -682,12 +699,16 @@ RegisterTypePtr Generator::addString(const BaseTypePtr &stype_string)
     auto reg_global = GenerateGlobalReg();
     auto string_size_string = to_string(dynamic_cast_string->token.size() + 1);
 
-    buff.emitGlobal(
-        reg_global + " = constant [" + string_size_string +
-        " x i8] c\"" + dynamic_cast_string->token + "\\00\"");
+    string to_emit = reg_global + " = constant [";
+    to_emit += string_size_string + " x i8] c\"";
+    to_emit += dynamic_cast_string->token + "\\00\"";
+    buff.emitGlobal(to_emit);
 
-    buff.emit(reg_result->reg_name + " = getelementptr [" + string_size_string +
-              " x i8], [" + string_size_string + " x i8]* " + reg_global + ", i32 0, i32 0");
+    to_emit = reg_result->reg_name + " = getelementptr [";
+    to_emit += string_size_string + " x i8], [";
+    to_emit += string_size_string + " x i8]* ";
+    to_emit += reg_global + ", i32 0, i32 0";
+    buff.emit(to_emit);
 
     return reg_result;
 }
@@ -698,14 +719,12 @@ BaseTypePtr Generator::addIdentification(const SymbolTypePtr &symbol)
 
     if (dynamic_cast_symbol->generation_type == FUNCTION_TYPE)
     {
-
         return dynamic_cast_symbol;
     }
 
     auto exp_reg = addLoadReg(dynamic_cast_symbol->offset, dynamic_cast_symbol->generation_type);
     if (exp_reg->generation_type == BOOL_TYPE)
     {
-
         return regToBooleanExpression(exp_reg->reg_name);
     }
 
@@ -714,35 +733,34 @@ BaseTypePtr Generator::addIdentification(const SymbolTypePtr &symbol)
 
 StatementTypePtr Generator::addBranchNext()
 {
-
-    auto fake_statement = make_shared<StatementType>(
-        Buff::makelist({buff.emit("br label @  ; end of statement"), FIRST}));
+    string empty_statement_str = "br label @  ; end of statement";
+    auto fake_statement = make_shared<StatementType>(Buff::makelist({buff.emit(empty_statement_str), FIRST}));
     return fake_statement;
 }
 
 StatementTypePtr Generator::addBWhileHead()
 {
-    auto fake_statement = make_shared<StatementType>(
-        Buff::makelist({buff.emit("br label @  ; start/end of while"), FIRST}));
+    string empty_statement_str = "br label @  ; start/end of while";
+    auto fake_statement = make_shared<StatementType>(Buff::makelist({buff.emit(empty_statement_str), FIRST}));
     return fake_statement;
 }
 
 StatementTypePtr Generator::addPBIfNext()
 {
-    auto fake_statement = make_shared<StatementType>(
-        Buff::makelist({buff.emit("br label @  ; end of if"), FIRST}));
-    return fake_statement;
+    string empty_statement_str = "br label @  ; end of if";
+    auto empty_statement = make_shared<StatementType>(Buff::makelist({buff.emit(empty_statement_str), FIRST}));
+    return empty_statement;
 }
 
 BaseTypePtr Generator::addCallExpression(BaseTypePtr call_exp)
 {
     auto dynamic_cast_call_exp = dynamic_pointer_cast<RegisterType>(call_exp);
-    if (call_exp->generation_type == BOOL_TYPE)
+    if (call_exp->generation_type != BOOL_TYPE)
     {
-        return regToBooleanExpression(dynamic_cast_call_exp->reg_name);
+        return call_exp;
     }
     else
     {
-        return call_exp;
+        return regToBooleanExpression(dynamic_cast_call_exp->reg_name);
     }
 }

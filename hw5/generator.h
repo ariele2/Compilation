@@ -18,7 +18,7 @@ public:
     int num_of_regs;
     Validations validator_ref;
 
-    StatementTypePtr addStatIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+    StatementTypePtr addStatIf(const BaseTypePtr &expression, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                                const BaseTypePtr &if_list_as_statement);
     BoolExpTypePtr addTrue();
 
@@ -30,7 +30,7 @@ public:
 
     static BoolExpTypePtr addNot(const BaseTypePtr &bool_exp);
 
-    StatementTypePtr addStatIfAndElse(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
+    StatementTypePtr addStatIfAndElse(const BaseTypePtr &expression, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                                       BaseTypePtr if_list_as_statement,
                                       const BaseTypePtr &else_label, const BaseTypePtr &else_statement);
 
@@ -40,9 +40,9 @@ public:
 
     void emitPrintf();
 
-    StatementTypePtr addStatAssign(string id, const BaseTypePtr &exp);
+    StatementTypePtr addStatAssign(string id, const BaseTypePtr &expression);
 
-    StatementTypePtr addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &exp,
+    StatementTypePtr addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &while_head_label, const BaseTypePtr &expression,
                                   const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
                                   const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list);
 
@@ -60,7 +60,7 @@ public:
 
     StatementTypePtr addStatRet();
 
-    StatementTypePtr addStatRetExpression(const BaseTypePtr &exp);
+    StatementTypePtr addStatRetExpression(const BaseTypePtr &expression);
 
     void addFunctionHead(const FuncSymbolTypePtr &symbol);
 
@@ -83,12 +83,12 @@ public:
 
     void addProg();
 
-    string findNoBoolExpStr(const BaseTypePtr &exp);
+    string findNoBoolExpStr(const BaseTypePtr &expression);
 
     BaseTypePtr addCallExpression(BaseTypePtr call_exp);
 
     RegisterTypePtr addBinop(const BaseTypePtr &exp1, string binop, const BaseTypePtr &exp2);
-    void addCheckDivZero(const BaseTypePtr &exp);
+    void addCheckDivZero(const BaseTypePtr &expression);
 
     static string findTypeOfLLVM(const Ty &type);
     StatementTypePtr addBranchNext();
@@ -99,7 +99,7 @@ public:
 
     StatementTypePtr addPBIfNext();
 
-    void addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result);
+    void addBoolExpToReg(const BaseTypePtr &expression, const name_of_register &reg_result);
 
     BaseTypePtr regToBooleanExpression(string &reg_source);
 };

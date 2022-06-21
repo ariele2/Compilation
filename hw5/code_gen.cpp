@@ -663,9 +663,11 @@ BoolExpTypePtr Generator::addNot(const BaseTypePtr &bool_exp)
 
 BoolExpTypePtr Generator::addAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr &and_label, const BaseTypePtr &bool_exp2)
 {
-    auto dynamic_cast_bool_exp1 = dynamic_pointer_cast<BoolExpType>(bool_exp1);
-    auto dynamic_cast_and_label = dynamic_pointer_cast<StringType>(and_label);
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
+    auto dynamic_cast_and_label = dynamic_pointer_cast<StringType>(and_label);
+    auto dynamic_cast_bool_exp1 = dynamic_pointer_cast<BoolExpType>(bool_exp1);
+   
+    
 
     buff.bpatch(dynamic_cast_bool_exp1->true_list, dynamic_cast_and_label->token);
 
@@ -676,9 +678,11 @@ BoolExpTypePtr Generator::addAnd(const BaseTypePtr &bool_exp1, const BaseTypePtr
 
 BoolExpTypePtr Generator::addOr(const BaseTypePtr &bool_exp1, const BaseTypePtr &or_label, const BaseTypePtr &bool_exp2)
 {
-    auto dynamic_cast_bool_exp1 = dynamic_pointer_cast<BoolExpType>(bool_exp1);
-    auto dynamic_cast_or_label = dynamic_pointer_cast<StringType>(or_label);
     auto dynamic_cast_bool_exp2 = dynamic_pointer_cast<BoolExpType>(bool_exp2);
+     auto dynamic_cast_or_label = dynamic_pointer_cast<StringType>(or_label);
+    auto dynamic_cast_bool_exp1 = dynamic_pointer_cast<BoolExpType>(bool_exp1);
+   
+    
 
     buff.bpatch(dynamic_cast_bool_exp1->false_list, dynamic_cast_or_label->token);
 

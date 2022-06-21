@@ -2,9 +2,43 @@
 
 #include <utility>
 
+Scope::Scope(ScopeType scope_type, int offset, Ty ret_type, bool inside_while, bool inside_switch,
+             string while_continue_label, br_list_pointer break_list) :
+        scope_type(scope_type), offset(offset), return_type(ret_type),
+        inside_while(inside_while), inside_switch(inside_switch),
+        while_continue_label(move(while_continue_label)), break_list(move(break_list)) {
+
+}
+
+void SymbolTable::AddVariable(const SymbolTypePtr &symbol) {
+  
+    assert(!scope_stack.empty());
+    current_offset+= 4;
+    symbol->offset = current_offset;
+    scope_stack.top()->symbols.push_back(symbol);
+    symbols_map.emplace(symbol->name, symbol);
+}
+
+void SymbolTable::AddFunction(const FuncSymbolTypePtr &symbol) {
+    assert(!scope_stack.empty());
+
+  
+    symbol->offset = 0;
+    auto curr_param_offset = 0;
+    for (auto &param:symbol->params) {
+        param.offset = --curr_param_offset;
+    }
+
+    scope_stack.top()->symbols.push_back(symbol);
+    symbols_map.emplace(symbol->name, symbol);
+}
+
+bool SymbolTable::IsSymbolDefined(string &symbol_name) {
+    return (symbols_map.find(symbol_name) != symbols_map.end());
+}
 
 void SymbolTable::PushDefaultFunctions() {
-    // push print
+  
     string message_name = "message";
     SymbolType print_param_symbol(message_name, -1, STRING_TYPE);
 
@@ -14,7 +48,7 @@ void SymbolTable::PushDefaultFunctions() {
     auto print_func = make_shared<FuncSymType>(print_name, VOID_TYPE, print_args);
     AddFunction(print_func);
 
-    // push printi
+    
     string number_name = "number";
     SymbolType printi_param_symbol(number_name, -1, INT_TYPE);
 
@@ -26,14 +60,14 @@ void SymbolTable::PushDefaultFunctions() {
 }
 
 void SymbolTable::PushScope(ScopeType scope_type) {
-    // copy everything from top scope, unless global. the calling functions handle other stuff
+
     Ty ret_type;
     bool inside_while, inside_switch;
     string while_continue_label;
     br_list_pointer break_list;
 
     if (scope_type == GLOBAL_SCOPE) {
-        // labels and lists are empty, no need to init
+      
         ret_type = ERROR_TYPE;
         inside_while = false;
         inside_switch = false;
@@ -50,6 +84,16 @@ void SymbolTable::PushScope(ScopeType scope_type) {
                                         while_continue_label, break_list));
 }
 
+void SymbolTable::AddParam(const SymbolTypePtr &symbol) {
+    assert(!scope_stack.empty());
+    scope_stack.top()->symbols.push_back(symbol);
+    symbols_map.emplace(symbol->name, symbol);
+}
+
+SymbolTypePtr SymbolTable::GetDefinedSymbol(string &symbol_name) {
+    return symbols_map[symbol_name];
+}
+
 void SymbolTable::PushFunctionScope(Ty ret_type) {
     PushScope(FUNCTION_SCOPE);
     scope_stack.top()->return_type = ret_type;
@@ -61,7 +105,7 @@ void SymbolTable::PopScope() {
         endScope();
     }
 
-    // in global scope - functions only; in non-global scope - variables only
+
     if (scope_stack.top()->scope_type == GLOBAL_SCOPE) {
         for (const auto &func_symbol:scope_stack.top()->symbols) {
             assert(func_symbol->generation_type == FUNCTION_TYPE);
@@ -97,49 +141,4 @@ SymbolTable::SymbolTable() : current_offset(0), symbols_map(), scope_stack() {
 
 }
 
-void SymbolTable::AddParam(const SymbolTypePtr &symbol) {
-    assert(!scope_stack.empty());
-    scope_stack.top()->symbols.push_back(symbol);
-    symbols_map.emplace(symbol->name, symbol);
-}
 
-void SymbolTable::AddVariable(const SymbolTypePtr &symbol) {
-    // add params only after adding the function
-    assert(!scope_stack.empty());
-    current_offset+= 4;
-    symbol->offset = current_offset;
-    scope_stack.top()->symbols.push_back(symbol);
-    symbols_map.emplace(symbol->name, symbol);
-}
-
-void SymbolTable::AddFunction(const FuncSymbolTypePtr &symbol) {
-    assert(!scope_stack.empty());
-
-    // set offsets
-    symbol->offset = 0;
-    auto curr_param_offset = 0;
-    for (auto &param:symbol->params) {
-        param.offset = --curr_param_offset;
-    }
-
-    scope_stack.top()->symbols.push_back(symbol);
-    symbols_map.emplace(symbol->name, symbol);
-}
-
-bool SymbolTable::IsSymbolDefined(string &symbol_name) {
-    return (symbols_map.find(symbol_name) != symbols_map.end());
-}
-
-SymbolTypePtr SymbolTable::GetDefinedSymbol(string &symbol_name) {
-    return symbols_map[symbol_name];
-}
-
-
-// the labels are initialized empty
-Scope::Scope(ScopeType scope_type, int offset, Ty ret_type, bool inside_while, bool inside_switch,
-             string while_continue_label, br_list_pointer break_list) :
-        scope_type(scope_type), offset(offset), return_type(ret_type),
-        inside_while(inside_while), inside_switch(inside_switch),
-        while_continue_label(move(while_continue_label)), break_list(move(break_list)) {
-
-}

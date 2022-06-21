@@ -9,22 +9,22 @@ namespace output{
     void endScope();
     void printID(const string& id, int offset, const string& type);
 
-    /* Do not save the string returned from this function in a data structure
-        as it is not dynamically allocated and will be destroyed(!) at the end of the calling scope.
-    */
+    void errorUndefFunc(int ln, const string& id);
+    void errorLex(int ln);
+    void errorSyn(int ln);
     string makeFunctionType(const string& retType, vector<string>& argTypes);
-
-    void errorLex(int lineno);
-    void errorSyn(int lineno);
-    void errorUndef(int lineno, const string& id);
-    void errorDef(int lineno, const string& id);
-    void errorUndefFunc(int lineno, const string& id);
-    void errorMismatch(int lineno);
-    void errorPrototypeMismatch(int lineno, const string& id, vector<string>& argTypes);
-    void errorUnexpectedBreak(int lineno);
-    void errorUnexpectedContinue(int lineno);
+    void errorMismatch(int ln);
+    void errorPrototypeMismatch(int ln, const string& id, vector<string>& argTypes);
+    void errorUnexpectedBreak(int ln);
+    
+    void errorUndef(int ln, const string& id);
+    void errorDef(int ln, const string& id);
+    
+    void errorUnexpectedContinue(int ln);
     void errorMainMissing();
-    void errorByteTooLarge(int lineno, const string& value);
+    void errorByteTooLarge(int ln, const string& value);
+    
+    
 }
 
 #endif

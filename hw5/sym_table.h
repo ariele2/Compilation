@@ -6,7 +6,8 @@
 
 using namespace output;
 
-enum ScopeType {
+enum ScopeType
+{
     STATEMENT_SCOPE,
     FUNCTION_SCOPE,
     WHILE_SCOPE,
@@ -14,48 +15,40 @@ enum ScopeType {
     GLOBAL_SCOPE
 };
 
-class Scope {
+class Scope
+{
 public:
-    ScopeType scope_type;
-    int offset;
-    vector<SymbolTypePtr> symbols;
     Ty return_type;
-    bool inside_while;
-    bool inside_switch;
     string while_continue_label;
     br_list_pointer break_list;
+    ScopeType scope_type;
+    bool inside_while;
+
+    int offset;
+    vector<SymbolTypePtr> symbols;
+
+    bool inside_switch;
 
     Scope(ScopeType scope_type, int offset, Ty ret_type, bool inside_while, bool inside_switch,
           string while_continue_label, br_list_pointer break_list);
 };
 
-class SymbolTable {
+class SymbolTable
+{
 public:
     int current_offset;
     unordered_map<string, SymbolTypePtr> symbols_map;
     stack<ScopePointer> scope_stack;
-
-    void PushDefaultFunctions();
-
+    void AddVariable(const SymbolTypePtr &symbol);
     void PushScope(ScopeType scope_type);
-
+    void AddFunction(const FuncSymbolTypePtr &symbol);
+    void AddParam(const SymbolTypePtr &symbol);
+    SymbolTypePtr GetDefinedSymbol(string &symbol_name);
     void PushFunctionScope(Ty ret_type);
-
     void PopScope();
-
-    SymbolTable();
-
-    void AddParam(const SymbolTypePtr& symbol);
-
-    void AddVariable(const SymbolTypePtr& symbol);
-
-    void AddFunction(const FuncSymbolTypePtr & symbol);
-
     bool IsSymbolDefined(string &symbol_name);
-
-    SymbolTypePtr GetDefinedSymbol(string& symbol_name);
-
+    SymbolTable();
+    void PushDefaultFunctions();
 };
-
 
 #endif // SYM_TABLE_H

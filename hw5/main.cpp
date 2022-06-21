@@ -9,6 +9,6 @@ int main(){
 
     yyparse();
 
-    // moved parse program here because syntax error happens after the reduce
+  
     Compiler::instance().pProgram(yylineno);
 }

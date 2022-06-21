@@ -80,9 +80,7 @@ void Compiler::pProgram(int ln)
     }
 }
 
-void Compiler::pFuncs(int ln)
-{
-}
+void Compiler::pFuncs(int ln) {}
 
 void Compiler::pFuncHead( const BaseTypePtr &type_returned, const BaseTypePtr &identification, const BaseTypePtr &list_of_formals, int ln)
 {
@@ -106,7 +104,6 @@ void Compiler::pFuncHead( const BaseTypePtr &type_returned, const BaseTypePtr &i
                 handleErrorDef(ln, param_symbol->name);
             }
         }
-
         code_genreation.addFunctionHead(func_sym);
     }
     else
@@ -410,8 +407,37 @@ StatementTypePtr Compiler::pStatContinue(int ln)
     }
 }
 
-BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, const BaseTypePtr &exp_list, int ln)
+RegisterTypePtr Compiler::pBinop( const BaseTypePtr &first_expression, BaseTypePtr &binop, const BaseTypePtr &second_expression, int ln)
 {
+    if (!validations.CheckFunction(first_expression->generation_type))
+    {
+        if (!validations.CheckFunction(second_expression->generation_type))
+        {
+            if (validations.CheckAndGetBinOpType(first_expression->generation_type, second_expression->generation_type) == ERROR_TYPE)
+            {
+                handleErrorMismatch(ln);
+            }
+
+            return code_genreation.addBinop(first_expression, dynamic_pointer_cast<StringType>(binop)->token, second_expression);
+        }
+        else
+        {
+
+            handleErrorUndef(ln, dynamic_pointer_cast<FuncSymType>(second_expression)->name);
+        }
+    }
+    else
+    {
+
+        handleErrorUndef(ln, dynamic_pointer_cast<FuncSymType>(first_expression)->name);
+    }
+}
+
+RegisterTypePtr Compiler::pString( const BaseTypePtr &stype_string, int ln) {
+    return code_genreation.addString(stype_string);
+}
+
+BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, const BaseTypePtr &exp_list, int ln) {
 
     if (validations.CheckSymDefined(dynamic_pointer_cast<StringType>(identification)->token))
     {
@@ -447,13 +473,11 @@ BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, const BaseTypePt
     }
 }
 
-BaseTypePtr Compiler::pAuto(int ln)
-{
+BaseTypePtr Compiler::pAuto(int ln) {
     return std::make_shared<CType>(AUTO_TYPE);
 }
 
-BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, int ln)
-{
+BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, int ln) {
     auto dynamic_cast_id = dynamic_pointer_cast<StringType>(identification);
 
     if (validations.CheckSymDefined(dynamic_cast_id->token))
@@ -488,27 +512,59 @@ BaseTypePtr Compiler::pCall( const BaseTypePtr &identification, int ln)
     }
 }
 
-
-BaseTypePtr Compiler::pExplist( const BaseTypePtr &expression, int ln)
+BaseTypePtr Compiler::pParen( BaseTypePtr expression, int ln)
 {
+    return expression;
+}
+
+BaseTypePtr Compiler::pExplist(const BaseTypePtr &expression, int ln) {
     ExpListTypePtr exp_list_pointer = make_shared<TExpList>();
 
     exp_list_pointer->exp_list.insert(exp_list_pointer->exp_list.begin(), expression);
     return exp_list_pointer;
 }
 
-BaseTypePtr Compiler::pExplist( const BaseTypePtr &expression, const BaseTypePtr &exp_list, int ln)
-{
+BaseTypePtr Compiler::pExplist(const BaseTypePtr &expression, const BaseTypePtr &exp_list, int ln) {
     ExpListTypePtr dynamic_cast_exp_list = dynamic_pointer_cast<TExpList>(exp_list);
 
     dynamic_cast_exp_list->exp_list.insert(dynamic_cast_exp_list->exp_list.begin(), expression);
     return dynamic_cast_exp_list;
 }
 
+BaseTypePtr Compiler::pID( const BaseTypePtr &identification, int ln) {
+
+    if (sym_tab.IsSymbolDefined(dynamic_pointer_cast<StringType>(identification)->token)) {
+
+        return code_genreation.addIdentification(sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->token));
+    }
+    else {
+        handleErrorUndef(ln, dynamic_pointer_cast<StringType>(identification)->token);
+    }
+}
+
+BaseTypePtr Compiler::pCallExp( BaseTypePtr call_exp, int ln)
+{
+    return code_genreation.addCallExpression(move(call_exp));
+}
+
 CTypePtr Compiler::pInt(int ln)
 {
     auto val = make_shared<CType>(INT_TYPE);
     return val;
+}
+
+BaseTypePtr Compiler::pNumB(BaseTypePtr num, int ln)
+{
+
+    if (validations.CheckOFByte(dynamic_pointer_cast<NumberType>(num)->token))
+    {
+        num->generation_type = BYTE_TYPE;
+        return num;
+    }
+    else
+    {
+        handleErrorByteTooLarge(ln, to_string(dynamic_pointer_cast<NumberType>(num)->token));
+    }
 }
 
 CTypePtr Compiler::pByte(int ln)
@@ -524,87 +580,17 @@ CTypePtr Compiler::pBool(int ln)
     return val;
 }
 
-BaseTypePtr Compiler::pParen( BaseTypePtr expression, int ln)
-{
-    return expression;
-}
-
-RegisterTypePtr Compiler::pBinop( const BaseTypePtr &first_expression, BaseTypePtr &binop, const BaseTypePtr &second_expression, int ln)
-{
-    if (!validations.CheckFunction(first_expression->generation_type))
-    {
-        if (!validations.CheckFunction(second_expression->generation_type))
-        {
-            if (validations.CheckAndGetBinOpType(first_expression->generation_type, second_expression->generation_type) == ERROR_TYPE)
-            {
-                handleErrorMismatch(ln);
-            }
-
-            return code_genreation.addBinop(first_expression, dynamic_pointer_cast<StringType>(binop)->token, second_expression);
-        }
-        else
-        {
-
-            handleErrorUndef(ln, dynamic_pointer_cast<FuncSymType>(second_expression)->name);
-        }
-    }
-    else
-    {
-
-        handleErrorUndef(ln, dynamic_pointer_cast<FuncSymType>(first_expression)->name);
-    }
-}
-
-BaseTypePtr Compiler::pID( const BaseTypePtr &identification, int ln)
-{
-
-    if (sym_tab.IsSymbolDefined(dynamic_pointer_cast<StringType>(identification)->token))
-    {
-
-        return code_genreation.addIdentification(sym_tab.GetDefinedSymbol(dynamic_pointer_cast<StringType>(identification)->token));
-    }
-    else
-    {
-        handleErrorUndef(ln, dynamic_pointer_cast<StringType>(identification)->token);
-    }
-}
-// change
-BaseTypePtr Compiler::pCallExp( BaseTypePtr call_exp, int ln)
-{
-    return code_genreation.addCallExpression(move(call_exp));
-}
-
-NumberTypePtr Compiler::pNum( const BaseTypePtr &num, int ln)
+NumberTypePtr Compiler::pNum(const BaseTypePtr &num, int ln)
 {
 
     return dynamic_pointer_cast<NumberType>(num);
 }
 
-BaseTypePtr Compiler::pNumB( BaseTypePtr num, int ln)
-{
-
-    if (validations.CheckOFByte(dynamic_pointer_cast<NumberType>(num)->token))
-    {
-        num->generation_type = BYTE_TYPE;
-        return num;
-    }
-    else
-    {
-        handleErrorByteTooLarge(ln, to_string(dynamic_pointer_cast<NumberType>(num)->token));
-    }
-}
-
-// change here
-RegisterTypePtr Compiler::pString( const BaseTypePtr &stype_string, int ln)
-{
-    return code_genreation.addString(stype_string);
-}
-// also
 BoolExpTypePtr Compiler::pTrue(int ln)
 {
     return code_genreation.addTrue();
 }
-// also
+
 BoolExpTypePtr Compiler::pFalse(int ln)
 {
     return code_genreation.addFalse();
@@ -631,9 +617,8 @@ BoolExpTypePtr Compiler::pNot(const BaseTypePtr &boolean_expression, int ln)
     }
 }
 
-BoolExpTypePtr
-Compiler::pAnd( const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_and, const BaseTypePtr &second_boolean_exppression, int ln)
-{
+BoolExpTypePtr Compiler::pAnd(const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_and, 
+                              const BaseTypePtr &second_boolean_exppression, int ln) {
     if (!validations.CheckFunction(first_boolean_exppression->generation_type))
     {
         if (validations.CheckFunction(second_boolean_exppression->generation_type))
@@ -665,9 +650,34 @@ Compiler::pAnd( const BaseTypePtr &first_boolean_exppression, const BaseTypePtr 
     }
 }
 
-BoolExpTypePtr
-Compiler::pOr( const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_or, const BaseTypePtr &second_boolean_exppression, int ln)
+BoolExpTypePtr Compiler::pRelOp(const BaseTypePtr &first_expression, BaseTypePtr &relop, const BaseTypePtr &second_expression, int ln)
 {
+    if (!validations.CheckFunction(first_expression->generation_type))
+    {
+        if (validations.CheckFunction(second_expression->generation_type))
+        {
+            auto func_cast = dynamic_pointer_cast<FuncSymType>(second_expression);
+            handleErrorUndef(ln, func_cast->name);
+        }
+
+        if (validations.CheckRelop(first_expression->generation_type, second_expression->generation_type))
+        {
+            return code_genreation.addRelOp(first_expression, relop, second_expression);
+        }
+        else
+        {
+            handleErrorMismatch(ln);
+        }
+    }
+    else
+    {
+        auto func_cast = dynamic_pointer_cast<FuncSymType>(first_expression);
+        handleErrorUndef(ln, func_cast->name);
+    }
+}
+
+BoolExpTypePtr Compiler::pOr(const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &label_of_or, 
+                             const BaseTypePtr &second_boolean_exppression, int ln) {
     if (!validations.CheckFunction(first_boolean_exppression->generation_type))
     {
 
@@ -702,39 +712,12 @@ Compiler::pOr( const BaseTypePtr &first_boolean_exppression, const BaseTypePtr &
     }
 }
 
-BoolExpTypePtr Compiler::pRelOp( const BaseTypePtr &first_expression, BaseTypePtr &relop, const BaseTypePtr &second_expression, int ln)
-{
-    if (!validations.CheckFunction(first_expression->generation_type))
-    {
-        if (validations.CheckFunction(second_expression->generation_type))
-        {
-            auto func_cast = dynamic_pointer_cast<FuncSymType>(second_expression);
-            handleErrorUndef(ln, func_cast->name);
-        }
-
-        if (validations.CheckRelop(first_expression->generation_type, second_expression->generation_type))
-        {
-            return code_genreation.addRelOp(first_expression, relop, second_expression);
-        }
-        else
-        {
-            handleErrorMismatch(ln);
-        }
-    }
-    else
-    {
-        auto func_cast = dynamic_pointer_cast<FuncSymType>(first_expression);
-        handleErrorUndef(ln, func_cast->name);
-    }
-}
-
 void Compiler::pAddStatScope(int ln)
 {
     sym_tab.PushScope(STATEMENT_SCOPE);
 }
 
-void Compiler::pAddWhileScope( const BaseTypePtr &label_of_while_head, int ln)
-{
+void Compiler::pAddWhileScope(const BaseTypePtr &label_of_while_head, int ln) {
 
     auto break_list = make_shared<br_list>();
 
@@ -750,7 +733,7 @@ void Compiler::pRemoveScope(int ln)
     sym_tab.PopScope();
 }
 
-void Compiler::pCheckBool( const BaseTypePtr &boolean_expression, int ln)
+void Compiler::pCheckBool(const BaseTypePtr &boolean_expression, int ln)
 {
     if (validations.CheckFunction(boolean_expression->generation_type))
     {
@@ -764,6 +747,13 @@ void Compiler::pCheckBool( const BaseTypePtr &boolean_expression, int ln)
         handleErrorMismatch(ln);
        
     }
+}
+
+StringTypePtr Compiler::pGenerateWhileHeadL(int ln)
+{
+   
+    auto lable_of_name = code_genreation.buff.genLabel(GEN_WHILE_HEAD);
+    return make_shared<StringType>(lable_of_name);
 }
 
 StringTypePtr Compiler::pGenerateIfL(int ln)
@@ -784,17 +774,16 @@ StringTypePtr Compiler::pGenerateWhileBodyL(int ln)
     return make_shared<StringType>(lable_of_name);
 }
 
-StringTypePtr Compiler::pGenerateWhileHeadL(int ln)
-{
-   
-    auto lable_of_name = code_genreation.buff.genLabel(GEN_WHILE_HEAD);
-    return make_shared<StringType>(lable_of_name);
-}
-
 StringTypePtr Compiler::pGenerateAndL(int ln)
 {
     auto lable_of_name = code_genreation.buff.genLabel(GEN_AND);
     return make_shared<StringType>(lable_of_name);
+}
+
+StatementTypePtr Compiler::pBNext(int ln)
+{
+
+    return code_genreation.addBranchNext();
 }
 
 StringTypePtr Compiler::pGenerateOrL(int ln)
@@ -809,12 +798,6 @@ StringTypePtr Compiler::pGenerateNextL(int ln)
     return make_shared<StringType>(lable_of_name);
 }
 
-StatementTypePtr Compiler::pBNext(int ln)
-{
-
-    return code_genreation.addBranchNext();
-}
-
 StatementTypePtr Compiler::pBWhileH(int ln)
 {
     return code_genreation.addBWhileHead();
@@ -825,7 +808,7 @@ StatementTypePtr Compiler::pBIfNext(int ln)
     return code_genreation.addPBIfNext();
 }
 
-BaseTypePtr Compiler::pConvBool( BaseTypePtr expression, int ln)
+BaseTypePtr Compiler::pConvBool(BaseTypePtr expression, int ln)
 {
     if (expression->generation_type == BOOL_TYPE)
     {

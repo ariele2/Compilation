@@ -6,39 +6,23 @@ Validations::Validations(SymbolTable &table) : table_ref(table)
 {
 }
 
-bool Validations::CheckSymDefined(string &n)
+
+bool Validations::CheckGeneralType(Ty t, GeneralType gt)
 {
-    return table_ref.IsSymbolDefined(n);
+    return gt == t;
 }
 
-bool Validations::CheckMainIsDefined()
+bool Validations::CheckTypeType(Ty t1, Ty t)
 {
-    for (auto map_pair:table_ref.symbols_map) {
-        if (map_pair.second->generation_type == FUNCTION_TYPE) {
-            auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
-            if (dyn_cast_func->name == "main") {
-                if (dyn_cast_func->params.empty() && dyn_cast_func->ret_type == VOID_TYPE) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
-    return false;
+    return t1 == t;
 }
 
-bool Validations::CheckAssigned(Ty f, Ty s)
+
+bool Validations::CheckContinue()
 {
-    if (CheckTypeType(s, f) || (CheckGeneralType(s, BYTE_TYPE) && CheckGeneralType(f, INT_TYPE)))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return CheckBreak();
 }
+
 
 bool Validations::CheckCall(FuncSymbolTypePtr &func, ExpListTypePtr &exp_list)
 {
@@ -62,46 +46,6 @@ bool Validations::CheckReturn(Ty t)
     bool check_type = CheckAssigned(table_ref.scope_stack.top()->return_type, t);
     return check_type;
 }
-
-bool Validations::CheckFunction(Ty t)
-{
-    bool check_type = CheckGeneralType(t, FUNCTION_TYPE);
-    return check_type;
-}
-
-bool Validations::CheckVoid(Ty t)
-{
-    bool check_type = CheckGeneralType(t, VOID_TYPE);
-    return check_type;
-}
-
-bool Validations::CheckBool(Ty t)
-{
-    bool check_type = CheckGeneralType(t, BOOL_TYPE);
-    return check_type;
-}
-
-bool Validations::CheckGeneralType(Ty t, GeneralType gt)
-{
-    return gt == t;
-}
-
-bool Validations::CheckTypeType(Ty t1, Ty t)
-{
-    return t1 == t;
-}
-
-bool Validations::CheckBreak()
-{
-    bool is_in_while(table_ref.scope_stack.top()->inside_while);
-    return is_in_while;
-}
-
-bool Validations::CheckContinue()
-{
-    return CheckBreak();
-}
-
 bool Validations::CheckOFByte(int &num)
 {
     return (num <= UPPER && num >= LOWER);
@@ -125,6 +69,67 @@ Ty Validations::CheckAndGetBinOpType(Ty f, Ty s)
     }
     return INT_TYPE;
 }
+
+bool Validations::CheckFunction(Ty t)
+{
+    bool check_type = CheckGeneralType(t, FUNCTION_TYPE);
+    return check_type;
+}
+
+bool Validations::CheckSymDefined(string &n)
+{
+    return table_ref.IsSymbolDefined(n);
+}
+
+bool Validations::CheckVoid(Ty t)
+{
+    bool check_type = CheckGeneralType(t, VOID_TYPE);
+    return check_type;
+}
+
+bool Validations::CheckBool(Ty t)
+{
+    bool check_type = CheckGeneralType(t, BOOL_TYPE);
+    return check_type;
+}
+
+bool Validations::CheckMainIsDefined()
+{
+    for (auto map_pair:table_ref.symbols_map) {
+        if (map_pair.second->generation_type == FUNCTION_TYPE) {
+            auto dyn_cast_func = dynamic_pointer_cast<FuncSymType>(map_pair.second);
+            if (dyn_cast_func->name == "main") {
+                if (dyn_cast_func->params.empty() && dyn_cast_func->ret_type == VOID_TYPE) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+bool Validations::CheckAssigned(Ty f, Ty s)
+{
+    if (CheckTypeType(s, f) || (CheckGeneralType(s, BYTE_TYPE) && CheckGeneralType(f, INT_TYPE)))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+bool Validations::CheckBreak()
+{
+    bool is_in_while(table_ref.scope_stack.top()->inside_while);
+    return is_in_while;
+}
+
+
+
 
 bool Validations::CheckCast(Ty f, Ty s)
 {

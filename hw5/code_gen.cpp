@@ -288,34 +288,38 @@ BoolExpTypePtr Generator::addRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, 
 
     if (relop_str == "<")
     {
-        icmp_string += "slt";
+        icmp_string = icmp_string + "slt";
+    }
+     else if (relop_str == "==")
+    {
+        icmp_string = icmp_string + "eq";
     }
     else if (relop_str == "<=")
     {
-        icmp_string += "sle";
-    }
-    else if (relop_str == ">")
-    {
-        icmp_string += "sgt";
+        icmp_string = icmp_string + "sle";
     }
     else if (relop_str == ">=")
     {
-        icmp_string += "sge";
+        icmp_string = icmp_string + "sge";
+    }
+    else if (relop_str == ">")
+    {
+        icmp_string = icmp_string + "sgt";
     }
     else if (relop_str == "!=")
     {
-        icmp_string += "ne";
+       icmp_string = icmp_string + "ne";
     }
-    else if (relop_str == "==")
-    {
-        icmp_string += "eq";
-    }
+   
     else
     {
         assert(false);
     }
 
-    icmp_string += " i32 " + exp1_value + ", " + exp2_value;
+    icmp_string = icmp_string + " i32 ";
+    icmp_string = icmp_string  + exp1_value;
+    icmp_string = icmp_string + ", "; 
+    icmp_string = icmp_string + exp2_value;
     buff.emit(icmp_string);
     auto branch_addr = buff.emit("br i1 " + reg_icmp + ", label @, label @");
 
@@ -364,17 +368,13 @@ StatementTypePtr Generator::addStatAssign(string id, const BaseTypePtr &exp)
 
 void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &reg_result)
 {
-    //  #define TRUE_LABEL "_convert_true"
-//  #define BP_TRUE "br label @"
-//  #define  FALSE_LABEL "_convert_false"
-//  #define BP_FALSE "br label @"
-//  #define CONVERT_LABEL "_convert_final"
+   
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
     auto true_label = buff.genLabel(TRUE_LABEL);
+    auto false_label = buff.genLabel(FALSE_LABEL);
+    auto convert_label = buff.genLabel(CONVERT_LABEL);
     auto bp_true = buff.emit(BP_TRUE);
-    auto false_label = buff.genLabel("_convert_false");
-    auto bp_false = buff.emit("br label @");
-    auto convert_label = buff.genLabel("_convert_final");
+    auto bp_false = buff.emit(BP_FALSE);
 
     auto convert_true_list = Buff::makelist(branch_pair(bp_true, FIRST));
     auto convert_false_list = Buff::makelist(branch_pair(bp_false, FIRST));

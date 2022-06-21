@@ -31,6 +31,7 @@ public:
     name_of_register GenerateReg();
 
     name_of_register GenerateGlobalReg();
+    
 
     void addGlobalFuncs();
 

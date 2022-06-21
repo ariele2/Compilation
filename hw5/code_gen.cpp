@@ -488,11 +488,11 @@ BaseTypePtr Generator::regToBooleanExpression(string &reg_source)
     to_emit1 += " = trunc i32 ";
     to_emit1 += reg_source;
     to_emit1 += " to i1";
-    
+
     to_emit2 = "br i1 ";
     to_emit2 = to_emit2 + reg_bitcast;
     to_emit2 = to_emit2 + ", label @, label @";
-    
+
     buff.emit(to_emit1);
     auto branch_addr = buff.emit(to_emit2);
 
@@ -502,7 +502,7 @@ BaseTypePtr Generator::regToBooleanExpression(string &reg_source)
 
 StatementTypePtr Generator::addStatCall()
 {
-   
+
     return make_shared<StatementType>(br_list());
 }
 
@@ -520,17 +520,16 @@ StatementTypePtr Generator::addStatRetExpression(const BaseTypePtr &exp)
 
     if (exp->generation_type != BOOL_TYPE)
     {
-       reg_result = findNoBoolExpStr(exp);
+        reg_result = findNoBoolExpStr(exp);
     }
     else
     {
-         reg_result = GenerateReg();
+        reg_result = GenerateReg();
         addBoolExpToReg(exp, reg_result);
-        
     }
     string to_emit = "ret ";
-    to_emit+=findTypeOfLLVM(exp->generation_type);
-    to_emit +=" ";
+    to_emit += findTypeOfLLVM(exp->generation_type);
+    to_emit += " ";
     to_emit += reg_result;
     buff.emit(to_emit);
     return statement;
@@ -540,15 +539,14 @@ StatementTypePtr
 Generator::addStatIf(const BaseTypePtr &exp, const BaseTypePtr &if_label, const BaseTypePtr &if_statement,
                      const BaseTypePtr &if_list_as_statement)
 {
-    auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
-    auto dynamic_cast_if_statement = dynamic_pointer_cast<StatementType>(if_statement);
+
     auto dynamic_cast_if_label = dynamic_pointer_cast<StringType>(if_label);
     auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
+    auto dynamic_cast_if_statement = dynamic_pointer_cast<StatementType>(if_statement);
+    auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
 
-    
     buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
 
-    // merge false and next
     auto statement = dynamic_cast_if_statement;
     statement->next_list = Buff::merge(dynamic_cast_if_list_as_statement->next_list,
                                        Buff::merge(statement->next_list,
@@ -562,18 +560,17 @@ Generator::addStatIfAndElse(const BaseTypePtr &exp, const BaseTypePtr &if_label,
                             BaseTypePtr if_list_as_statement,
                             const BaseTypePtr &else_label, const BaseTypePtr &else_statement)
 {
-    auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
-    auto dynamic_cast_if_statement = dynamic_pointer_cast<StatementType>(if_statement);
-    auto dynamic_cast_else_statement = dynamic_pointer_cast<StatementType>(else_statement);
-    auto dynamic_cast_if_label = dynamic_pointer_cast<StringType>(if_label);
-    auto dynamic_cast_else_label = dynamic_pointer_cast<StringType>(else_label);
-    auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
 
-    // bpatch true and false
+    auto dynamic_cast_if_list_as_statement = dynamic_pointer_cast<StatementType>(if_list_as_statement);
+    auto dynamic_cast_if_statement = dynamic_pointer_cast<StatementType>(if_statement);
+    auto dynamic_cast_if_label = dynamic_pointer_cast<StringType>(if_label);
+    auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
+    auto dynamic_cast_else_label = dynamic_pointer_cast<StringType>(else_label);
+    auto dynamic_cast_else_statement = dynamic_pointer_cast<StatementType>(else_statement);
+
     buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_if_label->token);
     buff.bpatch(dynamic_cast_bool_exp->false_list, dynamic_cast_else_label->token);
 
-    // merge if's next (includes if_list) and else's next
     auto statement = dynamic_cast_if_statement;
     statement->next_list = Buff::merge(
         Buff::merge(statement->next_list, dynamic_cast_else_statement->next_list),
@@ -587,12 +584,12 @@ Generator::addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &
                         const BaseTypePtr &while_body_label, const BaseTypePtr &while_statement,
                         const BaseTypePtr &end_list_as_statement, const br_list_pointer &break_list)
 {
-    auto dynamic_cast_start_list_as_statement = dynamic_pointer_cast<StatementType>(start_list_as_statement);
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
+    auto dynamic_cast_start_list_as_statement = dynamic_pointer_cast<StatementType>(start_list_as_statement);
     auto dynamic_cast_while_statement = dynamic_pointer_cast<StatementType>(while_statement);
-    auto dynamic_cast_while_head_label = dynamic_pointer_cast<StringType>(while_head_label);
-    auto dynamic_cast_while_body_label = dynamic_pointer_cast<StringType>(while_body_label);
     auto dynamic_cast_end_list_as_statement = dynamic_pointer_cast<StatementType>(end_list_as_statement);
+    auto dynamic_cast_while_body_label = dynamic_pointer_cast<StringType>(while_body_label);
+    auto dynamic_cast_while_head_label = dynamic_pointer_cast<StringType>(while_head_label);
 
     buff.bpatch(dynamic_cast_bool_exp->true_list, dynamic_cast_while_body_label->token);
     buff.bpatch(dynamic_cast_while_statement->next_list, dynamic_cast_while_head_label->token);
@@ -607,8 +604,8 @@ Generator::addStatWhile(BaseTypePtr start_list_as_statement, const BaseTypePtr &
 
 StatementTypePtr Generator::addStatBreak()
 {
-
-    validator_ref.table_ref.scope_stack.top()->break_list->push_back({buff.emit("br label @  ; break"), FIRST});
+    string break_label = "br label @  ; break";
+    validator_ref.table_ref.scope_stack.top()->break_list->push_back({buff.emit(break_label), FIRST});
 
     auto statement = make_shared<StatementType>(br_list());
     return statement;
@@ -623,15 +620,14 @@ StatementTypePtr Generator::addStatContinue()
 
 void Generator::addFuncDeclaration(const BaseTypePtr &statements, const BaseTypePtr &next_label)
 {
-
     auto curr_func_ret_type = validator_ref.table_ref.scope_stack.top()->return_type;
-    if (curr_func_ret_type == VOID_TYPE)
+    if (curr_func_ret_type != VOID_TYPE)
     {
-        buff.emit("ret void");
+        buff.emit("ret i32 0");
     }
     else
     {
-        buff.emit("ret i32 0");
+        buff.emit("ret void");
     }
 
     buff.emit("}");

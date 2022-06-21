@@ -321,7 +321,11 @@ BoolExpTypePtr Generator::addRelOp(const BaseTypePtr &exp1, BaseTypePtr &relop, 
     icmp_string = icmp_string + ", "; 
     icmp_string = icmp_string + exp2_value;
     buff.emit(icmp_string);
-    auto branch_addr = buff.emit("br i1 " + reg_icmp + ", label @, label @");
+    string to_emit ="br i1 ";
+     to_emit =to_emit+reg_icmp;
+     to_emit =to_emit+", label @";
+     to_emit =to_emit+", label @";
+    auto branch_addr = buff.emit(to_emit);
 
     auto true_list = Buff::makelist({branch_addr, FIRST});
     auto false_list = Buff::makelist({branch_addr, SECOND});
@@ -371,10 +375,10 @@ void Generator::addBoolExpToReg(const BaseTypePtr &exp, const name_of_register &
    
     auto dynamic_cast_bool_exp = dynamic_pointer_cast<BoolExpType>(exp);
     auto true_label = buff.genLabel(TRUE_LABEL);
-    auto false_label = buff.genLabel(FALSE_LABEL);
-    auto convert_label = buff.genLabel(CONVERT_LABEL);
     auto bp_true = buff.emit(BP_TRUE);
+    auto false_label = buff.genLabel(FALSE_LABEL);
     auto bp_false = buff.emit(BP_FALSE);
+    auto convert_label = buff.genLabel(CONVERT_LABEL);
 
     auto convert_true_list = Buff::makelist(branch_pair(bp_true, FIRST));
     auto convert_false_list = Buff::makelist(branch_pair(bp_false, FIRST));
@@ -392,27 +396,30 @@ void Generator::addFunctionHead(const FuncSymbolTypePtr &symbol)
 
     string emit_string("define ");
 
-    if (symbol->ret_type == VOID_TYPE)
+    if (symbol->ret_type != VOID_TYPE)
     {
-        emit_string += "void @";
+        emit_string += "i32 @";
     }
     else
     {
-        emit_string += "i32 @";
+        emit_string += "void @";
     }
 
     emit_string += symbol->name + "(";
 
-    for (size_t i = 0; i < symbol->params.size(); ++i)
+    size_t i = 0;
+    while(i < symbol->params.size())
     {
         if (i > 0)
         {
             emit_string += ", ";
         }
         emit_string += "i32";
+        ++i;
     }
 
-    emit_string += ") {";
+    emit_string = emit_string + ")";
+    emit_string = emit_string + "{";
 
     buff.emit(emit_string);
 

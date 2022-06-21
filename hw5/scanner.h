@@ -1,7 +1,7 @@
 #ifndef HW3_SCANNER_H
 #define HW3_SCANNER_H
 
-#include "typedefs.h"
+#include "types.h"
 #include "parser.tab.hpp"
 #include "hw3_output.hpp"
 
